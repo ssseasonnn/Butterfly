@@ -1,0 +1,6 @@
+plugins {
+    id 'kotlin'
+    id 'maven-publish'
+}
+
+group = 'com.github.ssseasonnn'
