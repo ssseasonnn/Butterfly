@@ -1,7 +1,7 @@
 package zlc.season.butterfly.compiler
 
 import com.google.auto.service.AutoService
-import zlc.season.butterfly.annotation.Butterfly
+import zlc.season.butterfly.annotation.Agile
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
@@ -47,7 +47,7 @@ class Compiler : AbstractProcessor() {
 
     override fun getSupportedAnnotationTypes(): Set<String> {
         val types = LinkedHashSet<String>()
-        types.add(Butterfly::class.java.canonicalName)
+        types.add(Agile::class.java.canonicalName)
         return types
     }
 
@@ -56,12 +56,12 @@ class Compiler : AbstractProcessor() {
     }
 
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        val elements = roundEnv.getElementsAnnotatedWith(Butterfly::class.java)
+        val elements = roundEnv.getElementsAnnotatedWith(Agile::class.java)
         elements.forEach {
             if (it.kind != ElementKind.CLASS) {
                 "Butterfly must be annotated at Class!".loge()
             } else {
-                val annotation = it.getAnnotation(Butterfly::class.java)
+                val annotation = it.getAnnotation(Agile::class.java)
                 val scheme = annotation.scheme
                 schemeMap[scheme] = it.toString()
             }

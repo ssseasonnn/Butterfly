@@ -4,17 +4,15 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 
 /**
-File example:
-
-public class ButterflyModuleApp() {
-public val schemeMap: HashMap<String, String> = hashMapOf<String, String>()
-
-init {
-schemeMap["foo"] = "bar"
-}
-
-
-}
+ * public class ButterflyModuleApp() : Module {
+ *  public val schemeMap: HashMap<String, String> = hashMapOf<String, String>()
+ *  init {
+ *      schemeMap["aaa"] = "zlc.season.butterflydemo.MainActivity"
+ *      schemeMap["test"] = "zlc.season.butterflydemo.TestActivity"
+ *  }
+ *
+ *  public override fun `get`(): HashMap<String, String> = schemeMap
+ * }
  */
 class Generator(
     private val packageName: String,

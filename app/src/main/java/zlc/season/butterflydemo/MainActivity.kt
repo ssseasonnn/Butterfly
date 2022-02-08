@@ -1,15 +1,21 @@
 package zlc.season.butterflydemo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import zlc.season.bufferfly.ButterflyModuleApp
-import zlc.season.butterfly.annotation.Butterfly
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import zlc.season.butterfly.Butterfly
+import zlc.season.butterfly.Butterfly.evade
+import zlc.season.butterfly.annotation.Agile
 
-@Butterfly("aaa")
+@Agile("aaa")
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        ButterflyModuleApp().get()
+        val button = findViewById<Button>(R.id.btn_action)
+        button.setOnClickListener {
+            val request = Butterfly.scheme("bbb")
+            request.evade()
+        }
     }
 }

@@ -9,12 +9,16 @@ object Butterfly {
         moduleController.addModule(*module)
     }
 
-    fun evade(scheme: String) {
+    fun scheme(scheme: String): ButterflyRequest {
         val dest = moduleController.query(scheme)
-        if (dest.isNotEmpty()) {
-
-        }else{
-            //log
+        return if (dest.isNotEmpty()) {
+            ButterflyRequest(scheme, dest)
+        } else {
+            ButterflyRequest.EMPTY
         }
+    }
+
+    fun ButterflyRequest.evade() {
+        realEvade()
     }
 }
