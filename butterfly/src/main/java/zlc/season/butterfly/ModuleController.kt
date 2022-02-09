@@ -2,13 +2,17 @@ package zlc.season.butterfly
 
 import zlc.season.butterfly.annotation.Module
 
-class ButterflyModuleController {
+class ModuleController {
     private val modules = mutableListOf<Module>()
 
     fun addModule(vararg module: Module) {
         module.forEach {
             modules.add(it)
         }
+    }
+
+    fun removeModule(module: Module) {
+        modules.remove(module)
     }
 
     fun query(scheme: String): String {

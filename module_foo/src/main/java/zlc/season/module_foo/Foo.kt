@@ -1,7 +1,7 @@
 package zlc.season.module_foo
 
-import zlc.season.butterfly.annotation.Butterfly
+import zlc.season.butterfly.annotation.Agile
 
-@Butterfly("ccc")
+@Agile("ccc")
 class Foo {
 }

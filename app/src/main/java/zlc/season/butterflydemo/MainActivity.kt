@@ -14,8 +14,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val button = findViewById<Button>(R.id.btn_action)
         button.setOnClickListener {
-            val request = Butterfly.scheme("bbb")
-            request.evade()
+            Butterfly.agile("test").evade(this)
         }
     }
 }
