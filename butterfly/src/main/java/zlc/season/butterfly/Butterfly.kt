@@ -1,6 +1,7 @@
 package zlc.season.butterfly
 
 import android.content.Context
+import android.util.Log
 import zlc.season.butterfly.annotation.Module
 
 object Butterfly {
@@ -20,6 +21,10 @@ object Butterfly {
 
     }
 
+    init {
+        interceptorController.addInterceptor(ButterflyInterceptor())
+    }
+
     fun agile(scheme: String): Request {
         val dest = moduleController.query(scheme)
         return Request(scheme, dest)
@@ -34,5 +39,15 @@ object Butterfly {
     suspend fun Request.evaded(context: Context): Result {
         val newRequest = interceptorController.intercept(context, this)
         return dispatchController.dispatchWithResult(context, newRequest)
+    }
+
+    internal fun <T> T.logd(tag: String = ""): T {
+        val realTag = tag.ifEmpty { "Butterfly" }
+        if (this is Throwable) {
+            Log.d(realTag, this.message ?: "", this)
+        } else {
+            Log.d(realTag, this.toString())
+        }
+        return this
     }
 }

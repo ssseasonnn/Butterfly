@@ -7,34 +7,43 @@ import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onStart
+import zlc.season.butterfly.Butterfly.logd
 
 class DispatchController {
     companion object {
         const val SCHEME = "butterfly_scheme"
     }
 
-    fun dispatch(context: Context, request: Request) {
-        val intent = createIntent(context, request)
-        context.startActivity(intent)
+    suspend fun dispatch(context: Context, request: Request) {
+        if (request.type == Request.TYPE_ACTIVITY) {
+            val intent = createIntent(context, request)
+            context.startActivity(intent)
+            "dispatch activity".logd()
+        } else if (request.type == Request.TYPE_SERVICE) {
+            val cls = Class.forName(request.target)
+            val service = cls.newInstance() as Service
+            service.start(context, request)
+            "dispatch service".logd()
+        }
     }
 
     suspend fun dispatchWithResult(context: Context, request: Request): Result {
         val intent = createIntent(context, request)
-        if (context is FragmentActivity) {
+        return if (context is FragmentActivity) {
             val fm = context.supportFragmentManager
-            return ButterflyFragment.showAsFlow(fm, intent)
+            ButterflyFragment.showAsFlow(fm, intent)
                 .onStart { }
                 .onCompletion { }
                 .first()
         } else {
-            return Result()
+            Result()
         }
     }
 
     private fun createIntent(context: Context, request: Request): Intent {
         val intent = Intent()
         intent.putExtra(SCHEME, request.scheme)
-        intent.setClassName(context.packageName, request.dest)
+        intent.setClassName(context.packageName, request.target)
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
