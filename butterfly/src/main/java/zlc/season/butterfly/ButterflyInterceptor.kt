@@ -13,7 +13,7 @@ class ButterflyInterceptor : Interceptor {
         return request.copy(type = type)
     }
 
-    private fun getType(request: Request): Int {
+    private fun getType(request: Request): String {
         val dest = request.target
         val cls = Class.forName(dest)
         return when {
