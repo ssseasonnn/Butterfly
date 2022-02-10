@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ButterflyDemo">
         <activity
-            android:name=".TestActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

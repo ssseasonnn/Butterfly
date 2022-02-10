@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="zlc.season.home">
+
+    <application>
+        <activity
+            android:name="zlc.season.home.TestActivity"
+            android:exported="false" />
+    </application>
+</manifest>

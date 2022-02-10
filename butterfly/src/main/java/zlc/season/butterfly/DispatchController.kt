@@ -28,15 +28,25 @@ class DispatchController {
     }
 
     suspend fun dispatchWithResult(context: Context, request: Request): Result {
-        val intent = createIntent(context, request)
-        return if (context is FragmentActivity) {
-            val fm = context.supportFragmentManager
-            ButterflyFragment.showAsFlow(fm, intent)
-                .onStart { }
-                .onCompletion { }
-                .first()
-        } else {
-            Result()
+        if (request.type == Request.TYPE_ACTIVITY) {
+            "dispatch activity".logd()
+            val intent = createIntent(context, request)
+            return if (context is FragmentActivity) {
+                val fm = context.supportFragmentManager
+                ButterflyFragment.showAsFlow(fm, intent)
+                    .onStart { }
+                    .onCompletion { }
+                    .first()
+            } else {
+                Result()
+            }
+        } else if (request.type == Request.TYPE_SERVICE) {
+            "dispatch service".logd()
+            val cls = Class.forName(request.target)
+            val service = cls.newInstance() as Service
+            return service.start(context, request)
+        }else {
+            return Result()
         }
     }
 
