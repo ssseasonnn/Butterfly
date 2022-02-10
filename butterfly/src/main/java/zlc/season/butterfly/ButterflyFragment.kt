@@ -2,12 +2,12 @@ package zlc.season.butterfly
 
 import android.app.Activity
 import android.content.Intent
-import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
+import androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -25,96 +25,49 @@ class ButterflyFragment : Fragment() {
             beginTransaction().remove(fragment).commitAllowingStateLoss()
         }
 
-        private fun getFragment(fm: FragmentManager): ButterflyFragment {
-            return fm.findFragmentByTag(TAG) as? ButterflyFragment ?: ButterflyFragment()
-        }
-
         @OptIn(ExperimentalCoroutinesApi::class)
         fun showAsFlow(fm: FragmentManager, intent: Intent) = callbackFlow {
-            val fragment = getFragment(fm)
-            if (fragment.lifecycle.currentState == Lifecycle.State.RESUMED) {
-                fragment.callback = {
-                    trySend(it)
-                    close()
-                }
-                if (isActive) {
-                    fragment.launcher.launch(intent)
-                }
-                awaitClose {
-                    println("await close")
-                }
-            } else {
-                val cb = object : FragmentManager.FragmentLifecycleCallbacks() {
-                    override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-                        if (fragment === f) {
-                            fragment.callback = {
-                                trySend(it)
-                                close()
-                            }
-                            fragment.launcher.launch(intent)
-                            println("on fragment resumed")
-                        }
-                    }
-
-                    override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
-                        if (fragment === f) {
+            val fragment = ButterflyFragment()
+            val cb = object : FragmentLifecycleCallbacks() {
+                override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
+                    if (fragment === f) {
+                        fragment.viewModel.callback = {
+                            trySend(it)
                             close()
-                            println("on fragment destroyed")
                         }
+                        fragment.launcher.launch(intent)
                     }
                 }
 
-                if (isActive) {
-                    fm.registerFragmentLifecycleCallbacks(cb, false)
-                    fm.add(fragment)
+                override fun onFragmentDestroyed(fm: FragmentManager, f: Fragment) {
+                    if (fragment === f) {
+                        close()
+                    }
                 }
-                awaitClose {
-                    fm.unregisterFragmentLifecycleCallbacks(cb)
-                    println("await close")
-                }
+            }
+
+            if (isActive) {
+                fm.registerFragmentLifecycleCallbacks(cb, false)
+                fm.add(fragment)
+            }
+            awaitClose {
+                fm.remove(fragment)
+                fm.unregisterFragmentLifecycleCallbacks(cb)
             }
         }
     }
 
-    var callback: (Result) -> Unit = {}
-
-    val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        println("on result")
+    private val viewModel by lazy { ViewModelProvider(this).get(ButterflyViewModel::class.java) }
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val result = if (it.resultCode == Activity.RESULT_OK) {
             Result(it.data)
         } else {
             Result(null)
         }
-        callback(result)
+        viewModel.callback.invoke(result)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        println("oncreate")
-    }
-
-    override fun onStart() {
-        super.onStart()
-        println("on start")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        println("on resume")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        println("on pause")
-    }
-
-    override fun onStop() {
-        super.onStop()
-        println("on stop")
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        println("on destroy")
+    class ButterflyViewModel : ViewModel() {
+        var callback: ((Result) -> Unit) = {}
     }
 }
