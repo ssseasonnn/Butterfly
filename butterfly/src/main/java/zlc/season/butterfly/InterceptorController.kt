@@ -1,7 +1,5 @@
 package zlc.season.butterfly
 
-import android.content.Context
-
 class InterceptorController {
     private val interceptorList = mutableListOf<Interceptor>()
 
@@ -9,10 +7,10 @@ class InterceptorController {
         interceptorList.add(interceptor)
     }
 
-    suspend fun intercept(context: Context, request: Request): Request {
-        var newRequest = request
+    suspend fun intercept(butterflyRequest: ButterflyRequest): ButterflyRequest {
+        var newRequest = butterflyRequest
         interceptorList.forEach {
-            newRequest = it.intercept(context, newRequest)
+            newRequest = it.intercept(newRequest)
         }
         return newRequest
     }

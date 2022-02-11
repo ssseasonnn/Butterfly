@@ -1,7 +1,7 @@
 package zlc.season.butterfly.compiler
 
 import com.google.auto.service.AutoService
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.*
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
@@ -19,11 +19,13 @@ class Compiler : AbstractProcessor() {
 
     private var packageName = ""
     private var className = ""
-    private val schemeMap = mutableMapOf<String, String>()
+
+    private val agileMap = mutableMapOf<String, String>()
+    private val evadeMap = mutableMapOf<String, String>()
+    private val evadeImplMap = mutableMapOf<String, EvadeData>()
 
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
-        println("compiler init")
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
         if (kaptKotlinGeneratedDir != null) {
             val moduleName = getModuleName(kaptKotlinGeneratedDir)
@@ -48,6 +50,8 @@ class Compiler : AbstractProcessor() {
     override fun getSupportedAnnotationTypes(): Set<String> {
         val types = LinkedHashSet<String>()
         types.add(Agile::class.java.canonicalName)
+        types.add(Evade::class.java.canonicalName)
+        types.add(EvadeImpl::class.java.canonicalName)
         return types
     }
 
@@ -56,19 +60,42 @@ class Compiler : AbstractProcessor() {
     }
 
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        val elements = roundEnv.getElementsAnnotatedWith(Agile::class.java)
-        elements.forEach {
+        val agileElements = roundEnv.getElementsAnnotatedWith(Agile::class.java)
+        agileElements.forEach {
             if (it.kind != ElementKind.CLASS) {
-                "Butterfly must be annotated at Class!".loge()
+                "@Agile must be annotated at Class!".loge()
             } else {
                 val annotation = it.getAnnotation(Agile::class.java)
                 val scheme = annotation.scheme
-                schemeMap[scheme] = it.toString()
+                agileMap[scheme] = it.toString()
+            }
+        }
+
+        val evadeElements = roundEnv.getElementsAnnotatedWith(Evade::class.java)
+        evadeElements.forEach {
+            if (it.kind != ElementKind.INTERFACE) {
+                "@Evade must be annotated at Interface!".loge()
+            } else {
+                val annotation = it.getAnnotation(Evade::class.java)
+                val scheme = annotation.scheme
+                evadeMap[scheme] = it.toString()
+            }
+        }
+
+        val evadeImplElements = roundEnv.getElementsAnnotatedWith(EvadeImpl::class.java)
+        evadeImplElements.forEach {
+            if (it.kind != ElementKind.CLASS) {
+                "@Evasion must be annotated at Class!".loge()
+            } else {
+                val annotation = it.getAnnotation(EvadeImpl::class.java)
+                val scheme = annotation.scheme
+                val singleton = annotation.singleton
+                evadeImplMap[scheme] = EvadeData(it.toString(), singleton)
             }
         }
 
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
-        val generator = Generator(packageName, className, schemeMap)
+        val generator = Generator(packageName, className, agileMap, evadeMap, evadeImplMap)
         if (kaptKotlinGeneratedDir != null) {
             generator.generate().writeTo(File(kaptKotlinGeneratedDir))
         }

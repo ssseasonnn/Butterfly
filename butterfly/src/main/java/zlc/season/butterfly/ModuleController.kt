@@ -15,15 +15,44 @@ class ModuleController {
         modules.remove(module)
     }
 
-    fun query(scheme: String): String {
+
+    fun queryAgile(scheme: String): String {
         var result = ""
         modules.forEach {
-            val find = it.get()[scheme]
+            val find = it.getAgile()[scheme]
             if (!find.isNullOrEmpty()) {
                 result = find
                 return@forEach
             }
         }
         return result
+    }
+
+    fun queryEvade(scheme: String): Triple<String, String, Boolean> {
+        var className = ""
+        var implClassName = ""
+        var isSingleton = false
+        modules.forEach {
+            if (className.isEmpty()) {
+                val evadeMap = it.getEvade()
+                val temp = evadeMap[scheme]
+                if (!temp.isNullOrEmpty()) {
+                    className = temp
+                }
+            }
+            if (implClassName.isEmpty()) {
+                val implMap = it.getEvadeImpl()
+                val temp = implMap[scheme]
+                if (temp != null) {
+                    implClassName = temp.className
+                    isSingleton = temp.singleton
+                }
+            }
+
+            if (className.isNotEmpty() && implClassName.isNotEmpty()) {
+                return@forEach
+            }
+        }
+        return Triple(className, implClassName, isSingleton)
     }
 }

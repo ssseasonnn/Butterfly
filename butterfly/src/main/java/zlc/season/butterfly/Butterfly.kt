@@ -1,53 +1,38 @@
 package zlc.season.butterfly
 
-import android.content.Context
-import android.util.Log
-import zlc.season.butterfly.annotation.Module
+import zlc.season.butterfly.ButterflyCore.TYPE_AGILE
+import zlc.season.butterfly.ButterflyCore.TYPE_EVADE
 
-object Butterfly {
-    private val moduleController by lazy { ModuleController() }
-    private val dispatchController by lazy { DispatchController() }
-    private val interceptorController by lazy { InterceptorController() }
-
-    fun init(vararg module: Module) {
-        moduleController.addModule(*module)
-    }
-
-    fun addModule(module: Module) {
-        moduleController.addModule(module)
-    }
-
-    fun removeModule(module: Module) {
-
-    }
-
-    init {
-        interceptorController.addInterceptor(ButterflyInterceptor())
-    }
-
-    fun agile(scheme: String): Request {
-        val dest = moduleController.query(scheme)
-        return Request(scheme, dest)
-    }
-
-
-    suspend fun Request.evade(context: Context) {
-        val newRequest = interceptorController.intercept(context, this)
-        dispatchController.dispatch(context, newRequest)
-    }
-
-    suspend fun Request.evaded(context: Context): Result {
-        val newRequest = interceptorController.intercept(context, this)
-        return dispatchController.dispatchWithResult(context, newRequest)
-    }
-
-    internal fun <T> T.logd(tag: String = ""): T {
-        val realTag = tag.ifEmpty { "Butterfly" }
-        if (this is Throwable) {
-            Log.d(realTag, this.message ?: "", this)
-        } else {
-            Log.d(realTag, this.toString())
+class Butterfly private constructor(val scheme: String, val type: Int) {
+    companion object {
+        fun agile(scheme: String): Butterfly {
+            return Butterfly(scheme, TYPE_AGILE)
         }
-        return this
+
+        fun evade(scheme: String): Butterfly {
+            return Butterfly(scheme, TYPE_EVADE)
+        }
+    }
+
+    suspend fun start() {
+        if (type == TYPE_AGILE) {
+            val className = ButterflyCore.queryAgile(scheme)
+            val request = ButterflyRequest.AgileRequest(scheme, className)
+            ButterflyDispatcher.dispatch(request)
+        } else {
+            "Evade should use get.".logd()
+        }
+    }
+
+    suspend fun get(): Any {
+        return if (type == TYPE_AGILE) {
+            val className = ButterflyCore.queryAgile(scheme)
+            val request = ButterflyRequest.AgileRequest(scheme, className)
+            ButterflyDispatcher.dispatch(request)
+        } else {
+            val (className, implClassName, isSingleton) = ButterflyCore.queryEvade(scheme)
+            val request = ButterflyRequest.EvadeRequest(scheme, className, implClassName, isSingleton)
+            ButterflyDispatcher.dispatch(request)
+        }
     }
 }
