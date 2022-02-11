@@ -11,12 +11,6 @@ import javax.tools.Diagnostic
 
 @AutoService(Processor::class)
 class Compiler : AbstractProcessor() {
-    companion object {
-        const val PATH = "/build/generated/source/kaptKotlin"
-        const val DEFAULT_MODULE_NAME = "ButterflyModule"
-        const val DEFAULT_PACKAGE = "zlc.season.bufferfly"
-    }
-
     private var packageName = ""
     private var className = ""
 
@@ -31,19 +25,9 @@ class Compiler : AbstractProcessor() {
             val moduleName = getModuleName(kaptKotlinGeneratedDir)
             className = moduleName.ifEmpty { DEFAULT_MODULE_NAME }
             packageName = DEFAULT_PACKAGE
-        }
-    }
 
-    private fun getModuleName(generateDir: String): String {
-        return try {
-            val pathIndex = generateDir.lastIndexOf(PATH)
-            val subStr = generateDir.substring(0, pathIndex)
-            val lastIndex = subStr.lastIndexOf(File.separatorChar)
-            val result = subStr.substring(lastIndex + 1)
-            DEFAULT_MODULE_NAME + result.capitalize()
-        } catch (e: Exception) {
-            "Can not found valid module name, use default!".logn()
-            ""
+            val rootDir = findRootDir(kaptKotlinGeneratedDir)
+
         }
     }
 

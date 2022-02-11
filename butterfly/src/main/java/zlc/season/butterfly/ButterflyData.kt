@@ -1,6 +1,5 @@
 package zlc.season.butterfly
 
-import zlc.season.butterfly.annotation.EvadeData
 
 data class Result(val data: Any? = null) {
     fun isSuccess(): Boolean {
@@ -8,6 +7,13 @@ data class Result(val data: Any? = null) {
     }
 }
 
+
+data class ButterflyData(
+    val scheme: String,
+    val className: String,
+    val implClassName: String,
+    val isSingleton: Boolean
+)
 
 sealed class ButterflyRequest(val scheme: String, val className: String) {
     class AgileRequest(scheme: String, className: String) : ButterflyRequest(scheme, className)
