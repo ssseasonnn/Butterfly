@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         google()
         mavenCentral()
@@ -8,11 +9,12 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
+        mavenLocal()
+        gradlePluginPortal()
         google()
         mavenCentral()
-        gradlePluginPortal()
         jcenter()
         maven { url 'https://jitpack.io' }
     }
@@ -22,9 +24,11 @@ include ':app'
 include ':annotation'
 include ':butterfly'
 include ':compiler'
+include ':gradle-plugin'
 
 include ':modules'
 include ':modules:home'
 include ':modules:base'
 include ':modules:foo'
 include ':modules:bar'
+

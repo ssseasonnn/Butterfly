@@ -1,0 +1,51 @@
+plugins {
+    id 'kotlin'
+    id 'groovy'
+    id 'maven-publish'
+    id 'java-gradle-plugin'
+}
+
+group 'org.example.greeting'
+version '1.0.1'
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation "com.android.tools.build:gradle:7.0.4"
+    implementation 'com.android.tools.build:gradle-api:7.0.4'
+    implementation "com.squareup:kotlinpoet:1.10.2"
+}
+
+
+//gradlePlugin {
+//    plugins {
+//        simplePlugin {
+//            id = 'org.example.greeting'
+//            implementationClass = 'zlc.season.butterfly.gradle_plugin.ButterflyPlugin'
+//        }
+//    }
+//}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.example.greeting'
+            artifactId = 'org.example.greeting.gradle.plugin'
+            version = '1.0.1'
+
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
+
+//publishing {
+//    repositories {
+//        maven {
+//            name = 'localPluginRepository'
+//            url = '../local-plugin-repository'
+//        }
+//    }
+//}

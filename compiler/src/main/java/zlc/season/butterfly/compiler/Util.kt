@@ -1,8 +1,9 @@
 package zlc.season.butterfly.compiler
 
 import java.io.File
+import java.io.File.separatorChar as s
 
-const val PATH = "/build/generated/source/kaptKotlin"
+val PATH = "${s}build${s}generated${s}source${s}kaptKotlin"
 
 const val DEFAULT_PACKAGE = "zlc.season.bufferfly"
 const val DEFAULT_MODULE_NAME = "ButterflyModule"
@@ -14,7 +15,7 @@ fun getModuleName(generateDir: String): String {
     return try {
         val pathIndex = generateDir.lastIndexOf(PATH)
         val subStr = generateDir.substring(0, pathIndex)
-        val lastIndex = subStr.lastIndexOf(File.separatorChar)
+        val lastIndex = subStr.lastIndexOf(s)
         val result = subStr.substring(lastIndex + 1)
         DEFAULT_MODULE_NAME + result.capitalize()
     } catch (e: Exception) {
@@ -43,10 +44,24 @@ fun findRootDir(generateDir: String): File? {
 }
 
 fun parseSchemeFile(rootDir: File): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+
     val file = File(rootDir, BUTTERFLY_SCHEME_FILE)
     file.bufferedReader().forEachLine {
-        it.trim()
+        val line = it.trim()
+        if (line.startsWith("val") || line.startsWith("var")) {
+            val split = line.split('=')
+            if (split.size == 2) {
+                val first = split[0]
+                val second = split[1]
+                val key = first.replace("val", "").replace("var", "").trim()
+                val value = second.trim()
+                result[key] = value
+            }
+        }
     }
+
+    return result
 }
 
 private fun File.isRoot(): Boolean {
