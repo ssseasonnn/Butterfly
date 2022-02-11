@@ -2,8 +2,8 @@ package zlc.season.home
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import zlc.season.base.Scheme
 import zlc.season.butterfly.annotation.Agile
 

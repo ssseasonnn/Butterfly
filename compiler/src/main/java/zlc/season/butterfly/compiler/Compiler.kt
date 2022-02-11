@@ -85,7 +85,7 @@ class Compiler : AbstractProcessor() {
         val evadeImplElements = roundEnv.getElementsAnnotatedWith(EvadeImpl::class.java)
         evadeImplElements.forEach {
             if (it.kind != ElementKind.CLASS) {
-                "@Evasion must be annotated at Class!".loge()
+                "@EvadeImpl must be annotated at Class!".loge()
             } else {
                 val annotation = it.getAnnotation(EvadeImpl::class.java)
                 val scheme = annotation.scheme
