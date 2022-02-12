@@ -22,19 +22,9 @@ class Compiler : AbstractProcessor() {
         super.init(processingEnv)
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
         if (kaptKotlinGeneratedDir != null) {
-            val moduleName = getModuleName(kaptKotlinGeneratedDir)
-            moduleName.logn()
-            className = moduleName.ifEmpty { DEFAULT_MODULE_NAME }
+            className = getModuleName(kaptKotlinGeneratedDir)
             packageName = DEFAULT_PACKAGE
-
-//            val rootDir = findRootDir(kaptKotlinGeneratedDir)
-//            if (rootDir != null) {
-//                val map = parseSchemeFile(rootDir)
-//                SchemeGenerator(packageName, className, map).generate().writeTo(File(kaptKotlinGeneratedDir))
-//            }
         }
-
-
     }
 
     override fun getSupportedAnnotationTypes(): Set<String> {

@@ -4,13 +4,13 @@ import org.gradle.api.Project
 import java.io.File
 import java.util.*
 
-const val PACKAGE_NAME = "zlc.season.butterfly"
-const val SOURCE_SET_NAME = "schemeConfig"
-const val GENERATE_DIR = "/generated/source/schemeConfig/"
+internal const val PACKAGE_NAME = "zlc.season.butterfly"
+internal const val SOURCE_SET_NAME = "schemeConfig"
+internal const val GENERATE_DIR = "/generated/source/schemeConfig/"
 
-const val BUTTERFLY_SCHEME_FILE = "ButterflyScheme.kts"
+internal const val BUTTERFLY_SCHEME_FILE = "ButterflyScheme.kts"
 
-fun findRootDir(dir: File): File? {
+internal fun findRootDir(dir: File): File? {
     return try {
         var rootDir: File? = null
         var parent: File? = dir
@@ -37,7 +37,7 @@ private fun File.isRoot(): Boolean {
     return result
 }
 
-fun cleanDirectory(directory: File) {
+internal fun cleanDirectory(directory: File) {
     val files = directory.listFiles() ?: return
     files.forEach {
         forceDelete(it)
@@ -55,7 +55,7 @@ private fun forceDelete(file: File) {
     }
 }
 
-fun String.camelCase(): String {
+internal fun String.camelCase(): String {
     val words: List<String> = split("[\\W_]+".toRegex())
     val builder = StringBuilder()
     words.forEach {
@@ -66,6 +66,6 @@ fun String.camelCase(): String {
     return builder.toString()
 }
 
-fun String.cap(): String {
+internal fun String.cap(): String {
     return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }

@@ -1,14 +1,13 @@
 package zlc.season.butterflydemo
 
 import android.app.Application
-import zlc.season.bufferfly.ButterflyModuleFoo
-import zlc.season.bufferfly.ButterflyModuleHome
-import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.ButterflyCore
+import zlc.season.butterfly.ButterflyFooModule
+import zlc.season.butterfly.ButterflyHomeModule
 
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        ButterflyCore.init(ButterflyModuleHome(), ButterflyModuleFoo())
+        ButterflyCore.init(ButterflyHomeModule(), ButterflyFooModule())
     }
 }
