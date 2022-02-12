@@ -25,7 +25,7 @@ class ButterflyPlugin : Plugin<Project> {
     }
 
     private fun configSchemeTask(project: Project, variant: BaseVariant) {
-        val outputDir = "${project.buildDir}${GENERATE_DIR}${variant.name.cap()}/"
+        val outputDir = "${project.buildDir}${GENERATE_DIR}${variant.name}/"
         val schemeProvider = project.tasks.register("generate${variant.name.cap()}SchemeConfig", SchemeConfigTask::class.java) {
             it.genDir = File(outputDir)
             it.rootDir = project.rootDir

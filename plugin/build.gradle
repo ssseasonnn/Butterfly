@@ -38,17 +38,17 @@ tasks.withType(Copy).all {
     duplicatesStrategy 'exclude'
 }
 
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            groupId = 'org.example.greeting'
-//            artifactId = 'plugin'
-//            version = '1.0.3'
-//
-//            from components.java
-//        }
-//    }
-//    repositories {
-//        mavenLocal()
-//    }
-//}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'zlc.season.butterfly'
+            artifactId = 'zlc.season.butterfly.plugin'
+            version = '1.0'
+
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}
