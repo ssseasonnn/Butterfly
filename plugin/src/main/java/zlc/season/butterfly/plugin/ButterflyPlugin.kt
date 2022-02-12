@@ -1,4 +1,4 @@
-package zlc.season.butterfly.gradle_plugin
+package zlc.season.butterfly.plugin
 
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.variant.AndroidComponentsExtension

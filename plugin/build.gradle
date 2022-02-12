@@ -1,12 +1,10 @@
 plugins {
     id 'kotlin'
     id 'groovy'
-    id 'maven-publish'
     id 'java-gradle-plugin'
+    id 'maven-publish'
+    id 'com.gradle.plugin-publish' version '0.18.0'
 }
-
-group 'org.example.greeting'
-version '1.0.3'
 
 dependencies {
     implementation gradleApi()
@@ -16,17 +14,41 @@ dependencies {
     implementation "com.squareup:kotlinpoet:1.10.2"
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'org.example.greeting'
-            artifactId = 'org.example.greeting.gradle.plugin'
-            version = '1.0.3'
+group = 'zlc.season'
+version = '1.0'
 
-            from components.java
+gradlePlugin {
+    plugins {
+        butterflyPlugin {
+            id = 'zlc.season.butterfly'
+            displayName = 'Butterfly plugin'
+            description = 'Butterfly plugin'
+            implementationClass = 'zlc.season.butterfly.plugin.ButterflyPlugin'
         }
     }
-    repositories {
-        mavenLocal()
-    }
 }
+
+pluginBundle {
+    website = 'https://github.com/ssseasonnn/Butterfly'
+    vcsUrl = 'https://github.com/ssseasonnn/Butterfly.git'
+    tags = ['Butterfly', 'Plugin']
+}
+
+tasks.withType(Copy).all {
+    duplicatesStrategy 'exclude'
+}
+
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'org.example.greeting'
+//            artifactId = 'plugin'
+//            version = '1.0.3'
+//
+//            from components.java
+//        }
+//    }
+//    repositories {
+//        mavenLocal()
+//    }
+//}

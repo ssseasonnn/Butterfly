@@ -1,4 +1,4 @@
-package zlc.season.butterfly.gradle_plugin
+package zlc.season.butterfly.plugin
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
