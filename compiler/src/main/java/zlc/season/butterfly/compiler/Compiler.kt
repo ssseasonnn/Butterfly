@@ -19,7 +19,7 @@ class Compiler : AbstractProcessor() {
     private val evadeImplMap = mutableMapOf<String, EvadeData>()
 
     override fun init(processingEnv: ProcessingEnvironment) {
-
+        super.init(processingEnv)
         val kaptKotlinGeneratedDir = processingEnv.options["kapt.kotlin.generated"]
         if (kaptKotlinGeneratedDir != null) {
             val moduleName = getModuleName(kaptKotlinGeneratedDir)
@@ -27,14 +27,14 @@ class Compiler : AbstractProcessor() {
             className = moduleName.ifEmpty { DEFAULT_MODULE_NAME }
             packageName = DEFAULT_PACKAGE
 
-            val rootDir = findRootDir(kaptKotlinGeneratedDir)
-            if (rootDir != null) {
-                val map = parseSchemeFile(rootDir)
-                SchemeGenerator(packageName, className, map).generate().writeTo(File(kaptKotlinGeneratedDir))
-            }
+//            val rootDir = findRootDir(kaptKotlinGeneratedDir)
+//            if (rootDir != null) {
+//                val map = parseSchemeFile(rootDir)
+//                SchemeGenerator(packageName, className, map).generate().writeTo(File(kaptKotlinGeneratedDir))
+//            }
         }
 
-        super.init(processingEnv)
+
     }
 
     override fun getSupportedAnnotationTypes(): Set<String> {

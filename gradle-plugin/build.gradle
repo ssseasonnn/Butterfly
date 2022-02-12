@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'org.example.greeting'
-version '1.0.1'
+version '1.0.3'
 
 dependencies {
     implementation gradleApi()
@@ -31,7 +31,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'org.example.greeting'
             artifactId = 'org.example.greeting.gradle.plugin'
-            version = '1.0.1'
+            version = '1.0.3'
 
             from components.java
         }

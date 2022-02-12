@@ -1,22 +1,22 @@
 pluginManagement {
     repositories {
-        mavenLocal()
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
         jcenter()
         maven { url 'https://jitpack.io' }
+        mavenLocal()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
-        mavenLocal()
-        gradlePluginPortal()
         google()
         mavenCentral()
+        gradlePluginPortal()
         jcenter()
         maven { url 'https://jitpack.io' }
+        mavenLocal()
     }
 }
 rootProject.name = "ButterflyDemo"
