@@ -24,7 +24,7 @@ include ':app'
 include ':annotation'
 include ':butterfly'
 include ':compiler'
-include ':gradle-plugin'
+include ':plugin'
 
 include ':modules'
 include ':modules:home'

@@ -16,16 +16,6 @@ dependencies {
     implementation "com.squareup:kotlinpoet:1.10.2"
 }
 
-
-//gradlePlugin {
-//    plugins {
-//        simplePlugin {
-//            id = 'org.example.greeting'
-//            implementationClass = 'zlc.season.butterfly.gradle_plugin.ButterflyPlugin'
-//        }
-//    }
-//}
-
 publishing {
     publications {
         maven(MavenPublication) {
@@ -40,12 +30,3 @@ publishing {
         mavenLocal()
     }
 }
-
-//publishing {
-//    repositories {
-//        maven {
-//            name = 'localPluginRepository'
-//            url = '../local-plugin-repository'
-//        }
-//    }
-//}
