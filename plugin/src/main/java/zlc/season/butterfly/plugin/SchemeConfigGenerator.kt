@@ -2,11 +2,15 @@ package zlc.season.butterfly.plugin
 
 import com.squareup.kotlinpoet.*
 
-class SchemeGenerator(val packageName: String, val className: String, val map: Map<String, String>) {
+class SchemeConfigGenerator(
+    private val packageName: String,
+    private val className: String,
+    private val configMap: Map<String, String>
+) {
     fun generate(): FileSpec {
-        val classBuilder = TypeSpec.objectBuilder("${className}SchemeConfig")
+        val classBuilder = TypeSpec.objectBuilder(className)
 
-        map.forEach { (t, u) ->
+        configMap.forEach { (t, u) ->
             classBuilder.addProperty(
                 PropertySpec.builder(t, String::class.asClassName())
                     .addModifiers(KModifier.CONST)
@@ -15,8 +19,7 @@ class SchemeGenerator(val packageName: String, val className: String, val map: M
             )
         }
 
-
-        return FileSpec.builder(packageName, "${className}SchemeConfig")
+        return FileSpec.builder(packageName, className)
             .addType(classBuilder.build())
             .build()
     }
