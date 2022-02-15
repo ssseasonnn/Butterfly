@@ -23,7 +23,7 @@ class HomeActivity : AppCompatActivity() {
             changeTab("cart")
         }
         binding.bottomBar.onUserClick = {
-
+            changeTab("user")
         }
     }
 

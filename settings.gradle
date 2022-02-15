@@ -33,3 +33,4 @@ include ':modules:foo'
 include ':modules:bar'
 
 include ':modules:cart'
+include ':modules:user'
