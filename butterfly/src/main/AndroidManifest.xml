@@ -2,9 +2,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="zlc.season.butterfly">
 
-    <application>
-        <provider
-            android:name=".ButterflyInit"
-            android:authorities="zlc.season.butterfly.ButterflyInit" />
-    </application>
+    <application />
 </manifest>

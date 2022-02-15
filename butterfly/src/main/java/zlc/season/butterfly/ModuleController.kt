@@ -15,7 +15,6 @@ class ModuleController {
         modules.remove(module)
     }
 
-
     fun queryAgile(scheme: String): String {
         var result = ""
         modules.forEach {

@@ -3,81 +3,113 @@ package zlc.season.butterfly
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import kotlinx.coroutines.flow.first
 import zlc.season.claritypotion.ClarityPotion.Companion.clarityPotion
 import zlc.season.claritypotion.ClarityPotion.Companion.currentActivity
 import java.lang.reflect.Proxy
+import java.util.concurrent.ConcurrentHashMap
 
-object ButterflyDispatcher {
+@Suppress("UNCHECKED_CAST")
+object AgileDispatcher {
     const val SCHEME = "butterfly_scheme"
 
     private const val AGILE_TYPE_NONE = 0
-    private const val AGILE_TYPE_ACTIVITY = 1
-    private const val AGILE_TYPE_FRAGMENT = 2
-    private const val AGILE_TYPE_DIALOG_FRAGMENT = 3
-    private const val AGILE_TYPE_SERVICE = 4
+    private const val AGILE_TYPE_ACTION = 1
+    private const val AGILE_TYPE_ACTIVITY = 2
+    private const val AGILE_TYPE_FRAGMENT = 3
 
-    private val interceptorController by lazy { InterceptorController() }
-
-    suspend fun dispatch(request: ButterflyRequest): Any {
-        val newRequest = interceptorController.intercept(request)
-
-        if (newRequest is ButterflyRequest.AgileRequest) {
-            return dispatchAgile(newRequest)
-        } else if (newRequest is ButterflyRequest.EvadeRequest) {
-            return dispatchEvade(newRequest)
-        } else {
-            return Any()
+    fun <T> dispatch(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
+        val cls = Class.forName(request.className)
+        when (getAgileType(cls)) {
+            AGILE_TYPE_ACTIVITY -> {
+                dispatchActivity(request, onResult)
+            }
+            AGILE_TYPE_FRAGMENT -> {
+                dispatchFragment(request, onResult)
+            }
+            AGILE_TYPE_ACTION -> {
+                dispatchAction(request, onResult)
+            }
         }
     }
 
-    suspend fun dispatchAgile(request: ButterflyRequest.AgileRequest): Any {
+    private fun <T> dispatchActivity(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
+        if (onResult == null) {
+            val context = currentActivity() ?: clarityPotion
+            val intent = createIntent(context, request)
+            context.startActivity(intent)
+        } else {
+            val currentActivity = currentActivity()
+            if (currentActivity != null && currentActivity is FragmentActivity) {
+                val intent = createIntent(currentActivity, request)
+                ButterflyFragment.show(currentActivity.supportFragmentManager, intent) {
+                    onResult(it as T)
+                }
+            } else {
+                "No valid activity found!".logd()
+            }
+        }
+    }
+
+    private fun <T> dispatchFragment(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
+        if (onResult == null) {
+            "Need result callback".logd()
+        } else {
+            val cls = Class.forName(request.className)
+            val f = cls.newInstance() as T
+            onResult(f)
+        }
+    }
+
+    private fun <T> dispatchAction(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
         val context = currentActivity() ?: clarityPotion
         val cls = Class.forName(request.className)
-        val type = getAgileType(cls)
-        if (type == AGILE_TYPE_ACTIVITY) {
-            val intent = createIntent(context, request)
-            return when (context) {
-                !is Activity -> {
-                    clarityPotion.startActivity(intent)
-                    Any()
-                }
-                is FragmentActivity -> {
-                    val fm = context.supportFragmentManager
-                    ButterflyFragment.showAsFlow(fm, intent).first()
-                }
-                else -> {
-                    Any()
-                }
-            }
-        } else if (type == AGILE_TYPE_SERVICE) {
-            val service = cls.newInstance() as Service
-            service.start(context, request)
+        val action = cls.newInstance() as Action
+        if (onResult == null) {
+            action.doAction(context, request)
+        } else {
+            val result = action.doAction(context, request) as T
+            onResult(result)
         }
-
-        return Any()
     }
 
     private fun getAgileType(cls: Class<*>): Int {
         return when {
-            Service::class.java.isAssignableFrom(cls) -> AGILE_TYPE_SERVICE
-            DialogFragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_DIALOG_FRAGMENT
-            Fragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_FRAGMENT
+            Action::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTION
             Activity::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTIVITY
+            Fragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_FRAGMENT
             else -> AGILE_TYPE_NONE
         }
     }
 
-    suspend fun dispatchEvade(request: ButterflyRequest.EvadeRequest): Any {
+    private fun createIntent(context: Context, request: AgileRequest): Intent {
+        val intent = Intent()
+        intent.putExtra(SCHEME, request.scheme)
+        intent.setClassName(context.packageName, request.className)
+        if (context !is Activity) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return intent
+    }
+}
+
+object EvadeDispatcher {
+    private val implObjMap = ConcurrentHashMap<String, Any>()
+
+    fun dispatch(request: EvadeRequest): Any {
         val evadeClass = Class.forName(request.className)
         if (request.implClassName.isEmpty()) {
-            return Any()
+            "No evade impl found".logd()
+            return Unit
         }
+
         val implClass = Class.forName(request.implClassName)
-        val implObj = implClass.newInstance()
+        val implObj = implClass.getImplObj(request)
+
+        if (implClass.isAssignableFrom(evadeClass)) {
+            return implObj
+        }
 
         val evadeObj = Proxy.newProxyInstance(Thread.currentThread().contextClassLoader, arrayOf(evadeClass)) { _, method, args ->
             try {
@@ -96,6 +128,21 @@ object ButterflyDispatcher {
         return evadeObj
     }
 
+    private fun Class<*>.getImplObj(request: EvadeRequest): Any {
+        return if (request.isSingleton) {
+            val find = implObjMap[request.implClassName]
+            if (find == null) {
+                val implObj = newInstance()
+                implObjMap[request.implClassName] = implObj
+                implObj
+            } else {
+                find
+            }
+        } else {
+            newInstance()
+        }
+    }
+
     private fun createArgsClassArray(args: Array<Any>): Array<Class<*>> {
         val argsClassList = mutableListOf<Class<*>>()
         args.forEach {
@@ -103,15 +150,4 @@ object ButterflyDispatcher {
         }
         return argsClassList.toTypedArray()
     }
-
-    private fun createIntent(context: Context, request: ButterflyRequest.AgileRequest): Intent {
-        val intent = Intent()
-        intent.putExtra(SCHEME, request.scheme)
-        intent.setClassName(context.packageName, request.className)
-        if (context !is Activity) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        return intent
-    }
-
 }

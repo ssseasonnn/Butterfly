@@ -1,38 +1,38 @@
 package zlc.season.butterfly
 
-import zlc.season.butterfly.ButterflyCore.TYPE_AGILE
-import zlc.season.butterfly.ButterflyCore.TYPE_EVADE
+import zlc.season.butterfly.annotation.Module
 
-class Butterfly private constructor(val scheme: String, val type: Int) {
-    companion object {
-        fun agile(scheme: String): Butterfly {
-            return Butterfly(scheme, TYPE_AGILE)
-        }
+object Butterfly {
+    private val moduleController by lazy { ModuleController() }
 
-        fun evade(scheme: String): Butterfly {
-            return Butterfly(scheme, TYPE_EVADE)
-        }
+    fun init(vararg module: Module) {
+        moduleController.addModule(*module)
     }
 
-    suspend fun start() {
-        if (type == TYPE_AGILE) {
-            val className = ButterflyCore.queryAgile(scheme)
-            val request = ButterflyRequest.AgileRequest(scheme, className)
-            ButterflyDispatcher.dispatch(request)
-        } else {
-            "Evade should use get.".logd()
-        }
+    fun addModule(module: Module) {
+        moduleController.addModule(module)
     }
 
-    suspend fun get(): Any {
-        return if (type == TYPE_AGILE) {
-            val className = ButterflyCore.queryAgile(scheme)
-            val request = ButterflyRequest.AgileRequest(scheme, className)
-            ButterflyDispatcher.dispatch(request)
-        } else {
-            val (className, implClassName, isSingleton) = ButterflyCore.queryEvade(scheme)
-            val request = ButterflyRequest.EvadeRequest(scheme, className, implClassName, isSingleton)
-            ButterflyDispatcher.dispatch(request)
-        }
+    fun removeModule(module: Module) {
+        moduleController.removeModule(module)
+    }
+
+    fun agile(scheme: String): AgileRequest {
+        val className = moduleController.queryAgile(scheme)
+        return AgileRequest(scheme, className)
+    }
+
+    fun evade(scheme: String): EvadeRequest {
+        val (className, implClassName, isSingleton) = moduleController.queryEvade(scheme)
+        return EvadeRequest(scheme, className, implClassName, isSingleton)
+    }
+
+    fun <T> AgileRequest.carry(onResult: (T) -> Unit = {}) {
+        AgileDispatcher.dispatch(this, onResult)
+    }
+
+
+    fun EvadeRequest.carry(): Any {
+        return EvadeDispatcher.dispatch(this)
     }
 }

@@ -1,22 +1,8 @@
 package zlc.season.butterfly
 
-
-data class Result(val data: Any? = null) {
-    fun isSuccess(): Boolean {
-        return data != null
-    }
-}
+import android.content.Intent
 
 
-data class ButterflyData(
-    val scheme: String,
-    val className: String,
-    val implClassName: String,
-    val isSingleton: Boolean
-)
+data class AgileRequest(val scheme: String, val className: String)
 
-sealed class ButterflyRequest(val scheme: String, val className: String) {
-    class AgileRequest(scheme: String, className: String) : ButterflyRequest(scheme, className)
-
-    class EvadeRequest(scheme: String, className: String, val implClassName: String, val isSingleton: Boolean) : ButterflyRequest(scheme, className)
-}
+data class EvadeRequest(val scheme: String, val className: String, val implClassName: String, val isSingleton: Boolean)
