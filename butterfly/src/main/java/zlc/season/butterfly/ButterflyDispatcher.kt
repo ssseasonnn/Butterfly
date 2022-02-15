@@ -19,18 +19,23 @@ object AgileDispatcher {
     private const val AGILE_TYPE_ACTIVITY = 2
     private const val AGILE_TYPE_FRAGMENT = 3
 
-    fun <T> dispatch(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
+    private val returnObj = Any()
+
+    fun dispatch(request: AgileRequest, onResult: ((Intent) -> Unit)? = null): Any {
+        if (request.className.isEmpty()) return returnObj
         val cls = Class.forName(request.className)
-        when (getAgileType(cls)) {
+        return when (getAgileType(cls)) {
             AGILE_TYPE_ACTIVITY -> {
                 dispatchActivity(request, onResult)
+                returnObj
             }
             AGILE_TYPE_FRAGMENT -> {
-                dispatchFragment(request, onResult)
+                dispatchFragment(request)
             }
             AGILE_TYPE_ACTION -> {
-                dispatchAction(request, onResult)
+                dispatchAction(request)
             }
+            else -> returnObj
         }
     }
 
@@ -52,26 +57,16 @@ object AgileDispatcher {
         }
     }
 
-    private fun <T> dispatchFragment(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
-        if (onResult == null) {
-            "Need result callback".logd()
-        } else {
-            val cls = Class.forName(request.className)
-            val f = cls.newInstance() as T
-            onResult(f)
-        }
+    private fun dispatchFragment(request: AgileRequest): Any {
+        val cls = Class.forName(request.className)
+        return cls.newInstance()
     }
 
-    private fun <T> dispatchAction(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
+    private fun dispatchAction(request: AgileRequest): Any {
         val context = currentActivity() ?: clarityPotion
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action
-        if (onResult == null) {
-            action.doAction(context, request)
-        } else {
-            val result = action.doAction(context, request) as T
-            onResult(result)
-        }
+        return action.doAction(context, request.scheme)
     }
 
     private fun getAgileType(cls: Class<*>): Int {

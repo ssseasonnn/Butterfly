@@ -45,6 +45,7 @@ dependencies {
 
     implementation project(':modules:base')
     implementation project(':modules:home')
+    implementation project(':modules:cart')
     implementation project(':modules:foo')
     implementation project(':modules:bar')
 

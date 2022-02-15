@@ -36,7 +36,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt project(':compiler')
     implementation project(':modules:base')

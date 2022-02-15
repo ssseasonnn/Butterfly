@@ -1,5 +1,6 @@
 package zlc.season.butterfly
 
+import android.content.Intent
 import zlc.season.butterfly.annotation.Module
 
 object Butterfly {
@@ -27,8 +28,8 @@ object Butterfly {
         return EvadeRequest(scheme, className, implClassName, isSingleton)
     }
 
-    fun <T> AgileRequest.carry(onResult: (T) -> Unit = {}) {
-        AgileDispatcher.dispatch(this, onResult)
+    fun AgileRequest.carry(onResult: (Intent) -> Unit = {}): Any {
+        return AgileDispatcher.dispatch(this, onResult)
     }
 
 
