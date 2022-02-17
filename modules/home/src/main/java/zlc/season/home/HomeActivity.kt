@@ -5,6 +5,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
+import zlc.season.butterfly.ButterflyCore
 import zlc.season.home.databinding.ActivityHomeBinding
 import java.lang.reflect.GenericArrayType
 
@@ -15,16 +16,19 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        Butterfly.evade<Home>().showHome(supportFragmentManager, R.id.container)
+        val home = Butterfly.evade<Home>()
+        home.showHome(supportFragmentManager, R.id.container)
 
         binding.bottomBar.onHomeClick = {
-            Butterfly.evade<Home>().showHome(supportFragmentManager, R.id.container)
+            home.showHome(supportFragmentManager, R.id.container)
         }
         binding.bottomBar.onCartClick = {
-            Butterfly.evade<Cart>().showCart(supportFragmentManager, R.id.container)
+            val cart = Butterfly.evade<Cart>()
+            cart.showCart(supportFragmentManager, R.id.container)
         }
         binding.bottomBar.onUserClick = {
-            Butterfly.evade<User>().showUser(supportFragmentManager, R.id.container)
+            val user = Butterfly.evade<User>()
+            user.showUser(supportFragmentManager, R.id.container)
         }
     }
 }

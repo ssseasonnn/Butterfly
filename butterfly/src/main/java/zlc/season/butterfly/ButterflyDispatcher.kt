@@ -6,7 +6,9 @@ import android.content.Intent
 import androidx.fragment.app.FragmentActivity
 import zlc.season.claritypotion.ClarityPotion.Companion.clarityPotion
 import zlc.season.claritypotion.ClarityPotion.Companion.currentActivity
+import java.lang.reflect.Method
 import java.lang.reflect.Proxy
+import java.util.Objects.*
 
 @Suppress("UNCHECKED_CAST")
 object AgileDispatcher {
@@ -85,7 +87,7 @@ object EvadeDispatcher {
 
         if (!check(request)) {
             "Evade -> $request not found!".logd()
-            return createEmptyObj(evadeClass)
+            return createProxyObj(evadeClass)
         }
 
         val implClass = Class.forName(request.implClassName)
@@ -96,25 +98,15 @@ object EvadeDispatcher {
             return implObj
         }
 
-        val evadeObj = Proxy.newProxyInstance(Thread.currentThread().contextClassLoader, arrayOf(evadeClass)) { _, method, args ->
-            try {
-                if (args == null) {
-                    val findMethod = implClass.getDeclaredMethod(method.name)
-                    findMethod.invoke(implObj)
-                } else {
-                    val findMethod = implClass.getDeclaredMethod(method.name, *method.parameterTypes)
-                    findMethod.invoke(implObj, *args)
-                }
-            } catch (e: Exception) {
-                if (e is NoSuchMethodException) {
-                    "Evade -> Method ${e.message} not found!".logd()
-                } else {
-                    e.logd()
-                }
-                Unit
+        return createProxyObj(evadeClass, implObj) { method, args ->
+            if (args == null) {
+                val findMethod = implClass.getDeclaredMethod(method.name)
+                findMethod.invoke(implObj)
+            } else {
+                val findMethod = implClass.getDeclaredMethod(method.name, *method.parameterTypes)
+                findMethod.invoke(implObj, *args)
             }
         }
-        return evadeObj
     }
 
     private fun check(request: EvadeRequest): Boolean {
@@ -143,7 +135,31 @@ object EvadeDispatcher {
         return find!!
     }
 
-    private fun createEmptyObj(cls: Class<*>): Any {
-        return Proxy.newProxyInstance(Thread.currentThread().contextClassLoader, arrayOf(cls)) { _, _, _ -> }
+    private fun createProxyObj(cls: Class<*>, implObj: Any = Any(), block: (Method, Array<Any>?) -> Any? = { _, _ -> }): Any {
+        return Proxy.newProxyInstance(Thread.currentThread().contextClassLoader, arrayOf(cls)) { _, method, args ->
+            try {
+                if (method.name == "hashCode") {
+                    hashCode(implObj)
+                } else if (method.name == "toString") {
+                    toString(implObj)
+                } else if (method.name == "equals") {
+                    val other = args[0]
+                    if (hashCode(implObj) == other.hashCode()) {
+                        true
+                    } else {
+                        equals(implObj, other)
+                    }
+                } else {
+                    block(method, args)
+                }
+            } catch (e: Exception) {
+                if (e is NoSuchMethodException) {
+                    "Evade -> Method ${e.message} not found!".logd()
+                } else {
+                    e.logd()
+                }
+                Unit
+            }
+        }
     }
 }
