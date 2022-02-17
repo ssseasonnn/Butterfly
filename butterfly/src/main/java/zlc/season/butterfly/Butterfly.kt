@@ -4,36 +4,20 @@ import android.content.Intent
 import zlc.season.butterfly.annotation.Module
 
 object Butterfly {
-    private val moduleController by lazy { ModuleController() }
 
-    fun init(vararg module: Module) {
-        moduleController.addModule(*module)
-    }
-
-    fun addModule(module: Module) {
-        moduleController.addModule(module)
-    }
-
-    fun removeModule(module: Module) {
-        moduleController.removeModule(module)
-    }
 
     fun agile(scheme: String): AgileRequest {
-        val className = moduleController.queryAgile(scheme)
+        val className = ButterflyCore.queryAgile(scheme)
         return AgileRequest(scheme, className)
     }
 
-    fun evade(scheme: String): EvadeRequest {
-        val (className, implClassName, isSingleton) = moduleController.queryEvade(scheme)
-        return EvadeRequest(scheme, className, implClassName, isSingleton)
+    inline fun <reified T> evade(identity: String = ""): T {
+        val real = identity.ifEmpty { T::class.java.simpleName }
+        val request = ButterflyCore.queryEvade(real)
+        return EvadeDispatcher.dispatch(request) as T
     }
 
     fun AgileRequest.carry(onResult: (Intent) -> Unit = {}): Any {
         return AgileDispatcher.dispatch(this, onResult)
-    }
-
-
-    fun EvadeRequest.carry(): Any {
-        return EvadeDispatcher.dispatch(this)
     }
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
 import zlc.season.home.databinding.ActivityHomeBinding
+import java.lang.reflect.GenericArrayType
 
 class HomeActivity : AppCompatActivity() {
     val binding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
@@ -14,23 +15,16 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        changeTab("home")
+        Butterfly.evade<Home>().showHome(supportFragmentManager, R.id.container)
 
         binding.bottomBar.onHomeClick = {
-            changeTab("home")
+            Butterfly.evade<Home>().showHome(supportFragmentManager, R.id.container)
         }
         binding.bottomBar.onCartClick = {
-            changeTab("cart")
+            Butterfly.evade<Cart>().showCart(supportFragmentManager, R.id.container)
         }
         binding.bottomBar.onUserClick = {
-            changeTab("user")
+            Butterfly.evade<User>().showUser(supportFragmentManager, R.id.container)
         }
-    }
-
-    private fun changeTab(scheme: String) {
-        val fragmentCreator = Butterfly.evade(scheme).carry() as FragmentCreator
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container, fragmentCreator.create(), "tag")
-            .commit()
     }
 }

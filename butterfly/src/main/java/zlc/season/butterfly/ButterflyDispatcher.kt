@@ -3,12 +3,10 @@ package zlc.season.butterfly
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.claritypotion.ClarityPotion.Companion.clarityPotion
 import zlc.season.claritypotion.ClarityPotion.Companion.currentActivity
 import java.lang.reflect.Proxy
-import java.util.concurrent.ConcurrentHashMap
 
 @Suppress("UNCHECKED_CAST")
 object AgileDispatcher {
@@ -17,7 +15,6 @@ object AgileDispatcher {
     private const val AGILE_TYPE_NONE = 0
     private const val AGILE_TYPE_ACTION = 1
     private const val AGILE_TYPE_ACTIVITY = 2
-    private const val AGILE_TYPE_FRAGMENT = 3
 
     private val returnObj = Any()
 
@@ -28,9 +25,6 @@ object AgileDispatcher {
             AGILE_TYPE_ACTIVITY -> {
                 dispatchActivity(request, onResult)
                 returnObj
-            }
-            AGILE_TYPE_FRAGMENT -> {
-                dispatchFragment(request)
             }
             AGILE_TYPE_ACTION -> {
                 dispatchAction(request)
@@ -57,11 +51,6 @@ object AgileDispatcher {
         }
     }
 
-    private fun dispatchFragment(request: AgileRequest): Any {
-        val cls = Class.forName(request.className)
-        return cls.newInstance()
-    }
-
     private fun dispatchAction(request: AgileRequest): Any {
         val context = currentActivity() ?: clarityPotion
         val cls = Class.forName(request.className)
@@ -73,7 +62,6 @@ object AgileDispatcher {
         return when {
             Action::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTION
             Activity::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTIVITY
-            Fragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_FRAGMENT
             else -> AGILE_TYPE_NONE
         }
     }
@@ -90,19 +78,21 @@ object AgileDispatcher {
 }
 
 object EvadeDispatcher {
-    private val implObjMap = ConcurrentHashMap<String, Any>()
+    private val implObjMap = mutableMapOf<String, Any>()
 
     fun dispatch(request: EvadeRequest): Any {
         val evadeClass = Class.forName(request.className)
-        if (request.implClassName.isEmpty()) {
-            "No evade impl found".logd()
-            return Unit
+
+        if (!check(request)) {
+            "Evade -> $request not found!".logd()
+            return createEmptyObj(evadeClass)
         }
 
         val implClass = Class.forName(request.implClassName)
         val implObj = implClass.getImplObj(request)
 
-        if (implClass.isAssignableFrom(evadeClass)) {
+        // check extend
+        if (evadeClass.isAssignableFrom(implClass)) {
             return implObj
         }
 
@@ -110,39 +100,50 @@ object EvadeDispatcher {
             try {
                 if (args == null) {
                     val findMethod = implClass.getDeclaredMethod(method.name)
-                    return@newProxyInstance findMethod.invoke(implObj)
+                    findMethod.invoke(implObj)
                 } else {
-                    val argsArray = createArgsClassArray(args)
-                    val findMethod = implClass.getDeclaredMethod(method.name, *argsArray)
-                    return@newProxyInstance findMethod.invoke(implObj, args)
+                    val findMethod = implClass.getDeclaredMethod(method.name, *method.parameterTypes)
+                    findMethod.invoke(implObj, *args)
                 }
             } catch (e: Exception) {
-                e.message.logd()
+                if (e is NoSuchMethodException) {
+                    "Evade -> Method ${e.message} not found!".logd()
+                } else {
+                    e.logd()
+                }
+                Unit
             }
         }
         return evadeObj
     }
 
+    private fun check(request: EvadeRequest): Boolean {
+        if (request.implClassName.isEmpty()) {
+            return false
+        }
+        return true
+    }
+
     private fun Class<*>.getImplObj(request: EvadeRequest): Any {
         return if (request.isSingleton) {
-            val find = implObjMap[request.implClassName]
-            if (find == null) {
-                val implObj = newInstance()
-                implObjMap[request.implClassName] = implObj
-                implObj
-            } else {
-                find
-            }
+            realGetImplObj(request)
         } else {
             newInstance()
         }
     }
 
-    private fun createArgsClassArray(args: Array<Any>): Array<Class<*>> {
-        val argsClassList = mutableListOf<Class<*>>()
-        args.forEach {
-            argsClassList.add(it.javaClass)
+    @Synchronized
+    private fun Class<*>.realGetImplObj(request: EvadeRequest): Any {
+        var find = implObjMap[request.implClassName]
+        if (find == null) {
+            val implObj = newInstance()
+            implObjMap[request.implClassName] = implObj
+            find = implObj
         }
-        return argsClassList.toTypedArray()
+        return find!!
+    }
+
+    private fun createEmptyObj(cls: Class<*>): Any {
+        return Proxy.newProxyInstance(Thread.currentThread().contextClassLoader, arrayOf(cls)) { _, _, _ -> }
     }
 }

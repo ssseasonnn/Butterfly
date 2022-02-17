@@ -57,8 +57,10 @@ class Compiler : AbstractProcessor() {
                 "@Evade must be annotated at Interface!".loge()
             } else {
                 val annotation = it.getAnnotation(Evade::class.java)
-                val scheme = annotation.scheme
-                evadeMap[scheme] = it.toString()
+                val name = it.simpleName
+                val identity = annotation.identity
+                val realKey = identity.ifEmpty { name }.toString()
+                evadeMap[realKey] = it.toString()
             }
         }
 
@@ -68,9 +70,17 @@ class Compiler : AbstractProcessor() {
                 "@EvadeImpl must be annotated at Class!".loge()
             } else {
                 val annotation = it.getAnnotation(EvadeImpl::class.java)
-                val scheme = annotation.scheme
                 val singleton = annotation.singleton
-                evadeImplMap[scheme] = EvadeData(it.toString(), singleton)
+                val name = it.simpleName
+                val identity = annotation.identity
+                if (identity.isEmpty() && !name.endsWith("Impl")) {
+                    "@EvadeImpl class name must end with Impl!".loge()
+                }
+                val realKey = identity.ifEmpty {
+                    val index = name.lastIndexOf("Impl")
+                    name.substring(0, index)
+                }.toString()
+                evadeImplMap[realKey] = EvadeData(it.toString(), singleton)
             }
         }
 

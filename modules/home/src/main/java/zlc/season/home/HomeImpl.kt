@@ -1,16 +1,20 @@
 package zlc.season.home
 
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.EvadeImpl
 
-@EvadeImpl("home", singleton = true)
+@EvadeImpl
 class HomeImpl : Home {
     var homeFragment: HomeFragment? = null
 
-    override fun create(): Fragment {
+    override fun showHome(fragmentManager: FragmentManager, container: Int) {
         if (homeFragment == null) {
             homeFragment = HomeFragment()
         }
-        return homeFragment!!
+        homeFragment?.let {
+            fragmentManager.beginTransaction()
+                .replace(container, it, "tag")
+                .commit()
+        }
     }
 }

@@ -9,12 +9,12 @@ annotation class Agile(
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class Evade(
-    val scheme: String
+    val identity: String = ""
 )
 
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class EvadeImpl(
-    val scheme: String,
-    val singleton: Boolean = false
+    val singleton: Boolean = true,
+    val identity: String = ""
 )

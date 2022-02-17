@@ -1,21 +1,20 @@
 package zlc.season.home
 
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.Evade
 
-interface FragmentCreator {
-    fun create(): Fragment
+
+@Evade
+interface Home {
+    fun showHome(fragmentManager: FragmentManager, container: Int)
 }
 
-
-@Evade("home")
-interface Home : FragmentCreator {
+@Evade
+interface Cart {
+    fun showCart(fragmentManager: FragmentManager, container: Int)
 }
 
-@Evade("cart")
-interface Cart : FragmentCreator {
-}
-
-@Evade("user")
-interface User : FragmentCreator {
+@Evade
+interface User {
+    fun showUser(fragmentManager: FragmentManager, container: Int)
 }

@@ -6,6 +6,6 @@ import zlc.season.butterfly.*
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        Butterfly.init(ButterflyHomeModule(), ButterflyCartModule(), ButterflyUserModule(), ButterflyFooModule())
+        ButterflyCore.init(ButterflyHomeModule(), ButterflyCartModule(), ButterflyUserModule())
     }
 }

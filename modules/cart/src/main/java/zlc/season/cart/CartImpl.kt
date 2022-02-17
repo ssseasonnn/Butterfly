@@ -1,17 +1,20 @@
 package zlc.season.cart
 
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.EvadeImpl
 
-@EvadeImpl("cart", singleton = true)
+@EvadeImpl
 class CartImpl {
     var cartFragment: CartFragment? = null
 
-    fun create(): Fragment {
+    fun showCart(fragmentManager: FragmentManager, container: Int) {
         if (cartFragment == null) {
             cartFragment = CartFragment()
         }
-        return cartFragment!!
+        cartFragment?.let {
+            fragmentManager.beginTransaction()
+                .replace(container, it, "tag")
+                .commit()
+        }
     }
-
 }

@@ -1,17 +1,20 @@
 package zlc.season.user
 
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.EvadeImpl
 
-@EvadeImpl("user", singleton = true)
+@EvadeImpl
 class UserImpl {
     var userFragment: UserFragment? = null
 
-    fun create(): Fragment {
+    fun showUser(fragmentManager: FragmentManager, container: Int) {
         if (userFragment == null) {
             userFragment = UserFragment()
         }
-        return userFragment!!
+        userFragment?.let {
+            fragmentManager.beginTransaction()
+                .replace(container, it, "tag")
+                .commit()
+        }
     }
-
 }

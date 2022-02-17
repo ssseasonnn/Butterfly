@@ -27,21 +27,22 @@ class ModuleController {
         return result
     }
 
-    fun queryEvade(scheme: String): Triple<String, String, Boolean> {
+    fun queryEvade(identity: String): EvadeRequest {
         var className = ""
         var implClassName = ""
-        var isSingleton = false
+        var isSingleton = true
+
         modules.forEach {
             if (className.isEmpty()) {
                 val evadeMap = it.getEvade()
-                val temp = evadeMap[scheme]
+                val temp = evadeMap[identity]
                 if (!temp.isNullOrEmpty()) {
                     className = temp
                 }
             }
             if (implClassName.isEmpty()) {
                 val implMap = it.getEvadeImpl()
-                val temp = implMap[scheme]
+                val temp = implMap[identity]
                 if (temp != null) {
                     implClassName = temp.className
                     isSingleton = temp.singleton
@@ -52,6 +53,6 @@ class ModuleController {
                 return@forEach
             }
         }
-        return Triple(className, implClassName, isSingleton)
+        return EvadeRequest(identity, className, implClassName, isSingleton)
     }
 }
