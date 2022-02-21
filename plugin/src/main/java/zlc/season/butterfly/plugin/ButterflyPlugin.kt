@@ -1,8 +1,12 @@
 package zlc.season.butterfly.plugin
 
+import com.android.build.api.instrumentation.FramesComputationMode
+import com.android.build.api.instrumentation.InstrumentationScope
+import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.api.BaseVariant
+import com.android.build.gradle.internal.utils.setDisallowChanges
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceTask
@@ -20,6 +24,17 @@ class ButterflyPlugin : Plugin<Project> {
             val libraryExtension = project.extensions.findByType(LibraryExtension::class.java)
             libraryExtension?.libraryVariants?.all { variant ->
                 configSchemeTask(it, variant)
+            }
+        }
+
+
+        project.pluginManager.withPlugin("com.android.application") {
+
+            val androidComponentsExtension = project.extensions.getByType(AndroidComponentsExtension::class.java)
+            androidComponentsExtension.onVariants { variant ->
+                variant.transformClassesWith(ModuleClassVisitorFactory::class.java, InstrumentationScope.ALL) {
+                }
+                variant.setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_ALL_CLASSES)
             }
         }
     }
