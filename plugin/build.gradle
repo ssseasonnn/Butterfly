@@ -11,7 +11,6 @@ dependencies {
     implementation localGroovy()
     implementation "com.android.tools.build:gradle:7.0.4"
     implementation 'com.android.tools.build:gradle-api:7.0.4'
-    implementation "com.squareup:kotlinpoet:1.10.2"
 }
 
 group = 'zlc.season'
