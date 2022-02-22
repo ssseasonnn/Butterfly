@@ -5,10 +5,6 @@ import zlc.season.butterfly.annotation.Module
 object ButterflyCore {
     private val moduleController by lazy { ModuleController() }
 
-    fun init(vararg module: Module) {
-        moduleController.addModule(*module)
-    }
-
     fun addModule(module: Module) {
         moduleController.addModule(module)
     }

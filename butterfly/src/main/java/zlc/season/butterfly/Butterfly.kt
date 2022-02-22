@@ -4,8 +4,6 @@ import android.content.Intent
 import zlc.season.butterfly.annotation.Module
 
 object Butterfly {
-
-
     fun agile(scheme: String): AgileRequest {
         val className = ButterflyCore.queryAgile(scheme)
         return AgileRequest(scheme, className)
