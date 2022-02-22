@@ -1,8 +1,7 @@
-package zlc.season.home
+package zlc.season.butterflydemo
 
 import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.Evade
-
 
 @Evade
 interface Home {

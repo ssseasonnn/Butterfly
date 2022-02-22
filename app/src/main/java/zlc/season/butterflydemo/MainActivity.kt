@@ -1,16 +1,12 @@
-package zlc.season.home
+package zlc.season.butterflydemo
 
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.ButterflyCore
-import zlc.season.home.databinding.ActivityHomeBinding
-import java.lang.reflect.GenericArrayType
+import zlc.season.butterflydemo.databinding.ActivityMainBinding
 
-class HomeActivity : AppCompatActivity() {
-    val binding by lazy { ActivityHomeBinding.inflate(layoutInflater) }
+class MainActivity : AppCompatActivity() {
+    val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

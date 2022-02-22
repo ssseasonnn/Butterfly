@@ -4,10 +4,10 @@ import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.EvadeImpl
 
 @EvadeImpl
-class HomeImpl : Home {
+class HomeImpl {
     var homeFragment: HomeFragment? = null
 
-    override fun showHome(fragmentManager: FragmentManager, container: Int) {
+    fun showHome(fragmentManager: FragmentManager, container: Int) {
         if (homeFragment == null) {
             homeFragment = HomeFragment()
         }
