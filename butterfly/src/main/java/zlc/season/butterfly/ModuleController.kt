@@ -15,7 +15,7 @@ class ModuleController {
         modules.remove(module)
     }
 
-    fun queryAgile(scheme: String): String {
+    fun queryAgile(scheme: String): AgileRequest {
         var result = ""
         modules.forEach {
             val find = it.getAgile()[scheme]
@@ -24,7 +24,7 @@ class ModuleController {
                 return@forEach
             }
         }
-        return result
+        return AgileRequest(scheme, result)
     }
 
     fun queryEvade(identity: String): EvadeRequest {

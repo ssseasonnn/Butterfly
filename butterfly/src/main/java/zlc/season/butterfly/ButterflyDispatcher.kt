@@ -18,25 +18,24 @@ object AgileDispatcher {
     private const val AGILE_TYPE_ACTION = 1
     private const val AGILE_TYPE_ACTIVITY = 2
 
-    private val returnObj = Any()
-
-    fun dispatch(request: AgileRequest, onResult: ((Intent) -> Unit)? = null): Any {
-        if (request.className.isEmpty()) return returnObj
+    fun dispatch(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
+        if (request.className.isEmpty()) return
         val cls = Class.forName(request.className)
-        return when (getAgileType(cls)) {
+        when (getAgileType(cls)) {
             AGILE_TYPE_ACTIVITY -> {
                 dispatchActivity(request, onResult)
-                returnObj
             }
             AGILE_TYPE_ACTION -> {
                 dispatchAction(request)
             }
-            else -> returnObj
+            else -> {
+                onResult(Result.failure(IllegalStateException("Not supported Agile type")))
+            }
         }
     }
 
-    private fun <T> dispatchActivity(request: AgileRequest, onResult: ((T) -> Unit)? = null) {
-        if (onResult == null) {
+    private fun dispatchActivity(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
+        if (onResult == EMPTY_LAMBDA) {
             val context = currentActivity() ?: clarityPotion
             val intent = createIntent(context, request)
             context.startActivity(intent)
@@ -45,10 +44,11 @@ object AgileDispatcher {
             if (currentActivity != null && currentActivity is FragmentActivity) {
                 val intent = createIntent(currentActivity, request)
                 ButterflyFragment.show(currentActivity.supportFragmentManager, intent) {
-                    onResult(it as T)
+                    onResult(Result.success(it))
                 }
             } else {
                 "No valid activity found!".logd()
+                onResult(Result.failure(IllegalStateException("App Currently no available Activity!")))
             }
         }
     }

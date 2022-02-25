@@ -13,7 +13,7 @@ object ButterflyCore {
         moduleController.removeModule(module)
     }
 
-    fun queryAgile(scheme: String): String = moduleController.queryAgile(scheme)
+    fun queryAgile(scheme: String): AgileRequest = moduleController.queryAgile(scheme)
 
     fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
 }

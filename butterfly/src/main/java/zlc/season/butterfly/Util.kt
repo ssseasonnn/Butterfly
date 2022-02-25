@@ -1,5 +1,6 @@
 package zlc.season.butterfly
 
+import android.content.Intent
 import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -19,6 +20,8 @@ internal fun <T> T.logd(tag: String = ""): T {
     }
     return this
 }
+
+val EMPTY_LAMBDA: (Result<Intent>) -> Unit = {}
 
 fun <T : Fragment> FragmentManager.show(fragment: T, callback: (T) -> Unit) = run {
     val cb = object : FragmentLifecycleCallbacks() {
