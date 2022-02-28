@@ -31,6 +31,3 @@ include ':modules:home'
 include ':modules:base'
 include ':modules:foo'
 include ':modules:bar'
-
-include ':modules:cart'
-include ':modules:user'

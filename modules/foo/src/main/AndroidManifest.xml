@@ -2,4 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="zlc.season.foo">
 
+    <application>
+        <activity
+            android:name=".FooResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FooActivity"
+            android:exported="false" />
+    </application>
+
 </manifest>

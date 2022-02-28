@@ -12,14 +12,19 @@ import java.util.Objects.*
 
 @Suppress("UNCHECKED_CAST")
 object AgileDispatcher {
-    const val SCHEME = "butterfly_scheme"
+    const val RAW_SCHEME = "butterfly_scheme"
 
     private const val AGILE_TYPE_NONE = 0
     private const val AGILE_TYPE_ACTION = 1
     private const val AGILE_TYPE_ACTIVITY = 2
 
     fun dispatch(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
-        if (request.className.isEmpty()) return
+        if (request.className.isEmpty()) {
+            "Agile --> class not found!".logw()
+            onResult(Result.failure(IllegalStateException("Agile class not found!")))
+            return
+        }
+
         val cls = Class.forName(request.className)
         when (getAgileType(cls)) {
             AGILE_TYPE_ACTIVITY -> {
@@ -29,13 +34,14 @@ object AgileDispatcher {
                 dispatchAction(request)
             }
             else -> {
-                onResult(Result.failure(IllegalStateException("Not supported Agile type")))
+                "Agile --> type error".logw()
+                onResult(Result.failure(IllegalStateException("Agile type error")))
             }
         }
     }
 
     private fun dispatchActivity(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
-        if (onResult == EMPTY_LAMBDA) {
+        if (onResult == Butterfly.EMPTY_LAMBDA) {
             val context = currentActivity() ?: clarityPotion
             val intent = createIntent(context, request)
             context.startActivity(intent)
@@ -47,17 +53,17 @@ object AgileDispatcher {
                     onResult(Result.success(it))
                 }
             } else {
-                "No valid activity found!".logd()
-                onResult(Result.failure(IllegalStateException("App Currently no available Activity!")))
+                "Agile --> activity not found".logw()
+                onResult(Result.failure(IllegalStateException("Activity not found")))
             }
         }
     }
 
-    private fun dispatchAction(request: AgileRequest): Any {
+    private fun dispatchAction(request: AgileRequest) {
         val context = currentActivity() ?: clarityPotion
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action
-        return action.doAction(context, request.scheme)
+        action.doAction(context, request.scheme)
     }
 
     private fun getAgileType(cls: Class<*>): Int {
@@ -70,8 +76,9 @@ object AgileDispatcher {
 
     private fun createIntent(context: Context, request: AgileRequest): Intent {
         val intent = Intent()
-        intent.putExtra(SCHEME, request.scheme)
+        intent.putExtra(RAW_SCHEME, request.scheme)
         intent.setClassName(context.packageName, request.className)
+        intent.putExtras(request.bundle)
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -86,7 +93,7 @@ object EvadeDispatcher {
         val evadeClass = Class.forName(request.className)
 
         if (!check(request)) {
-            "Evade -> $request not found!".logd()
+            "Evade -> $request not found!".logw()
             return createProxyObj(evadeClass)
         }
 
@@ -154,9 +161,9 @@ object EvadeDispatcher {
                 }
             } catch (e: Exception) {
                 if (e is NoSuchMethodException) {
-                    "Evade -> Method ${e.message} not found!".logd()
+                    "Evade -> Method ${e.message} not found!".logw()
                 } else {
-                    e.logd()
+                    e.logw()
                 }
                 Unit
             }

@@ -27,6 +27,11 @@ class ButterflyFragment : Fragment() {
             Intent()
         }
         viewModel.callback.invoke(result)
+
+        //clear current fragment
+        activity?.let { p ->
+            p.supportFragmentManager.remove(this)
+        }
     }
 
     class ButterflyViewModel : ViewModel() {
