@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.startAction.setOnClickListener {
-
+            Butterfly.agile(Schemes.SCHEME_ACTION).carry()
         }
 
         binding.showFragment.setOnClickListener {
