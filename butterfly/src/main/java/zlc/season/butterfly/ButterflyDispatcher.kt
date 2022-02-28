@@ -11,12 +11,14 @@ import java.lang.reflect.Proxy
 import java.util.Objects.*
 
 @Suppress("UNCHECKED_CAST")
-object AgileDispatcher {
-    const val RAW_SCHEME = "butterfly_scheme"
+class AgileDispatcher {
+    companion object {
+        const val RAW_SCHEME = "butterfly_scheme"
 
-    private const val AGILE_TYPE_NONE = 0
-    private const val AGILE_TYPE_ACTION = 1
-    private const val AGILE_TYPE_ACTIVITY = 2
+        private const val AGILE_TYPE_NONE = 0
+        private const val AGILE_TYPE_ACTION = 1
+        private const val AGILE_TYPE_ACTIVITY = 2
+    }
 
     fun dispatch(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
         if (request.className.isEmpty()) {
@@ -86,7 +88,7 @@ object AgileDispatcher {
     }
 }
 
-object EvadeDispatcher {
+class EvadeDispatcher {
     private val implObjMap = mutableMapOf<String, Any>()
 
     fun dispatch(request: EvadeRequest): Any {

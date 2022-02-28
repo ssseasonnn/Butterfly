@@ -17,7 +17,7 @@ object Butterfly {
     }
 
     fun AgileRequest.carry(onResult: (Result<Intent>) -> Unit = EMPTY_LAMBDA) {
-        AgileDispatcher.dispatch(this, onResult)
+        ButterflyCore.dispatchAgile(this, onResult)
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->
@@ -26,7 +26,7 @@ object Butterfly {
         if (request.className.isEmpty()) {
             request = request.copy(className = cls.name)
         }
-        EvadeDispatcher.dispatch(request)
+        ButterflyCore.dispatchEvade(request)
     }
 
     inline fun <reified T> evade(
