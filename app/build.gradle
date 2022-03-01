@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-kapt'
 }
 
-apply plugin: 'zlc.season.butterfly'
+apply plugin: 'io.github.ssseasonnn.butterfly'
 
 android {
     compileSdk 31

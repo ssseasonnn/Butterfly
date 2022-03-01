@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'zlc.season.butterfly'
+apply plugin: 'io.github.ssseasonnn.butterfly'
 
 android {
     compileSdk 31

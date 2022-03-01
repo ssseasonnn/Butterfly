@@ -13,13 +13,13 @@ dependencies {
     implementation 'com.android.tools.build:gradle-api:7.0.4'
 }
 
-group = 'zlc.season'
-version = '1.0'
+group = 'io.github.ssseasonnn'
+version = '1.0.0'
 
 gradlePlugin {
     plugins {
         butterflyPlugin {
-            id = 'zlc.season.butterfly'
+            id = 'io.github.ssseasonnn.butterfly'
             displayName = 'Butterfly plugin'
             description = 'Butterfly plugin'
             implementationClass = 'zlc.season.butterfly.plugin.ButterflyPlugin'
@@ -40,9 +40,9 @@ tasks.withType(Copy).all {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId = 'zlc.season.butterfly'
-            artifactId = 'zlc.season.butterfly.plugin'
-            version = '1.0'
+            groupId = 'io.github.ssseasonnn'
+            artifactId = 'io.github.ssseasonnn.butterfly'
+            version = '1.0.0'
 
             from components.java
         }
