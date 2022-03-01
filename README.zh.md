@@ -39,7 +39,7 @@ dependencies {
 
 ### Agile
 
-- 页面跳转
+#### 页面跳转
 
 ```kotlin
 @Agile("test/scheme")
@@ -58,7 +58,7 @@ Butterfly.agile("test/scheme")
     }
 ```
 
-- 传参
+#### 传参
 
 ```kotlin
 //scheme 传参
@@ -72,7 +72,7 @@ Butterfly.agile("test/scheme")
     .carry()
 ```
 
-- 拦截器
+#### 拦截器
 
 ```kotlin
 class TestInterceptor : ButterflyInterceptor {
@@ -117,10 +117,9 @@ Butterfly.agile("test/action")
 
 ### Evade
 
-- 通信
+#### 模块间通信
 
-当**模块foo**需要和**模块bar**通信时，首先在**模块foo**中定义接口，然后在**模块bar**中定义实现，同时分别添加上注解即可，
-并且，**模块bar** **不需要依赖** **模块foo**。
+当**模块foo**需要和**模块bar**通信时，首先在**模块foo**中定义接口，然后在**模块bar**中定义实现，同时分别添加上注解即可， 并且，**模块bar** **不需要依赖** **模块foo**。
 
 module foo
 
@@ -148,6 +147,7 @@ class HomeImpl {
 ```
 
 //调用
+
 ```kotlin
 val home = Butterfly.evade<Home>()
 home.showHome(supportFragmentManager, R.id.container)
