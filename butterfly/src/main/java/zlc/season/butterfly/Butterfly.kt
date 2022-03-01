@@ -25,6 +25,10 @@ object Butterfly {
         }
     }
 
+    fun AgileRequest.skipInterceptor(): AgileRequest {
+        return copy(needIntercept = false)
+    }
+
     fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Intent>> {
         return ButterflyCore.dispatchAgile(this, needResult)
     }

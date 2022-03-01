@@ -1,18 +1,18 @@
 package zlc.season.butterfly
 
 class InterceptorController {
-    private val interceptorList = mutableListOf<Interceptor>()
+    private val interceptorList = mutableListOf<ButterflyInterceptor>()
 
-    fun addInterceptor(interceptor: Interceptor) {
+    fun addInterceptor(interceptor: ButterflyInterceptor) {
         interceptorList.add(interceptor)
     }
 
-    fun removeInterceptor(interceptor: Interceptor) {
+    fun removeInterceptor(interceptor: ButterflyInterceptor) {
         interceptorList.remove(interceptor)
     }
 
     suspend fun intercept(agileRequest: AgileRequest) {
-        val temp = mutableListOf<Interceptor>()
+        val temp = mutableListOf<ButterflyInterceptor>()
         temp.addAll(interceptorList)
 
         temp.forEach {

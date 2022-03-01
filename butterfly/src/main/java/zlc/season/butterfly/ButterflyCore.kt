@@ -20,13 +20,15 @@ object ButterflyCore {
 
     fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
 
-    fun addInterceptor(interceptor: Interceptor) = interceptorController.addInterceptor(interceptor)
+    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorController.addInterceptor(interceptor)
 
-    fun removeInterceptor(interceptor: Interceptor) = interceptorController.removeInterceptor(interceptor)
+    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorController.removeInterceptor(interceptor)
 
     fun dispatchAgile(agileRequest: AgileRequest, needResult: Boolean): Flow<Result<Intent>> {
         return flow {
-            interceptorController.intercept(agileRequest)
+            if (agileRequest.needIntercept) {
+                interceptorController.intercept(agileRequest)
+            }
             emit(Unit)
         }.flatMapConcat {
             agileDispatcher.dispatch(agileRequest, needResult)
