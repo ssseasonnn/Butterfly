@@ -2,21 +2,23 @@
 
 [![](https://jitpack.io/v/ssseasonnn/Butterfly.svg)](https://jitpack.io/#ssseasonnn/Butterfly)
 
-# Butterfly
+# Butterfly - 蝴蝶
 
 *Read this in other languages: [中文](README.zh.md), [English](README.md), [Change Log](CHANGELOG.md)*
 
 Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.
+只有最强大和最经验的勇士才能挥动蝴蝶，但它在战斗中提供了令人难以置信的灵巧
 
-> Item introduction:
-> +30 Agility
-> +35% Evasion
-> +25 Attack Damage
-> +30 Attack Speed
+
+> 物品介绍:
+> +30 敏捷
+> +35% 闪避
+> +25 攻击
+> +30 攻速
 
 ## Prepare
 
-Add dependency
+添加依赖
 
 ```gradle
     repositories {
