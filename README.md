@@ -19,9 +19,9 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 Add dependency
 
 ```gradle
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 ```
 
 ```gradle
@@ -117,9 +117,8 @@ Butterfly.agile("test/action")
 
 - Inter-module communication
 
-When **module foo** needs to communicate with **module bar**, first define interfaces in **module foo**, 
-then define implemented in **module bar**, and add an annotation separately,
-And, **module bar** **does not need to rely on** **module foo**.
+When **module foo** needs to communicate with **module bar**, first define interfaces in **module foo**, then define implemented in **module bar**,
+and add an annotation separately, And, **module bar** **does not need to rely on** **module foo**.
 
 module foo
 
@@ -147,6 +146,7 @@ class HomeImpl {
 ```
 
 //call
+
 ```kotlin
 val home = Butterfly.evade<Home>()
 home.showHome(supportFragmentManager, R.id.container)

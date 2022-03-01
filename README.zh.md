@@ -21,9 +21,9 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 添加依赖
 
 ```gradle
-    repositories {
-        maven { url 'https://jitpack.io' }
-    }
+repositories {
+    maven { url 'https://jitpack.io' }
+}
 ```
 
 ```gradle
