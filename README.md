@@ -33,15 +33,124 @@ dependencies {
 }
 ```
 
-## Start
+## Usage
 
-### First Blood
+### Agile
 
-### Double Kill
+- Activity navigation
 
-### Triple Kill
+```kotlin
+@Agile("test/scheme")
+class AgileTestActivity : AppCompatActivity() {
+    //...
+}
 
-### Ultra Kill
+//navigation
+Butterfly.agile("test/scheme").carry()
+
+//with result
+Butterfly.agile("test/scheme")
+    .carry {
+        val result = it.getStringExtra("result")
+        binding.tvResult.text = result
+    }
+```
+
+- pass parameter
+
+```kotlin
+//scheme with query
+Butterfly.agile("test/scheme?a=1&b=2").carry()
+
+//use params 
+Butterfly.agile("test/scheme")
+    .params("intValue" to 1)
+    .params("booleanValue" to true)
+    .params("stringValue" to "test value")
+    .carry()
+```
+
+- Interceptor
+
+```kotlin
+class TestInterceptor : ButterflyInterceptor {
+    override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
+        return true
+    }
+    override suspend fun intercept(agileRequest: AgileRequest) {
+        println("intercepting")
+        delay(5000)
+        println("intercept finish")
+    }
+}
+
+//Add interceptor
+ButterflyCore.addInterceptor(TestInterceptor())
+
+//Skip interceptor
+Butterfly.agile("test/scheme").skipInterceptor().carry()
+```
+
+- Action
+
+```kotlin
+@Agile("test/action")
+class TestAction : Action {
+    override fun doAction(context: Context, scheme: String, data: Bundle) {
+        Toast.makeText(context, "This is an Action", Toast.LENGTH_SHORT).show()
+    }
+}
+
+//launch Action
+Butterfly.agile("test/action").carry()
+
+//Action also support pass param
+Butterfly.agile("test/action?a=1&b=2").carry()
+
+//params
+Butterfly.agile("test/action")
+    .params("intValue" to 1)
+    .carry()
+```
+
+### Evade
+
+- Inter-module communication
+
+When **module foo** needs to communicate with **module bar**, first define interfaces in **module foo**, 
+then define implemented in **module bar**, and add an annotation separately,
+And, **module bar** **does not need to rely on** **module foo**.
+
+module foo
+
+```kotlin
+@Evade
+interface Home {
+    fun showHome(fragmentManager: FragmentManager, container: Int)
+}
+```
+
+module bar
+
+```kotlin
+@EvadeImpl
+class HomeImpl {
+    val TAG = "home_tag"
+
+    fun showHome(fragmentManager: FragmentManager, container: Int) {
+        val homeFragment = HomeFragment()
+        fragmentManager.beginTransaction()
+            .replace(container, homeFragment, TAG)
+            .commit()
+    }
+}
+```
+
+//call
+```kotlin
+val home = Butterfly.evade<Home>()
+home.showHome(supportFragmentManager, R.id.container)
+```
 
 ### License
 
@@ -60,3 +169,4 @@ dependencies {
 > See the License for the specific language governing permissions and
 > limitations under the License.
 > ```
+> 

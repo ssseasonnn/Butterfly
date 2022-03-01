@@ -35,15 +35,123 @@ dependencies {
 }
 ```
 
-## Start
+## Usage
 
-### First Blood
+### Agile
 
-### Double Kill
+- 页面跳转
 
-### Triple Kill
+```kotlin
+@Agile("test/scheme")
+class AgileTestActivity : AppCompatActivity() {
+    //...
+}
 
-### Ultra Kill
+//跳转
+Butterfly.agile("test/scheme").carry()
+
+//需要返回结果
+Butterfly.agile("test/scheme")
+    .carry {
+        val result = it.getStringExtra("result")
+        binding.tvResult.text = result
+    }
+```
+
+- 传参
+
+```kotlin
+//scheme 传参
+Butterfly.agile("test/scheme?a=1&b=2").carry()
+
+//params 传参
+Butterfly.agile("test/scheme")
+    .params("intValue" to 1)
+    .params("booleanValue" to true)
+    .params("stringValue" to "test value")
+    .carry()
+```
+
+- 拦截器
+
+```kotlin
+class TestInterceptor : ButterflyInterceptor {
+    override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
+        return true
+    }
+    override suspend fun intercept(agileRequest: AgileRequest) {
+        println("intercepting")
+        delay(5000)
+        println("intercept finish")
+    }
+}
+
+//注册
+ButterflyCore.addInterceptor(TestInterceptor())
+
+//跳过拦截器
+Butterfly.agile("test/scheme").skipInterceptor().carry()
+```
+
+- Action
+
+```kotlin
+@Agile("test/action")
+class TestAction : Action {
+    override fun doAction(context: Context, scheme: String, data: Bundle) {
+        Toast.makeText(context, "This is an Action", Toast.LENGTH_SHORT).show()
+    }
+}
+
+//启动Action
+Butterfly.agile("test/action").carry()
+
+//Action同样支持传参
+Butterfly.agile("test/action?a=1&b=2").carry()
+
+//params 传参
+Butterfly.agile("test/action")
+    .params("intValue" to 1)
+    .carry()
+```
+
+### Evade
+
+- 通信
+
+当**模块foo**需要和**模块bar**通信时，首先在**模块foo**中定义接口，然后在**模块bar**中定义实现，同时分别添加上注解即可，
+并且，**模块bar** **不需要依赖** **模块foo**。
+
+module foo
+
+```kotlin
+@Evade
+interface Home {
+    fun showHome(fragmentManager: FragmentManager, container: Int)
+}
+```
+
+module bar
+
+```kotlin
+@EvadeImpl
+class HomeImpl {
+    val TAG = "home_tag"
+
+    fun showHome(fragmentManager: FragmentManager, container: Int) {
+        val homeFragment = HomeFragment()
+        fragmentManager.beginTransaction()
+            .replace(container, homeFragment, TAG)
+            .commit()
+    }
+}
+```
+
+//调用
+```kotlin
+val home = Butterfly.evade<Home>()
+home.showHome(supportFragmentManager, R.id.container)
+```
 
 ### License
 
