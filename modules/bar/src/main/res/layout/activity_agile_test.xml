@@ -15,21 +15,38 @@
         android:paddingBottom="20dp">
 
         <Button
-            android:id="@+id/startAgileTest"
+            android:id="@+id/startActivity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Agile test"
-            android:textColor="@color/black" />
+            android:text="start activity"
+            android:textColor="@android:color/black" />
 
         <Button
-            android:id="@+id/startEvadeTest"
+            android:id="@+id/startActivityForResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="evade test"
-            android:textColor="@color/black" />
+            android:text="start activity for result"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/startAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="start action"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/tv_result"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:textColor="@android:color/black" />
     </LinearLayout>
 </FrameLayout>

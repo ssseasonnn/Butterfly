@@ -1,13 +1,18 @@
 package zlc.season.butterfly
 
 import android.content.Intent
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 
 object Butterfly {
     val EMPTY_LAMBDA: (Result<Intent>) -> Unit = {}
 
     fun agile(scheme: String): AgileRequest {
-        return ButterflyCore.queryAgile(scheme)
+        val realScheme = parseScheme(scheme)
+        return ButterflyCore.queryAgile(realScheme).apply {
+            val params = parseSchemeParams(scheme)
+            bundle.putAll(bundleOf(*params))
+        }
     }
 
     fun AgileRequest.with(pair: Pair<String, Any>): AgileRequest {

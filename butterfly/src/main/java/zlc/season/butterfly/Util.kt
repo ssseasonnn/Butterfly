@@ -1,6 +1,7 @@
 package zlc.season.butterfly
 
 import android.util.Log
+import androidx.core.net.toUri
 
 internal fun <T> T.logd(tag: String = ""): T {
     val realTag = tag.ifEmpty { "Butterfly" }
@@ -22,3 +23,27 @@ internal fun <T> T.logw(tag: String = ""): T {
     return this
 }
 
+
+internal fun parseScheme(scheme: String): String {
+    val index = scheme.indexOfFirst { it == '?' }
+    return if (index > 0) {
+        scheme.substring(0, index)
+    } else {
+        scheme
+    }
+}
+
+internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
+    val uri = scheme.toUri()
+    val query = uri.query
+
+    if (query != null) {
+        val result = mutableListOf<Pair<String, String?>>()
+        uri.queryParameterNames.forEach {
+            val value = uri.getQueryParameter(it)
+            result.add(it to value)
+        }
+        return result.toTypedArray()
+    }
+    return arrayOf()
+}

@@ -1,4 +1,4 @@
-package zlc.season.butterflydemo
+package zlc.season.bar
 
 import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.Evade

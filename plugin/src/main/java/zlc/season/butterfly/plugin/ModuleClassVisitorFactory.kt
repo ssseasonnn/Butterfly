@@ -4,6 +4,9 @@ import com.android.build.api.instrumentation.AsmClassVisitorFactory
 import com.android.build.api.instrumentation.ClassContext
 import com.android.build.api.instrumentation.ClassData
 import com.android.build.api.instrumentation.InstrumentationParameters
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Optional
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
@@ -13,11 +16,14 @@ import org.objectweb.asm.Opcodes.*
  * Save all module name
  */
 object ModuleHolder {
-    val modulesList = mutableSetOf<String>()
+    val modulesSet = mutableSetOf<String>()
 }
 
 abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVisitorFactory.ModuleInstrumentation> {
     interface ModuleInstrumentation : InstrumentationParameters {
+        @get:Input
+        @get:Optional
+        val invalidate: Property<Long>
     }
 
     override fun createClassVisitor(classContext: ClassContext, nextClassVisitor: ClassVisitor): ClassVisitor {
@@ -26,7 +32,7 @@ abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVis
 
     override fun isInstrumentable(classData: ClassData): Boolean {
         if (classData.interfaces.contains("zlc.season.butterfly.annotation.Module")) {
-            ModuleHolder.modulesList.add(classData.className)
+            ModuleHolder.modulesSet.add(classData.className)
         }
 
         return if (classData.superClasses.contains("android.app.Application")) {
@@ -57,7 +63,7 @@ class ModuleClassVisitor(nextClassVisitor: ClassVisitor) : ClassVisitor(ASM7, ne
 class ModuleMethodVisitor(methodVisitor: MethodVisitor) : MethodVisitor(ASM7, methodVisitor) {
     override fun visitCode() {
         super.visitCode()
-        ModuleHolder.modulesList.forEach {
+        ModuleHolder.modulesSet.forEach {
             println("Butterfly --> Auto register module: $it")
 
             val moduleName = it.replace('.', '/')

@@ -14,6 +14,9 @@ class FooActivity : AppCompatActivity() {
     val booleanValue by params<Boolean>()
     val stringValue by params<String>()
 
+    val a by params<String>()
+    val b by params<String>()
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +27,8 @@ class FooActivity : AppCompatActivity() {
             intValue = $intValue 
             booleanValue = $booleanValue
             stringValue = $stringValue
+            a = $a
+            b = $b
         """.trimIndent()
 
         binding.btnFinish.setOnClickListener {
