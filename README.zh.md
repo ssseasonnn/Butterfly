@@ -22,7 +22,7 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 
 ```gradle
 repositories {
-    maven { url 'https://jitpack.io' }
+  maven { url 'https://jitpack.io' }
 }
 ```
 
@@ -30,8 +30,8 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-	implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.0.0'
-    kapt 'com.github.ssseasonnn.Butterfly:compiler:1.0.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.0.0'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.0.0'
 }
 ```
 
