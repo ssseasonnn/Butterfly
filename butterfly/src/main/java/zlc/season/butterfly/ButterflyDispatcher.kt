@@ -4,13 +4,15 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.FragmentActivity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import zlc.season.claritypotion.ClarityPotion.Companion.clarityPotion
 import zlc.season.claritypotion.ClarityPotion.Companion.currentActivity
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.util.Objects.*
 
-@Suppress("UNCHECKED_CAST")
 class AgileDispatcher {
     companion object {
         const val RAW_SCHEME = "butterfly_scheme"
@@ -20,52 +22,47 @@ class AgileDispatcher {
         private const val AGILE_TYPE_ACTIVITY = 2
     }
 
-    fun dispatch(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
+    fun dispatch(request: AgileRequest, needResult: Boolean): Flow<Result<Intent>> {
         if (request.className.isEmpty()) {
             "Agile --> class not found!".logw()
-            onResult(Result.failure(IllegalStateException("Agile class not found!")))
-            return
+            return flowOf(Result.failure(IllegalStateException("Agile class not found!")))
         }
 
         val cls = Class.forName(request.className)
-        when (getAgileType(cls)) {
-            AGILE_TYPE_ACTIVITY -> {
-                dispatchActivity(request, onResult)
-            }
-            AGILE_TYPE_ACTION -> {
-                dispatchAction(request)
-            }
+        return when (getAgileType(cls)) {
+            AGILE_TYPE_ACTIVITY -> dispatchActivity(request, needResult)
+            AGILE_TYPE_ACTION -> dispatchAction(request)
             else -> {
                 "Agile --> type error".logw()
-                onResult(Result.failure(IllegalStateException("Agile type error")))
+                flowOf(Result.failure(IllegalStateException("Agile type error")))
             }
         }
     }
 
-    private fun dispatchActivity(request: AgileRequest, onResult: (Result<Intent>) -> Unit) {
-        if (onResult == Butterfly.EMPTY_LAMBDA) {
-            val context = currentActivity() ?: clarityPotion
-            val intent = createIntent(context, request)
+    private fun dispatchActivity(request: AgileRequest, needResult: Boolean): Flow<Result<Intent>> {
+        return if (!needResult) {
+            val context = getContext()
+            val intent = createIntent(getContext(), request)
             context.startActivity(intent)
+            emptyFlow()
         } else {
             val currentActivity = currentActivity()
-            if (currentActivity != null && currentActivity is FragmentActivity) {
+            return if (currentActivity != null && currentActivity is FragmentActivity) {
                 val intent = createIntent(currentActivity, request)
-                ButterflyFragment.show(currentActivity.supportFragmentManager, intent) {
-                    onResult(Result.success(it))
-                }
+                ButterflyFragment.showAsFlow(currentActivity.supportFragmentManager, intent)
             } else {
                 "Agile --> activity not found".logw()
-                onResult(Result.failure(IllegalStateException("Activity not found")))
+                flowOf(Result.failure(IllegalStateException("Activity not found")))
             }
         }
     }
 
-    private fun dispatchAction(request: AgileRequest) {
-        val context = currentActivity() ?: clarityPotion
+    private fun dispatchAction(request: AgileRequest): Flow<Result<Intent>> {
+        val context = getContext()
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action
-        action.doAction(context, request.scheme)
+        action.doAction(context, request.scheme, request.bundle)
+        return emptyFlow()
     }
 
     private fun getAgileType(cls: Class<*>): Int {
@@ -86,6 +83,8 @@ class AgileDispatcher {
         }
         return intent
     }
+
+    private fun getContext(): Context = currentActivity() ?: clarityPotion
 }
 
 class EvadeDispatcher {

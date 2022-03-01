@@ -1,6 +1,9 @@
 package zlc.season.butterfly
 
 import android.content.Intent
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
 import zlc.season.butterfly.annotation.Module
 
 object ButterflyCore {
@@ -21,9 +24,12 @@ object ButterflyCore {
 
     fun removeInterceptor(interceptor: Interceptor) = interceptorController.removeInterceptor(interceptor)
 
-    fun dispatchAgile(agileRequest: AgileRequest, onResult: (Result<Intent>) -> Unit) {
-        interceptorController.intercept(agileRequest) {
-            agileDispatcher.dispatch(agileRequest, onResult)
+    fun dispatchAgile(agileRequest: AgileRequest, needResult: Boolean): Flow<Result<Intent>> {
+        return flow {
+            interceptorController.intercept(agileRequest)
+            emit(Unit)
+        }.flatMapConcat {
+            agileDispatcher.dispatch(agileRequest, needResult)
         }
     }
 

@@ -1,12 +1,12 @@
 package zlc.season.bar
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import zlc.season.bar.databinding.ActivityAgileTestBinding
 import zlc.season.base.Schemes
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.Butterfly.with
+import zlc.season.butterfly.Butterfly.params
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_AGILE_TEST)
@@ -18,23 +18,24 @@ class AgileTestActivity : AppCompatActivity() {
 
         binding.startActivity.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO + "?a=1&b=2")
-                .with("intValue" to 1)
-                .with("booleanValue" to true)
-                .with("stringValue" to "test value")
+                .params(
+                    "intValue" to 1,
+                    "booleanValue" to true,
+                    "stringValue" to "test value"
+                )
                 .carry()
         }
 
         binding.startActivityForResult.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_RESULT + "?a=1&b=2")
-                .with("intValue" to 1)
-                .with("booleanValue" to true)
-                .with("stringValue" to "test value")
+                .params(
+                    "intValue" to 1,
+                    "booleanValue" to true,
+                    "stringValue" to "test value"
+                )
                 .carry {
-                    if (it.isSuccess) {
-                        val data = it.getOrThrow()
-                        val result = data.getStringExtra("result")
-                        binding.tvResult.text = result
-                    }
+                    val result = it.getStringExtra("result")
+                    binding.tvResult.text = result
                 }
         }
 

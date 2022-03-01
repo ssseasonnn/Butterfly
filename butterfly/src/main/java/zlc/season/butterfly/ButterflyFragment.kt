@@ -7,14 +7,20 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 
 class ButterflyFragment : Fragment() {
     companion object {
-        fun show(fm: FragmentManager, intent: Intent, onResult: (Intent) -> Unit) {
+        @OptIn(ExperimentalCoroutinesApi::class)
+        fun showAsFlow(fm: FragmentManager, intent: Intent): Flow<Result<Intent>> {
             val fragment = ButterflyFragment()
-            fm.show(fragment) {
-                it.viewModel.callback = onResult
-                it.launcher.launch(intent)
+            return fm.showAsFlow(fragment) {
+                fragment.viewModel.callback = {
+                    trySend(Result.success(it))
+                    close()
+                }
+                fragment.launcher.launch(intent)
             }
         }
     }
