@@ -37,17 +37,17 @@ tasks.withType(Copy).all {
     duplicatesStrategy 'exclude'
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'io.github.ssseasonnn'
-            artifactId = 'io.github.ssseasonnn.butterfly'
-            version = '1.0.0'
-
-            from components.java
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
-}
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'io.github.ssseasonnn'
+//            artifactId = 'io.github.ssseasonnn.butterfly'
+//            version = '1.0.0'
+//
+//            from components.java
+//        }
+//    }
+//    repositories {
+//        mavenLocal()
+//    }
+//}

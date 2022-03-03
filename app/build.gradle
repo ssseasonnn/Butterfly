@@ -2,9 +2,8 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'io.github.ssseasonnn.butterfly'
 }
-
-apply plugin: 'io.github.ssseasonnn.butterfly'
 
 android {
     compileSdk 31
