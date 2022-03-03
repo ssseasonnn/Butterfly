@@ -1,7 +1,7 @@
 package zlc.season.butterfly.annotation
 
 interface Module {
-    fun getAgile(): Map<String, String>
-    fun getEvade(): Map<String, String>
+    fun getAgile(): Map<String, Class<*>>
+    fun getEvade(): Map<String, Class<*>>
     fun getEvadeImpl(): Map<String, EvadeData>
 }

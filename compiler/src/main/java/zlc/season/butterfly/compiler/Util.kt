@@ -32,3 +32,5 @@ internal fun String.camelCase(): String {
 internal fun String.cap(): String {
     return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }
+
+internal data class EvadeImplInfo(val className: String, val singleton: Boolean)

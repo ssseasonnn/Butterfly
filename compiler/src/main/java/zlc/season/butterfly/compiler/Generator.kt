@@ -30,28 +30,30 @@ import zlc.season.butterfly.annotation.EvadeData
  *  public override fun getEvadeImpl(): HashMap<String, EvadeData> = evadeImplMap
  * }
  */
-class Generator(
+@OptIn(ExperimentalStdlibApi::class)
+internal class Generator(
     private val packageName: String,
     private val className: String,
     private val agileMap: Map<String, String>,
     private val evadeMap: Map<String, String>,
-    private val evadeImplMap: Map<String, EvadeData>
+    private val evadeImplMap: Map<String, EvadeImplInfo>
 ) {
     private val moduleClass = ClassName("zlc.season.butterfly.annotation", "Module")
-    private val mapStringClass = HashMap::class.asClassName().parameterizedBy(String::class.asClassName(), String::class.asClassName())
+
+    private val mapClass = typeNameOf<HashMap<String, Class<*>>>()
     private val mapDataClass = HashMap::class.asClassName().parameterizedBy(String::class.asClassName(), EvadeData::class.asClassName())
 
     fun generate(): FileSpec {
         val classBuilder = TypeSpec.classBuilder(className)
             .addSuperinterface(moduleClass)
             .addProperty(
-                PropertySpec.builder("agileMap", mapStringClass)
-                    .initializer("hashMapOf<String, String>()")
+                PropertySpec.builder("agileMap", mapClass)
+                    .initializer("hashMapOf<String,  Class<*>>()")
                     .build()
             )
             .addProperty(
-                PropertySpec.builder("evadeMap", mapStringClass)
-                    .initializer("hashMapOf<String, String>()")
+                PropertySpec.builder("evadeMap", mapClass)
+                    .initializer("hashMapOf<String, Class<*>>()")
                     .build()
             )
             .addProperty(
@@ -72,14 +74,14 @@ class Generator(
                 FunSpec.builder("getAgile")
                     .addModifiers(KModifier.OVERRIDE)
                     .addStatement("return agileMap")
-                    .returns(mapStringClass)
+                    .returns(mapClass)
                     .build()
             )
             .addFunction(
                 FunSpec.builder("getEvade")
                     .addModifiers(KModifier.OVERRIDE)
                     .addStatement("return evadeMap")
-                    .returns(mapStringClass)
+                    .returns(mapClass)
                     .build()
             )
             .addFunction(
@@ -97,7 +99,7 @@ class Generator(
     private fun generateAgileMapBlock(): CodeBlock {
         val builder = CodeBlock.Builder()
         agileMap.forEach { (k, v) ->
-            builder.addStatement("""agileMap["$k"] = "$v" """)
+            builder.addStatement("""agileMap["$k"] = ${v}::class.java """)
         }
         return builder.build()
     }
@@ -105,7 +107,7 @@ class Generator(
     private fun generateEvadeMapBlock(): CodeBlock {
         val builder = CodeBlock.Builder()
         evadeMap.forEach { (k, v) ->
-            builder.addStatement("""evadeMap["$k"] = "$v" """)
+            builder.addStatement("""evadeMap["$k"] = ${v}::class.java """)
         }
         return builder.build()
     }
@@ -113,7 +115,7 @@ class Generator(
     private fun generateEvadeImplMapBlock(): CodeBlock {
         val builder = CodeBlock.Builder()
         evadeImplMap.forEach { (k, v) ->
-            builder.addStatement("""evadeImplMap["$k"] = EvadeData(className="${v.className}",singleton=${v.singleton}) """)
+            builder.addStatement("""evadeImplMap["$k"] = EvadeData(cls=${(v.className)}::class.java, singleton=${v.singleton}) """)
         }
         return builder.build()
     }

@@ -16,7 +16,7 @@ class Compiler : AbstractProcessor() {
 
     private val agileMap = mutableMapOf<String, String>()
     private val evadeMap = mutableMapOf<String, String>()
-    private val evadeImplMap = mutableMapOf<String, EvadeData>()
+    private val evadeImplMap = mutableMapOf<String, EvadeImplInfo>()
 
     override fun init(processingEnv: ProcessingEnvironment) {
         super.init(processingEnv)
@@ -80,7 +80,7 @@ class Compiler : AbstractProcessor() {
                     val index = name.lastIndexOf("Impl")
                     name.substring(0, index)
                 }.toString()
-                evadeImplMap[realKey] = EvadeData(it.toString(), singleton)
+                evadeImplMap[realKey] = EvadeImplInfo(it.toString(), singleton)
             }
         }
 

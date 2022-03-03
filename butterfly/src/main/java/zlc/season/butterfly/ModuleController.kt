@@ -19,8 +19,8 @@ class ModuleController {
         var result = ""
         modules.forEach {
             val find = it.getAgile()[scheme]
-            if (!find.isNullOrEmpty()) {
-                result = find
+            if (find != null) {
+                result = find.name
                 return@forEach
             }
         }
@@ -36,15 +36,15 @@ class ModuleController {
             if (className.isEmpty()) {
                 val evadeMap = it.getEvade()
                 val temp = evadeMap[identity]
-                if (!temp.isNullOrEmpty()) {
-                    className = temp
+                if (temp != null) {
+                    className = temp.name
                 }
             }
             if (implClassName.isEmpty()) {
                 val implMap = it.getEvadeImpl()
                 val temp = implMap[identity]
                 if (temp != null) {
-                    implClassName = temp.className
+                    implClassName = temp.cls.name
                     isSingleton = temp.singleton
                 }
             }

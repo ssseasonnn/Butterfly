@@ -1,3 +1,3 @@
 package zlc.season.butterfly.annotation
 
-data class EvadeData(val className: String, val singleton: Boolean)
+data class EvadeData(val cls: Class<*>, val singleton: Boolean)
