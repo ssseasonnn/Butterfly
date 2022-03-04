@@ -14,7 +14,7 @@ dependencies {
 }
 
 group = 'io.github.ssseasonnn'
-version = '1.0.0'
+version = '1.0.1'
 
 gradlePlugin {
     plugins {
@@ -37,17 +37,17 @@ tasks.withType(Copy).all {
     duplicatesStrategy 'exclude'
 }
 
-//publishing {
-//    publications {
-//        maven(MavenPublication) {
-//            groupId = 'io.github.ssseasonnn'
-//            artifactId = 'io.github.ssseasonnn.butterfly'
-//            version = '1.0.0'
-//
-//            from components.java
-//        }
-//    }
-//    repositories {
-//        mavenLocal()
-//    }
-//}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'io.github.ssseasonnn'
+            artifactId = 'io.github.ssseasonnn.butterfly'
+            version = '1.0.1'
+
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

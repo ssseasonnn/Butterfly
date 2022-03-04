@@ -44,8 +44,17 @@ internal class Generator(
     private val mapDataClass = HashMap::class.asClassName().parameterizedBy(String::class.asClassName(), EvadeData::class.asClassName())
 
     fun generate(): FileSpec {
+        val companion = TypeSpec.companionObjectBuilder()
+            .addFunction(
+                FunSpec.builder("doNothing")
+                    .returns(moduleClass)
+                    .addStatement("return ${className}()")
+                    .build()
+            )
+            .build()
         val classBuilder = TypeSpec.classBuilder(className)
             .addSuperinterface(moduleClass)
+            .primaryConstructor(FunSpec.constructorBuilder().build())
             .addProperty(
                 PropertySpec.builder("agileMap", mapClass)
                     .initializer("hashMapOf<String,  Class<*>>()")
@@ -91,6 +100,8 @@ internal class Generator(
                     .returns(mapDataClass)
                     .build()
             )
+            .addType(companion)
+
         return FileSpec.builder(packageName, className)
             .addType(classBuilder.build())
             .build()

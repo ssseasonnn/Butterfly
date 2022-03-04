@@ -11,9 +11,6 @@ class ButterflyPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.withPlugin("com.android.application") {
             val androidComponentsExtension = project.extensions.getByType(AndroidComponentsExtension::class.java)
-            androidComponentsExtension.finalizeDsl {
-                ModuleHolder.modulesSet.clear()
-            }
             androidComponentsExtension.onVariants { variant ->
                 variant.transformClassesWith(ModuleClassVisitorFactory::class.java, InstrumentationScope.ALL) {
                     it.invalidate.setDisallowChanges(System.currentTimeMillis())

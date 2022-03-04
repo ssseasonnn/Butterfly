@@ -12,6 +12,18 @@ object ButterflyCore {
     private val agileDispatcher by lazy { AgileDispatcher() }
     private val evadeDispatcher by lazy { EvadeDispatcher() }
 
+    fun addModule(moduleName: String) {
+        try {
+            val cls = Class.forName(moduleName)
+            if (Module::class.java.isAssignableFrom(cls)) {
+                val module = cls.newInstance() as Module
+                addModule(module)
+            }
+        } catch (ignore: Exception) {
+            //ignore
+        }
+    }
+
     fun addModule(module: Module) = moduleController.addModule(module)
 
     fun removeModule(module: Module) = moduleController.removeModule(module)

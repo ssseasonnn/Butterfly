@@ -10,13 +10,14 @@ import org.gradle.api.tasks.Optional
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
+import java.util.concurrent.ConcurrentHashMap
 
 
 /**
  * Save all module name
  */
 object ModuleHolder {
-    val modulesSet = mutableSetOf<String>()
+    val modulesMap = ConcurrentHashMap<String, String>()
 }
 
 abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVisitorFactory.ModuleInstrumentation> {
@@ -32,7 +33,8 @@ abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVis
 
     override fun isInstrumentable(classData: ClassData): Boolean {
         if (classData.interfaces.contains("zlc.season.butterfly.annotation.Module")) {
-            ModuleHolder.modulesSet.add(classData.className)
+            ModuleHolder.modulesMap[classData.className] = classData.className
+            println("Butterfly --> found module ${classData.className}")
         }
 
         return if (classData.superClasses.contains("android.app.Application")) {
@@ -63,27 +65,20 @@ class ModuleClassVisitor(nextClassVisitor: ClassVisitor) : ClassVisitor(ASM7, ne
 class ModuleMethodVisitor(methodVisitor: MethodVisitor) : MethodVisitor(ASM7, methodVisitor) {
     override fun visitCode() {
         super.visitCode()
-        ModuleHolder.modulesSet.forEach {
+
+        ModuleHolder.modulesMap.values.forEach {
             println("Butterfly --> Auto register module: $it")
 
-            val moduleName = it.replace('.', '/')
-            mv.visitFieldInsn(
-                GETSTATIC,
-                "zlc/season/butterfly/ButterflyCore",
-                "INSTANCE",
-                "Lzlc/season/butterfly/ButterflyCore;"
-            )
-            mv.visitTypeInsn(NEW, moduleName)
-            mv.visitInsn(DUP)
-            mv.visitMethodInsn(INVOKESPECIAL, moduleName, "<init>", "()V", false)
-            mv.visitTypeInsn(CHECKCAST, "zlc/season/butterfly/annotation/Module")
-            mv.visitMethodInsn(
-                INVOKEVIRTUAL,
-                "zlc/season/butterfly/ButterflyCore",
-                "addModule",
-                "(Lzlc/season/butterfly/annotation/Module;)V",
-                false
-            )
+            mv.visitFieldInsn(GETSTATIC, "zlc/season/butterfly/ButterflyCore", "INSTANCE", "Lzlc/season/butterfly/ButterflyCore;")
+            mv.visitInsn(ICONST_1)
+            mv.visitTypeInsn(ANEWARRAY, "java/lang/String")
+            mv.visitVarInsn(ASTORE, 1)
+            mv.visitVarInsn(ALOAD, 1)
+            mv.visitInsn(ICONST_0)
+            mv.visitLdcInsn(it)
+            mv.visitInsn(AASTORE)
+            mv.visitVarInsn(ALOAD, 1)
+            mv.visitMethodInsn(INVOKEVIRTUAL, "zlc/season/butterfly/ButterflyCore", "addModule", "([Ljava/lang/String;)V", false)
         }
     }
 }

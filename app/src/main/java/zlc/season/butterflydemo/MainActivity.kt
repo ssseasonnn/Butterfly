@@ -7,7 +7,6 @@ import zlc.season.base.Schemes
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.ButterflyCore
 import zlc.season.butterfly.ButterflyInterceptor
 import zlc.season.butterflydemo.databinding.ActivityMainBinding
 
@@ -18,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        ButterflyCore.addInterceptor(TestInterceptor())
+//        ButterflyCore.addInterceptor(TestInterceptor())
 
         binding.startAgileTest.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_AGILE_TEST).carry()
