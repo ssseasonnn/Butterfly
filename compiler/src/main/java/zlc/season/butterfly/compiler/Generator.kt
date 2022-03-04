@@ -3,6 +3,7 @@ package zlc.season.butterfly.compiler
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import zlc.season.butterfly.annotation.EvadeData
+import zlc.season.butterfly.module.Module
 
 /**
  * public class ButterflyModuleApp() : Module {
@@ -38,7 +39,7 @@ internal class Generator(
     private val evadeMap: Map<String, String>,
     private val evadeImplMap: Map<String, EvadeImplInfo>
 ) {
-    private val moduleClass = ClassName("zlc.season.butterfly.annotation", "Module")
+    private val moduleClass = Module::class.asClassName()
 
     private val mapClass = typeNameOf<HashMap<String, Class<*>>>()
     private val mapDataClass = HashMap::class.asClassName().parameterizedBy(String::class.asClassName(), EvadeData::class.asClassName())

@@ -1,4 +1,6 @@
-package zlc.season.butterfly.annotation
+package zlc.season.butterfly.module
+
+import zlc.season.butterfly.annotation.EvadeData
 
 interface Module {
     fun getAgile(): Map<String, Class<*>>

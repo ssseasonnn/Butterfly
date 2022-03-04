@@ -4,7 +4,7 @@ import android.content.Intent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
-import zlc.season.butterfly.annotation.Module
+import zlc.season.butterfly.module.Module
 
 object ButterflyCore {
     private val moduleController by lazy { ModuleController() }

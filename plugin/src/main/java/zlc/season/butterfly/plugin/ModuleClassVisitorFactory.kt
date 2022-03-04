@@ -17,7 +17,28 @@ import java.util.concurrent.ConcurrentHashMap
  * Save all module name
  */
 object ModuleHolder {
-    val modulesMap = ConcurrentHashMap<String, String>()
+    private val modulesMap = ConcurrentHashMap<String, String>()
+
+    fun printCurrentModules() {
+        println("Butterfly --> Current module info ${modulesMap.values}")
+    }
+
+    fun addModule(moduleName: String) {
+        modulesMap[moduleName] = moduleName
+        println("Butterfly --> Found module $moduleName")
+    }
+
+    fun forEach(block: (String) -> Unit) {
+        modulesMap.values.forEach {
+            println("Butterfly --> Auto register module $it")
+            block(it)
+        }
+    }
+
+    fun clearModule() {
+        println("Butterfly --> Clear module info...")
+        modulesMap.clear()
+    }
 }
 
 abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVisitorFactory.ModuleInstrumentation> {
@@ -32,9 +53,8 @@ abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVis
     }
 
     override fun isInstrumentable(classData: ClassData): Boolean {
-        if (classData.interfaces.contains("zlc.season.butterfly.annotation.Module")) {
-            ModuleHolder.modulesMap[classData.className] = classData.className
-            println("Butterfly --> found module ${classData.className}")
+        if (classData.interfaces.contains("zlc.season.butterfly.module.Module")) {
+            ModuleHolder.addModule(classData.className)
         }
 
         return if (classData.superClasses.contains("android.app.Application")) {
@@ -66,9 +86,7 @@ class ModuleMethodVisitor(methodVisitor: MethodVisitor) : MethodVisitor(ASM7, me
     override fun visitCode() {
         super.visitCode()
 
-        ModuleHolder.modulesMap.values.forEach {
-            println("Butterfly --> Auto register module: $it")
-
+        ModuleHolder.forEach {
             mv.visitFieldInsn(GETSTATIC, "zlc/season/butterfly/ButterflyCore", "INSTANCE", "Lzlc/season/butterfly/ButterflyCore;")
             mv.visitInsn(ICONST_1)
             mv.visitTypeInsn(ANEWARRAY, "java/lang/String")

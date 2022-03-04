@@ -1,6 +1,6 @@
 package zlc.season.butterfly
 
-import zlc.season.butterfly.annotation.Module
+import zlc.season.butterfly.module.Module
 
 class ModuleController {
     private val modules = mutableListOf<Module>()

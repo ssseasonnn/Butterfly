@@ -21,10 +21,10 @@
 #-renamesourcefileattribute SourceFile
 
 
--keep class zlc.season.butterfly.annotation.Module
-#-keep public class * extends zlc.season.butterfly.Action
+#-keep class zlc.season.butterfly.module.Module
+#-keep public class * extends zlc.season.butterfly.module.Module
 
--keep public class * extends zlc.season.butterfly.annotation.Module
+-keep public class * extends zlc.season.butterfly.Action
 
 -keep class zlc.season.butterfly.annotation.Agile
 -keep class zlc.season.butterfly.annotation.Evade

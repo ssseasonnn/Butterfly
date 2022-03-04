@@ -3,7 +3,7 @@ package zlc.season.butterfly.compiler
 import java.util.*
 import java.io.File.separatorChar as s
 
-const val DEFAULT_PACKAGE = "zlc.season.butterfly"
+const val DEFAULT_PACKAGE = "zlc.season.butterfly.module"
 
 internal fun getModuleName(generateDir: String): String {
     return try {
