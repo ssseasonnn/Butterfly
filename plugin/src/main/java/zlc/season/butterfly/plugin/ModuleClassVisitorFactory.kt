@@ -88,15 +88,8 @@ class ModuleMethodVisitor(methodVisitor: MethodVisitor) : MethodVisitor(ASM7, me
 
         ModuleHolder.forEach {
             mv.visitFieldInsn(GETSTATIC, "zlc/season/butterfly/ButterflyCore", "INSTANCE", "Lzlc/season/butterfly/ButterflyCore;")
-            mv.visitInsn(ICONST_1)
-            mv.visitTypeInsn(ANEWARRAY, "java/lang/String")
-            mv.visitVarInsn(ASTORE, 1)
-            mv.visitVarInsn(ALOAD, 1)
-            mv.visitInsn(ICONST_0)
             mv.visitLdcInsn(it)
-            mv.visitInsn(AASTORE)
-            mv.visitVarInsn(ALOAD, 1)
-            mv.visitMethodInsn(INVOKEVIRTUAL, "zlc/season/butterfly/ButterflyCore", "addModule", "([Ljava/lang/String;)V", false)
+            mv.visitMethodInsn(INVOKEVIRTUAL, "zlc/season/butterfly/ButterflyCore", "addModuleName", "(Ljava/lang/String;)V", false)
         }
     }
 }

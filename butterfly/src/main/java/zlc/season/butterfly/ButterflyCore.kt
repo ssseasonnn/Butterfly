@@ -12,7 +12,7 @@ object ButterflyCore {
     private val agileDispatcher by lazy { AgileDispatcher() }
     private val evadeDispatcher by lazy { EvadeDispatcher() }
 
-    fun addModule(moduleName: String) {
+    fun addModuleName(moduleName: String) {
         try {
             val cls = Class.forName(moduleName)
             if (Module::class.java.isAssignableFrom(cls)) {
