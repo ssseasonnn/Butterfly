@@ -270,6 +270,7 @@ home.showHome(supportFragmentManager, R.id.container)
 Butterfly generates a route table for each Module that uses the annotation, and the naming convention is: Butterfly[module name]Module
 
 Manual registration:
+
 ```kotlin
 class DemoApplication : Application() {
     override fun onCreate() {

@@ -262,14 +262,15 @@ home.showHome(supportFragmentManager, R.id.container)
 Butterfly会为每个使用了注解的Module生成一个路由表, 命名规则为: Butterfly[模块名称]Module
 
 手动注册:
+
 ```kotlin
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-		//注册
+        //注册
         ButterflyCore.addModule(ButterflyHomeModule())
-		ButterflyCore.addModule(ButterflyFooModule())
-		ButterflyCore.addModule(ButterflyBarModule())
+        ButterflyCore.addModule(ButterflyFooModule())
+        ButterflyCore.addModule(ButterflyBarModule())
     }
 }
 ```
