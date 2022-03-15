@@ -1,6 +1,7 @@
 package zlc.season.butterfly
 
 import android.content.Intent
+import android.os.Bundle
 import androidx.core.os.bundleOf
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +20,14 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.params(vararg pair: Pair<String, Any>): AgileRequest {
+    fun AgileRequest.params(vararg pair: Pair<String, Any?>): AgileRequest {
         return apply {
             bundle.putAll(bundleOf(*pair))
         }
+    }
+
+    fun AgileRequest.params(bundle: Bundle): AgileRequest {
+        return apply { bundle.putAll(bundle) }
     }
 
     fun AgileRequest.skipInterceptor(): AgileRequest {
