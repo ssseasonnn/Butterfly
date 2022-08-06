@@ -17,7 +17,7 @@ class ButterflyFragment : Fragment() {
     companion object {
         fun showAsFlow(fm: FragmentManager, intent: Intent): Flow<Result<Bundle>> {
             val fragment = ButterflyFragment()
-            return fm.awaitFragment(fragment) {
+            return fm.awaitFragmentResume(fragment) {
                 fragment.viewModel.callback = {
                     trySend(Result.success(it))
                     close()

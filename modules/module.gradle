@@ -35,9 +35,9 @@ android {
 }
 
 dependencies {
-    kapt 'com.github.ssseasonnn.Butterfly:compiler:1.0.0'
+//    kapt 'com.github.ssseasonnn.Butterfly:compiler:1.0.0'
 //    api 'com.github.ssseasonnn.Butterfly:butterfly:1.0.0'
-//    kapt project(":compiler")
+    kapt project(":compiler")
     api project(":butterfly")
 
     api 'androidx.constraintlayout:constraintlayout:2.1.3'

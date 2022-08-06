@@ -59,7 +59,7 @@ internal fun currentFm(): FragmentManager? {
     }
 }
 
-internal fun FragmentManager.awaitFragment(
+internal fun FragmentManager.awaitFragmentResume(
     fragment: Fragment,
     callback: ProducerScope<Result<Bundle>>.() -> Unit
 ) = callbackFlow {
@@ -74,8 +74,7 @@ internal fun FragmentManager.awaitFragment(
 
     if (!isDestroyed && isActive) {
         registerFragmentLifecycleCallbacks(cb, false)
-        val tag = fragment.hashCode().toString()
-        add(fragment, tag)
+        add(fragment)
     }
 
     awaitClose {
@@ -108,8 +107,8 @@ internal fun FragmentManager.awaitFragmentResult(
 }
 
 
-internal fun FragmentManager.add(fragment: Fragment, tag: String) {
-    beginTransaction().add(fragment, tag).commitAllowingStateLoss()
+internal fun FragmentManager.add(fragment: Fragment) {
+    beginTransaction().add(fragment, fragment.javaClass.name).commitAllowingStateLoss()
 }
 
 internal fun FragmentManager.remove(fragment: Fragment) {
