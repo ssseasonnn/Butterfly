@@ -44,7 +44,10 @@ class AgileTestActivity : AppCompatActivity() {
         }
 
         binding.startFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry()
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry {
+                val result = it.getString("abc")
+                println(result)
+            }
         }
 
         binding.startDialogFragment.setOnClickListener {
