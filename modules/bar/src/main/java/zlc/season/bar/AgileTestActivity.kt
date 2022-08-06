@@ -34,13 +34,21 @@ class AgileTestActivity : AppCompatActivity() {
                     "stringValue" to "test value"
                 )
                 .carry {
-                    val result = it.getStringExtra("result")
+                    val result = it.getString("result")
                     binding.tvResult.text = result
                 }
         }
 
         binding.startAction.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_ACTION + "?a=1&b=2").carry()
+        }
+
+        binding.startFragment.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry()
+        }
+
+        binding.startDialogFragment.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_DIALOG_FRAGMENT).carry()
         }
     }
 }

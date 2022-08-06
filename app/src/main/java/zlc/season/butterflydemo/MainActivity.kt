@@ -29,11 +29,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     class TestInterceptor : ButterflyInterceptor {
-        override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
+        override suspend fun shouldIntercept(request: AgileRequest): Boolean {
             return true
         }
 
-        override suspend fun intercept(agileRequest: AgileRequest) {
+        override suspend fun intercept(request: AgileRequest) {
             println("intercepting")
             delay(1000)
             println("intercept finish")

@@ -1,6 +1,9 @@
+@file:OptIn(FlowPreview::class)
+
 package zlc.season.butterfly
 
-import android.content.Intent
+import android.os.Bundle
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
@@ -32,18 +35,20 @@ object ButterflyCore {
 
     fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
 
-    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorController.addInterceptor(interceptor)
+    fun addInterceptor(interceptor: ButterflyInterceptor) =
+        interceptorController.addInterceptor(interceptor)
 
-    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorController.removeInterceptor(interceptor)
+    fun removeInterceptor(interceptor: ButterflyInterceptor) =
+        interceptorController.removeInterceptor(interceptor)
 
-    fun dispatchAgile(agileRequest: AgileRequest, needResult: Boolean): Flow<Result<Intent>> {
+    fun dispatchAgile(agileRequest: AgileRequest): Flow<Result<Bundle>> {
         return flow {
             if (agileRequest.needIntercept) {
                 interceptorController.intercept(agileRequest)
             }
             emit(Unit)
         }.flatMapConcat {
-            agileDispatcher.dispatch(agileRequest, needResult)
+            agileDispatcher.dispatch(agileRequest)
         }
     }
 

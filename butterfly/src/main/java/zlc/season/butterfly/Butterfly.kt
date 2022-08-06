@@ -1,16 +1,15 @@
 package zlc.season.butterfly
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 object Butterfly {
-    private val scope by lazy { MainScope() }
-    private val EMPTY_LAMBDA: (Intent) -> Unit = {}
+    const val RAW_SCHEME = "butterfly_scheme"
+
+    private val EMPTY_LAMBDA: (Bundle) -> Unit = {}
 
     fun agile(scheme: String): AgileRequest {
         val realScheme = parseScheme(scheme)
@@ -34,21 +33,24 @@ object Butterfly {
         return copy(needIntercept = false)
     }
 
-    fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Intent>> {
-        return ButterflyCore.dispatchAgile(this, needResult)
+    fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Bundle>> {
+        return ButterflyCore.dispatchAgile(copy(needResult = needResult))
     }
 
-    fun AgileRequest.carry(onError: (Throwable) -> Unit = {}, onResult: (Intent) -> Unit = EMPTY_LAMBDA) {
+    fun AgileRequest.carry(
+        onError: (Throwable) -> Unit = {},
+        onResult: (Bundle) -> Unit = EMPTY_LAMBDA
+    ) {
         if (onResult == EMPTY_LAMBDA) {
-            flow(false).launchIn(scope)
+            flow(false).launchIn(currentScope())
         } else {
             flow(true).onEach {
                 if (it.isSuccess) {
-                    onResult(it.getOrDefault(Intent()))
+                    onResult(it.getOrDefault(Bundle()))
                 } else {
                     onError(it.exceptionOrNull() ?: Throwable())
                 }
-            }.launchIn(scope)
+            }.launchIn(currentScope())
         }
     }
 

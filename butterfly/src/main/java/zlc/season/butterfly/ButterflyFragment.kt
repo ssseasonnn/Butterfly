@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package zlc.season.butterfly
 
 import android.app.Activity
 import android.content.Intent
-import androidx.activity.result.contract.ActivityResultContracts
+import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -12,10 +15,9 @@ import kotlinx.coroutines.flow.Flow
 
 class ButterflyFragment : Fragment() {
     companion object {
-        @OptIn(ExperimentalCoroutinesApi::class)
-        fun showAsFlow(fm: FragmentManager, intent: Intent): Flow<Result<Intent>> {
+        fun showAsFlow(fm: FragmentManager, intent: Intent): Flow<Result<Bundle>> {
             val fragment = ButterflyFragment()
-            return fm.showAsFlow(fragment) {
+            return fm.awaitFragment(fragment) {
                 fragment.viewModel.callback = {
                     trySend(Result.success(it))
                     close()
@@ -25,22 +27,20 @@ class ButterflyFragment : Fragment() {
         }
     }
 
-    private val viewModel by lazy { ViewModelProvider(this).get(ButterflyViewModel::class.java) }
-    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    private val viewModel by lazy { ViewModelProvider(this)[ButterflyViewModel::class.java] }
+    private val launcher = registerForActivityResult(StartActivityForResult()) {
         val result = if (it.resultCode == Activity.RESULT_OK) {
-            it.data ?: Intent()
+            it.data?.extras ?: Bundle()
         } else {
-            Intent()
+            Bundle()
         }
         viewModel.callback.invoke(result)
 
         //clear current fragment
-        activity?.let { p ->
-            p.supportFragmentManager.remove(this)
-        }
+        activity?.supportFragmentManager?.remove(this)
     }
 
     class ButterflyViewModel : ViewModel() {
-        var callback: ((Intent) -> Unit) = {}
+        var callback: ((Bundle) -> Unit) = {}
     }
 }
