@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import zlc.season.bar.databinding.ActivityAgileTestBinding
 import zlc.season.base.Schemes
+import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.Butterfly.params
@@ -34,7 +35,7 @@ class AgileTestActivity : AppCompatActivity() {
                     "stringValue" to "test value"
                 )
                 .carry {
-                    val result = it.getString("result")
+                    val result by it.params<String>()
                     binding.tvResult.text = result
                 }
         }
@@ -45,8 +46,8 @@ class AgileTestActivity : AppCompatActivity() {
 
         binding.startFragment.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry {
-                val result = it.getString("abc")
-                println(result)
+                val abc by it.params<String>()
+                println(abc)
             }
         }
 

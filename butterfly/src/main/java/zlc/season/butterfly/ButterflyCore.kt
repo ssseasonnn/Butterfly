@@ -6,7 +6,8 @@ import android.os.Bundle
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
 import zlc.season.butterfly.module.Module
 
 object ButterflyCore {
@@ -31,25 +32,27 @@ object ButterflyCore {
 
     fun removeModule(module: Module) = moduleController.removeModule(module)
 
-    fun queryAgile(scheme: String): AgileRequest = moduleController.queryAgile(scheme)
-
-    fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
-
     fun addInterceptor(interceptor: ButterflyInterceptor) =
         interceptorController.addInterceptor(interceptor)
 
     fun removeInterceptor(interceptor: ButterflyInterceptor) =
         interceptorController.removeInterceptor(interceptor)
 
+    fun queryAgile(scheme: String): AgileRequest = moduleController.queryAgile(scheme)
+
+    fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
+
     fun dispatchAgile(agileRequest: AgileRequest): Flow<Result<Bundle>> {
-        return flow {
-            if (agileRequest.needIntercept) {
-                interceptorController.intercept(agileRequest)
+        return flowOf(Unit)
+            .onEach {
+                if (agileRequest.shouldIntercept) {
+                    interceptorController.intercept(agileRequest)
+                }
+            }.onEach {
+                agileRequest.interceptorController.intercept(agileRequest)
+            }.flatMapConcat {
+                agileDispatcher.dispatch(agileRequest)
             }
-            emit(Unit)
-        }.flatMapConcat {
-            agileDispatcher.dispatch(agileRequest)
-        }
     }
 
     fun dispatchEvade(evadeRequest: EvadeRequest): Any {

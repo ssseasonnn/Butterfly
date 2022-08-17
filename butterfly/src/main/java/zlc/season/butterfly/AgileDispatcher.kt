@@ -4,12 +4,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 
 class AgileDispatcher {
@@ -66,7 +66,7 @@ object ActionDispatcher : InnerDispatcher {
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action
         action.doAction(currentCtx(), request.scheme, request.bundle)
-        return emptyFlow()
+        return flowOf(Result.success(Bundle()))
     }
 }
 
@@ -75,13 +75,15 @@ object ActivityDispatcher : InnerDispatcher {
         return if (!request.needResult) {
             val context = currentCtx()
             val intent = createIntent(context, request)
-            context.startActivity(intent)
-            emptyFlow()
+            context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
+
+            flowOf(Result.success(Bundle()))
         } else {
             val fm = currentFm()
             if (fm != null) {
-                val intent = createIntent(currentCtx(), request)
-                ButterflyFragment.showAsFlow(fm, intent)
+                val context = currentCtx()
+                val intent = createIntent(context, request)
+                ButterflyFragment.showAsFlow(fm, intent, createActivityOptions(context, request))
             } else {
                 "Agile --> activity not found".logw()
                 flowOf(Result.failure(IllegalStateException("Activity not found")))
@@ -99,6 +101,23 @@ object ActivityDispatcher : InnerDispatcher {
         }
         return intent
     }
+
+    private fun createActivityOptions(
+        context: Context,
+        request: AgileRequest
+    ): ActivityOptionsCompat? {
+        val config = request.activityConfig
+        return config.activityOptions
+            ?: if (config.enterAnim != 0 || config.exitAnim != 0) {
+                ActivityOptionsCompat.makeCustomAnimation(
+                    context,
+                    config.enterAnim,
+                    config.exitAnim
+                )
+            } else {
+                null
+            }
+    }
 }
 
 object DialogFragmentDispatcher : InnerDispatcher {
@@ -112,7 +131,7 @@ object DialogFragmentDispatcher : InnerDispatcher {
         if (fragment is DialogFragment) {
             fragment.show(fragmentManager, fragment.javaClass.name)
         }
-        return emptyFlow()
+        return flowOf(Result.success(Bundle()))
     }
 
     private fun createFragment(
@@ -139,7 +158,7 @@ object FragmentDispatcher : InnerDispatcher {
         return if (request.needResult) {
             fragmentManager.awaitFragmentResult(activity, fragment)
         } else {
-            emptyFlow()
+            flowOf(Result.success(Bundle()))
         }
     }
 
@@ -159,7 +178,7 @@ object FragmentDispatcher : InnerDispatcher {
             addToBackStack(null)
         }
 
-        if (config.addOrReplace) {
+        if (config.isAdd) {
             add(android.R.id.content, fragment)
         } else {
             replace(android.R.id.content, fragment)

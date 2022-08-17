@@ -59,6 +59,7 @@ internal fun currentFm(): FragmentManager? {
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal fun FragmentManager.awaitFragmentResume(
     fragment: Fragment,
     callback: ProducerScope<Result<Bundle>>.() -> Unit
@@ -82,6 +83,7 @@ internal fun FragmentManager.awaitFragmentResume(
     }
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 internal fun FragmentManager.awaitFragmentResult(
     lifecycleOwner: LifecycleOwner,
     fragment: Fragment

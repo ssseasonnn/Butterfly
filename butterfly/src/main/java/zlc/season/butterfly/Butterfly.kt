@@ -1,7 +1,11 @@
 package zlc.season.butterfly
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -29,8 +33,28 @@ object Butterfly {
         return apply { bundle.putAll(bundle) }
     }
 
-    fun AgileRequest.skipInterceptor(): AgileRequest {
-        return copy(needIntercept = false)
+    fun AgileRequest.skipGlobalInterceptor(): AgileRequest {
+        return copy(shouldIntercept = false)
+    }
+
+    fun AgileRequest.addInterceptor(interceptor: ButterflyInterceptor): AgileRequest {
+        return apply { interceptorController.addInterceptor(interceptor) }
+    }
+
+    fun AgileRequest.addInterceptor(interceptor: suspend (AgileRequest) -> Unit): AgileRequest {
+        return apply {
+            interceptorController.addInterceptor(DefaultButterflyInterceptor(interceptor))
+        }
+    }
+
+    fun AgileRequest.config(
+        activityConfig: ActivityConfig.() -> Unit = {},
+        fragmentConfig: FragmentConfig.() -> Unit = {}
+    ): AgileRequest {
+        return copy(
+            activityConfig = this.activityConfig.apply(activityConfig),
+            fragmentConfig = this.fragmentConfig.apply(fragmentConfig)
+        )
     }
 
     fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Bundle>> {
@@ -41,8 +65,16 @@ object Butterfly {
         onError: (Throwable) -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
+        carry(currentScope(), onError, onResult)
+    }
+
+    fun AgileRequest.carry(
+        scope: CoroutineScope = currentScope(),
+        onError: (Throwable) -> Unit = {},
+        onResult: (Bundle) -> Unit = EMPTY_LAMBDA
+    ) {
         if (onResult == EMPTY_LAMBDA) {
-            flow(false).launchIn(currentScope())
+            flow(false).launchIn(scope)
         } else {
             flow(true).onEach {
                 if (it.isSuccess) {
@@ -50,8 +82,16 @@ object Butterfly {
                 } else {
                     onError(it.exceptionOrNull() ?: Throwable())
                 }
-            }.launchIn(currentScope())
+            }.launchIn(scope)
         }
+    }
+
+    fun Activity.setResult(vararg pair: Pair<String, Any?>) {
+        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundleOf(*pair)) })
+    }
+
+    fun Fragment.setResult(vararg pair: Pair<String, Any?>) {
+        parentFragmentManager.setFragmentResult(javaClass.name, bundleOf(*pair))
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

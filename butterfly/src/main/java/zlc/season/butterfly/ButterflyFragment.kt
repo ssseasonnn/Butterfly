@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
+import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -15,14 +16,18 @@ import kotlinx.coroutines.flow.Flow
 
 class ButterflyFragment : Fragment() {
     companion object {
-        fun showAsFlow(fm: FragmentManager, intent: Intent): Flow<Result<Bundle>> {
+        fun showAsFlow(
+            fm: FragmentManager,
+            intent: Intent,
+            options: ActivityOptionsCompat?
+        ): Flow<Result<Bundle>> {
             val fragment = ButterflyFragment()
             return fm.awaitFragmentResume(fragment) {
                 fragment.viewModel.callback = {
                     trySend(Result.success(it))
                     close()
                 }
-                fragment.launcher.launch(intent)
+                fragment.launcher.launch(intent, options)
             }
         }
     }
