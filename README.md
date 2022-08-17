@@ -14,7 +14,14 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 
 ## Usage
 
-#### import
+### Feature
+
+The butterfly mainly contains two major features：
+
+- Agile :page navigation
+- Evade :module communicate
+
+### import
 
 ```gradle
 repositories {
@@ -31,15 +38,9 @@ dependencies {
 }
 ```
 
-Butterfly achieve different functions through two different annotations：
+### Agile
 
-- Agile Used for page navigation
-- Evade Used for component communication
-
-
-#### Agile
-
-- Page navigation
+#### 1.Page navigation
 
 By adding an Agile annotation to Activity, set the corresponding scheme, 
 then you can navigate through butterfly, or navigate and get the return data.
@@ -61,7 +62,7 @@ Butterfly.agile("test/scheme")
     }
 ```
 
-- Pass parameter
+#### 2.Pass parameter
 
 Agile supports a parameter navigation, there are two ways, 
 one is to add parameters to scheme to the Scheme by calling the parameter method, 
@@ -79,7 +80,7 @@ Butterfly.agile("test/scheme?a=1&b=2")
     .carry()
 ```
 
-- Parse parameters
+#### 3. Parse parameters
 
 On the navigation purpose page, you can get the passed parameter value by using the key field of the parameter
 
@@ -104,7 +105,7 @@ class AgileTestActivity : AppCompatActivity() {
 ```
 > See Details on how Bracer is used: Github [Bracer](https://github.com/ssseasonnn/Bracer)
 
-- Interceptors
+#### 4. Interceptors
 
 Agile supports interceptors that can be used to preprocess parts of logic, such as login detection, before navigation
 Navigation is also possible in the interceptor, but to avoid the interceptor nesting doll, 
@@ -133,7 +134,7 @@ ButterflyCore.addInterceptor(TestInterceptor())
 Butterfly.agile("test/scheme").skipInterceptor().carry()
 ```
 
-- Action
+#### 5. Action
 
 In addition to supporting page navigation, Agile also supports navigation Action, action has no pages, 
 and can do some logic processing
@@ -161,7 +162,7 @@ Butterfly.agile("test/action")
     .carry()
 ```
 
-- Process control
+#### 6.Process control
 
 In addition to directly calling carry navigation, Agile can also call flow to return the Flow object, 
 which can be used to process the navigation flow
@@ -175,7 +176,7 @@ Butterfly.agile("test/scheme").flow()
 ```
 
 
-#### Evade
+### Evade
 
 Butterfly can communicate between any component using a simple two annotations without 
 any direct or indirect dependency between the components
@@ -265,7 +266,7 @@ val home = Butterfly.evade<Home>()
 home.showHome(supportFragmentManager, R.id.container)
 ```
 
-#### Routing table
+### Routing table
 
 Butterfly generates a route table for each Module that uses the annotation, and the naming convention is: Butterfly[module name]Module
 
@@ -318,7 +319,7 @@ class DemoApplication : Application() {
 }
 ```
 
-#### Proguard config
+### Proguard config
 
 ```pro
 -keep public class zlc.season.butterfly.module.**
