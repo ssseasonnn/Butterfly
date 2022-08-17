@@ -10,6 +10,7 @@ object Schemes {
     const val SCHEME_FOO_RESULT = "${HOST}://foo_result"
     const val SCHEME_FOO_FRAGMENT = "${HOST}://foo_fragment"
     const val SCHEME_FOO_DIALOG_FRAGMENT = "${HOST}://foo_dialog_fragment"
+    const val SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT = "${HOST}://foo_bottom_sheet_dialog_fragment"
 
     const val SCHEME_ACTION = "${HOST}://action"
 }

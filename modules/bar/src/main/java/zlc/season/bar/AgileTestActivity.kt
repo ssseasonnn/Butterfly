@@ -7,6 +7,7 @@ import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.carry
+import zlc.season.butterfly.Butterfly.config
 import zlc.season.butterfly.Butterfly.params
 import zlc.season.butterfly.annotation.Agile
 
@@ -45,14 +46,23 @@ class AgileTestActivity : AppCompatActivity() {
         }
 
         binding.startFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry {
-                val abc by it.params<String>()
-                println(abc)
-            }
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT)
+                .config(fragmentConfig = {
+                    addToBackStack = true
+                })
+                .carry {
+                    val abc by it.params<String>()
+                    println(abc)
+                    binding.tvResult.text = abc
+                }
         }
 
         binding.startDialogFragment.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_DIALOG_FRAGMENT).carry()
+        }
+
+        binding.startBottomSheetDialogFragment.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT).carry()
         }
     }
 }
