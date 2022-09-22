@@ -4,60 +4,15 @@ package zlc.season.butterfly
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
-import zlc.season.claritypotion.ClarityPotion
-import zlc.season.claritypotion.ClarityPotion.Companion.currentActivity
 
-private val scope by lazy { MainScope() }
-
-internal fun currentCtx() = currentActivity() ?: ClarityPotion.clarityPotion
-
-internal fun currentScope(): CoroutineScope {
-    val activity = currentActivity()
-    return if (activity != null && activity is LifecycleOwner) {
-        activity.lifecycleScope
-    } else {
-        scope
-    }
-}
-
-internal fun currentLifecycle(): LifecycleOwner? {
-    val activity = currentActivity()
-    return if (activity != null && activity is LifecycleOwner) {
-        activity
-    } else {
-        null
-    }
-}
-
-internal fun currentFragmentActivity(): FragmentActivity? {
-    val activity = currentActivity()
-    return if (activity != null && activity is FragmentActivity) {
-        activity
-    } else {
-        null
-    }
-}
-
-internal fun currentFm(): FragmentManager? {
-    val activity = currentActivity()
-    return if (activity != null && activity is FragmentActivity) {
-        activity.supportFragmentManager
-    } else {
-        null
-    }
-}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal fun FragmentManager.awaitFragmentResume(

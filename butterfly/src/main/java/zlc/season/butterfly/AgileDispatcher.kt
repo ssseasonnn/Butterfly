@@ -11,6 +11,9 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import zlc.season.butterfly.ButterflyHelper.context
+import zlc.season.butterfly.ButterflyHelper.fragmentActivity
+import zlc.season.butterfly.ButterflyHelper.fragmentManager
 
 class AgileDispatcher {
     companion object {
@@ -65,7 +68,7 @@ object ActionDispatcher : InnerDispatcher {
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action
-        action.doAction(currentCtx(), request.scheme, request.bundle)
+        action.doAction(context, request.scheme, request.bundle)
         return flowOf(Result.success(Bundle()))
     }
 }
@@ -73,15 +76,15 @@ object ActionDispatcher : InnerDispatcher {
 object ActivityDispatcher : InnerDispatcher {
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         return if (!request.needResult) {
-            val context = currentCtx()
+            val context = context
             val intent = createIntent(context, request)
             context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
 
             flowOf(Result.success(Bundle()))
         } else {
-            val fm = currentFm()
+            val fm = fragmentManager
             if (fm != null) {
-                val context = currentCtx()
+                val context = context
                 val intent = createIntent(context, request)
                 ButterflyFragment.showAsFlow(fm, intent, createActivityOptions(context, request))
             } else {
@@ -122,7 +125,7 @@ object ActivityDispatcher : InnerDispatcher {
 
 object DialogFragmentDispatcher : InnerDispatcher {
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
-        val activity = currentFragmentActivity()
+        val activity = fragmentActivity
             ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
 
         val fragment = createFragment(activity, request)
@@ -149,7 +152,7 @@ object DialogFragmentDispatcher : InnerDispatcher {
 
 object FragmentDispatcher : InnerDispatcher {
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
-        val activity = currentFragmentActivity()
+        val activity = fragmentActivity
             ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
 
         val fragment = createFragment(activity, request)

@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import zlc.season.butterfly.ButterflyHelper.scope
 
 object Butterfly {
     const val RAW_SCHEME = "butterfly_scheme"
@@ -65,11 +66,11 @@ object Butterfly {
         onError: (Throwable) -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
-        carry(currentScope(), onError, onResult)
+        carry(scope, onError, onResult)
     }
 
     fun AgileRequest.carry(
-        scope: CoroutineScope = currentScope(),
+        scope: CoroutineScope = ButterflyHelper.scope,
         onError: (Throwable) -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
