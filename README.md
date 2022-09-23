@@ -12,16 +12,14 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 
 *Read this in other languages: [中文](README.zh.md), [English](README.md), [Change Log](CHANGELOG.md)*
 
-## Usage
-
 ### Feature
 
 The butterfly mainly contains two major features：
 
-- Agile :page navigation
-- Evade :module communicate
+- Agile page navigation
+- Evade module communicate
 
-### import
+### Setup
 
 ```gradle
 repositories {
@@ -33,175 +31,61 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.0.0'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.0.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.0'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.0'
 }
 ```
 
-### Agile
+## Basic Usage
 
-#### 1.Page navigation
+### Navigation
 
-By adding an Agile annotation to Activity, set the corresponding scheme, 
-then you can navigate through butterfly, or navigate and get the return data.
+Butterfly supports navigation for Activity、Fragment and DialogFragment
 
 ```kotlin
-@Agile("test/scheme")
-class AgileTestActivity : AppCompatActivity() {
-    //...
-}
+@Agile("test/activity")
+class AgileTestActivity : AppCompatActivity()
 
-//navigation
-Butterfly.agile("test/scheme").carry()
+@Agile("test/fragment")
+class TestFragment : Fragment()
 
-//Navigate and get the return data
-Butterfly.agile("test/scheme")
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment()
+
+//Navigation
+Butterfly.agile("test/xxx").carry()
+
+//Navigation and get result
+Butterfly.agile("test/xxx")
     .carry {
         val result = it.getStringExtra("result")
         binding.tvResult.text = result
     }
 ```
 
-#### 2.Pass parameter
+### Communication
 
-Agile supports a parameter navigation, there are two ways, 
-one is to add parameters to scheme to the Scheme by calling the parameter method, 
-or the mixing of the two, then the page after navigationGet the corresponding parameters
+Butterfly supports communication between any component
 
-```kotlin
-//add parameters to scheme
-Butterfly.agile("test/scheme?a=1&b=2").carry()
-
-//call params method
-Butterfly.agile("test/scheme?a=1&b=2")
-    .params("intValue" to 1)
-    .params("booleanValue" to true)
-    .params("stringValue" to "test value")
-    .carry()
-```
-
-#### 3. Parse parameters
-
-On the navigation purpose page, you can get the passed parameter value by using the key field of the parameter
-
-```kotlin
-@Agile("test/scheme")
-class AgileTestActivity : AppCompatActivity() {
-	val a by lazy { intent?.getStringExtra("a") ?: "" }
-	val b by lazy { intent?.getStringExtra("b") ?: "" }
-    val intValue by lazy { intent?.getIntExtra("intValue", 0) ?: 0 }
-}
-```
-
-In addition to manual parameter parsing, Bracer can also be equipped for fully automated parameter parsing
-
-```kotlin
-@Agile("test/scheme")
-class AgileTestActivity : AppCompatActivity() {
-	val a by params<String>()
-	val b by params<String>()
-	val intValue by params<Int>()
-}
-```
-> See Details on how Bracer is used: Github [Bracer](https://github.com/ssseasonnn/Bracer)
-
-#### 4. Interceptors
-
-Agile supports interceptors that can be used to preprocess parts of logic, such as login detection, before navigation
-Navigation is also possible in the interceptor, but to avoid the interceptor nesting doll, 
-the skipInterceptor() method needs to be added to ignore the interceptor
-
-```kotlin
-//Implement a custom interceptor
-class TestInterceptor : ButterflyInterceptor {
-    override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
-        //Detects whether interception is required
-        return true
-    }
-
-    override suspend fun intercept(agileRequest: AgileRequest) {
-        //Handles the interception logic
-        println("intercepting")
-        delay(5000)
-        println("intercept finish")
-    }
-}
-
-//Register the interceptor
-ButterflyCore.addInterceptor(TestInterceptor())
-
-//Skip the interceptor
-Butterfly.agile("test/scheme").skipInterceptor().carry()
-```
-
-#### 5. Action
-
-In addition to supporting page navigation, Agile also supports navigation Action, action has no pages, 
-and can do some logic processing
-First let the custom Class inherit the Action, then add @Agile annotations and set the scheme, 
-and the rest is consistent with the page navigation
-
-```kotlin
-@Agile("test/action")
-class TestAction : Action {
-    override fun doAction(context: Context, scheme: String, data: Bundle) {
-        //The parameters passed in can be obtained from the data
-        Toast.makeText(context, "This is an Action", Toast.LENGTH_SHORT).show()
-    }
-}
-
-//Start Action
-Butterfly.agile("test/action").carry()
-
-//Action also supports pass parameters
-Butterfly.agile("test/action?a=1&b=2").carry()
-
-//params
-Butterfly.agile("test/action")
-    .params("intValue" to 1)
-    .carry()
-```
-
-#### 6.Process control
-
-In addition to directly calling carry navigation, Agile can also call flow to return the Flow object, 
-which can be used to process the navigation flow
-
-```kotlin
-Butterfly.agile("test/scheme").flow()
-		.onStart { println("start") }
-		.onCompletion { println("complete") }
-		.onEach { println("process result") }
-		.launchIn(lifecycleScope)
-```
-
-
-### Evade
-
-Butterfly can communicate between any component using a simple two annotations without 
-any direct or indirect dependency between the components
-
-For example, there are two components: Module Foo and Module Bar that require communication
-
-In Module Foo, define the interface and add the Evade annotation:
+Define the interface in Module A and add Evade annotation:
 
 ```kotlin
 @Evade
 interface Home {
-	//Define the method
     fun showHome(fragmentManager: FragmentManager, container: Int)
 }
 ```
 
-In module Bar, define the implementation, and add the EvadeImpl annotation:
+Define the implementation in Module B, and add the EvadeImpl annotation:
 
 ```kotlin
-//The implementation class name must end in Impl
+//The implementation class name must end with Impl
 @EvadeImpl
 class HomeImpl {
     val TAG = "home_tag"
 
-	//To implement a method in the Home interface, the method name and method parameters must be the same
+    //Implement the method in the Home interface. 
+    //The method name and method parameters must be the same
     fun showHome(fragmentManager: FragmentManager, container: Int) {
         val homeFragment = HomeFragment()
         fragmentManager.beginTransaction()
@@ -211,64 +95,149 @@ class HomeImpl {
 }
 ```
 
-> Since Evade uses the class name as an important basis for defining and implementing associations, 
-> the interface class name and the implementation class name must be the same, and the implementation class name ends in Impl.
-If you cannot use a class name as an association, you can also use the same string type as the association key
->```kotlin
->@Evade(identity = "same key")
->interface Home
->
->@EvadeImpl(identity = "same key")
->class OtherNameImpl
->```
+> There is no dependency between Module A and Module B
 
-Then in Module Foo, you can use the evaluate method to get home and call:
+The communication between Module A and B can be completed by Butterfly:
 
 ```kotlin
 val home = Butterfly.evade<Home>()
 home.showHome(supportFragmentManager, R.id.container)
 ```
 
-In addition, Evade also supports strong association type communication in the form of sinking dependencies
+### Passing parameters
 
-For example, the following three components: the common component Module Base, Module Foo, and Module Bar
+You can pass parameters during navigation in two ways:
 
-First sink the Home interface into the common component Module Base:
+- Add parameters to scheme by splicing scheme
+- Manually pass in the parameters by calling the params method, or a combination of the two, and then obtain the corresponding parameters in the
+  navigated page
+
+Passing parameters:
 
 ```kotlin
-@Evade
-interface Home {
-    fun showHome(fragmentManager: FragmentManager, container: Int)
+//Splicing scheme
+Butterfly.agile("test/scheme?a=1&b=2").carry()
+
+//Call params
+Butterfly.agile("test/scheme?a=1&b=2")
+    .params("intValue" to 1)
+    .params("booleanValue" to true)
+    .params("stringValue" to "test value")
+    .carry()
+```
+
+Parses parameters：
+
+```kotlin
+//On the navigation target page, you can obtain the passed parameter value through the key field of the parameter
+@Agile("test/scheme")
+class AgileTestActivity : AppCompatActivity() {
+    val a by lazy { intent?.getStringExtra("a") ?: "" }
+    val b by lazy { intent?.getStringExtra("b") ?: "" }
+    val intValue by lazy { intent?.getIntExtra("intValue", 0) ?: 0 }
 }
 ```
 
-Then in the Module Bar, implement the interface:
+```kotlin
+//In addition to manual parameter analysis, Bracer can also be equipped to realize fully automatic parameter analysis
+@Agile("test/scheme")
+class AgileTestActivity : AppCompatActivity() {
+    val a by params<String>()
+    val b by params<String>()
+    val intValue by params<Int>()
+}
+```
+
+> See Github address for details of Bracer usage: [Bracer](https://github.com/ssseasonnn/Bracer)
+
+### Interceptor
+
+Butterfly supports global interceptors and one-time interceptors
 
 ```kotlin
-//The same naming convention needs to be used, and the implementation class name must end in Impl
-@EvadeImpl
-class HomeImpl : Home {
-    val TAG = "home_tag"
+//Custom Interceptor
+class TestInterceptor : ButterflyInterceptor {
+    override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
+        //Detect whether interception is required
+        return true
+    }
 
-    override fun showHome(fragmentManager: FragmentManager, container: Int) {
-        val homeFragment = HomeFragment()
-        fragmentManager.beginTransaction()
-            .replace(container, homeFragment, TAG)
-            .commit()
+    override suspend fun intercept(agileRequest: AgileRequest) {
+        //Processing interception logic
+        println("intercepting")
+        delay(5000)
+        println("intercept finish")
     }
 }
 ```
 
-Then in Module Foo, you can use the evaluate method to get home and call:
+Configure Global Interceptors：
 
 ```kotlin
-val home = Butterfly.evade<Home>()
-home.showHome(supportFragmentManager, R.id.container)
+//Add Global Interceptor
+ButterflyCore.addInterceptor(TestInterceptor())
+
+//Skip all global interceptors
+Butterfly.agile("test/scheme").skipGlobalInterceptor().carry()
 ```
 
-### Routing table
+Configure one-time interceptors：
 
-Butterfly generates a route table for each Module that uses the annotation, and the naming convention is: Butterfly[module name]Module
+```kotlin
+//Only the current navigation uses this interceptor
+Butterfly.agile(Schemes.SCHEME_AGILE_TEST)
+    .addInterceptor(TestInterceptor())
+    .carry()
+```
+
+### Action
+
+Butterfly supports not only page navigation, but also navigation actions. Actions have no pages and can be processed logically
+
+First let the customized class inherit Action, then add Agile annotation and set scheme. The rest are consistent with page navigation
+
+```kotlin
+@Agile("test/action")
+class TestAction : Action {
+    override fun doAction(context: Context, scheme: String, data: Bundle) {
+        Toast.makeText(context, "This is an Action", Toast.LENGTH_SHORT).show()
+    }
+}
+
+//Start Action
+Butterfly.agile("test/action").carry()
+
+//Action also support params
+Butterfly.agile("test/action?a=1&b=2").carry()
+
+Butterfly.agile("test/action")
+    .params("intValue" to 1)
+    .carry()
+```
+
+> Action does not support obtaining returned data
+
+### Using Flow
+
+In addition to directly calling **carry** to complete navigation, you can also call **flow** or **resultFlow** to return to Flow
+
+```kotlin
+Butterfly.agile("test/scheme").flow()
+    .onStart { println("start") }
+    .onCompletion { println("complete") }
+    .launchIn(lifecycleScope)
+
+//or
+Butterfly.agile("test/scheme").resultFlow()
+    .onStart { println("start") }
+    .onCompletion { println("complete") }
+    .onEach { println("process result") }
+    .launchIn(lifecycleScope)
+```
+
+### Router Table
+
+Butterfly will generate a routing table for each annotated module. The naming rule is: Butterfly[module name]Module
 
 Manual registration:
 
@@ -276,7 +245,7 @@ Manual registration:
 class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        //register
+
         ButterflyCore.addModule(ButterflyHomeModule())
         ButterflyCore.addModule(ButterflyFooModule())
         ButterflyCore.addModule(ButterflyBarModule())
@@ -284,16 +253,17 @@ class DemoApplication : Application() {
 }
 ```
 
-To register automatically with a plugin:
-1. Add plugin dependencies
+Automatic registration with plugin:
+
+1. Add plug-in dependency
 
 ```groovy
-//using plugins DSL:
+//使用 plugins DSL:
 plugins {
     id "io.github.ssseasonnn.butterfly" version "1.0.1"
 }
 
-//or useing legacy plugin application:
+//Or use the legacy plugin application:
 buildscript {
     repositories {
         maven {
@@ -305,7 +275,7 @@ buildscript {
     }
 }
 
-//add plugin
+//Add plugin
 apply plugin: "io.github.ssseasonnn.butterfly"
 ```
 
@@ -319,20 +289,82 @@ class DemoApplication : Application() {
 }
 ```
 
-### Proguard config
+## Extra Config
 
-```pro
--keep public class zlc.season.butterfly.module.**
--keep public class zlc.season.butterfly.annotation.**
--keep public class zlc.season.butterfly.ButterflyCore {*;}
--keep public class * extends zlc.season.butterfly.Action
+### Activity Configuration
 
--keep @zlc.season.butterfly.annotation.Agile class * {*;}
--keep @zlc.season.butterfly.annotation.Evade class * {*;}
--keep @zlc.season.butterfly.annotation.EvadeImpl class * {*;}
+```kotlin
+Butterfly.agile("test/activity")
+    .clearTop()                  //Launch mode
+    //or .singleTop()
+    .addFlag(Intent.Flag_XXX)    //Add other Flag
+    .enterAnim(R.anim.xxx)       //Add anim
+    .exitAnim(R.anim.xxx)
+    .carry()
 ```
 
-### License
+### Fragment Configuration
+
+```kotlin
+Butterfly.agile("test/fragment")
+    .clearTop()                  //Fragment also supports launch mode
+    //or .singleTop()
+    .disableBackStack()          //Do not add to the backstack
+    .enterAnim(R.anim.xxx)       //Add anim
+    .exitAnim(R.anim.xxx)
+    .container(R.id.container)   //Set the container ID to which Fragment is added
+    .tag("customTag")            //Set Fragment tag
+    .carry()
+```
+
+### DialogFragment Configuration
+
+```kotlin
+Butterfly.agile("test/dialog")
+    .disableBackStack()         //Do not add to the backstack
+    .tag("customTag")           //Set tag
+    .carry()
+```
+
+### Dialog and Fragment retreat
+
+Butterfly supports the backstack of Fragment and DialogFragment
+
+Back the top page anywhere:
+
+```kotlin
+Butterfly.retreat("result" to "123")
+
+Butterfly.retreatFragment("result" to "123")
+
+Butterfly.retreatDialog("result" to "123")
+```
+
+Back itself inside the page:
+
+```kotlin
+@Agile("test/fragment")
+class TestFragment : Fragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            retreat("result" to "123")
+        }
+    }
+}
+
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            retreat("result" to "123")
+        }
+    }
+}
+```
+
+## License
 
 > ```
 > Copyright 2022 Season.Zlc

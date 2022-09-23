@@ -1,4 +1,5 @@
 apply from: "../module.gradle"
+apply plugin: 'org.jetbrains.kotlin.android'
 
 dependencies {
     implementation project(':modules:base')

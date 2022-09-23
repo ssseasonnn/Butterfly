@@ -5,10 +5,11 @@
     android:background="@color/design_default_color_primary">
 
     <TextView
+        android:id="@+id/tvContent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="This is a Fragment!"
+        android:text="This is Fragment 0!"
         android:textColor="@android:color/white" />
 
     <Button

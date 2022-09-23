@@ -12,8 +12,6 @@ Butterfly - 小巧而强大的武器，拥有它，让你的Android开发如虎�
 
 *Read this in other languages: [中文](README.zh.md), [English](README.md), [Change Log](CHANGELOG.md)*
 
-## Usage
-
 ### 特性
 
 蝴蝶主要包含两大功能：
@@ -21,7 +19,7 @@ Butterfly - 小巧而强大的武器，拥有它，让你的Android开发如虎�
 - Agile 页面导航
 - Evade 组件化通信
 
-### 依赖
+### 集成
 
 ```gradle
 repositories {
@@ -38,32 +36,82 @@ dependencies {
 }
 ```
 
-### Agile
+## Basic Usage
 
-#### 1.导航
+### 导航
 
-通过给Activity添加Agile注解，并设置对应的scheme，随后即可通过Butterfly进行导航，或者导航并获取返回数据
+Butterfly支持Activity、Fragment和DialogFragment的导航
 
 ```kotlin
-@Agile("test/scheme")
-class AgileTestActivity : AppCompatActivity() {
-    //...
-}
+@Agile("test/activity")
+class AgileTestActivity : AppCompatActivity()
+
+@Agile("test/fragment")
+class TestFragment : Fragment()
+
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment()
 
 //导航
-Butterfly.agile("test/scheme").carry()
+Butterfly.agile("test/xxx").carry()
 
 //导航并获取返回数据
-Butterfly.agile("test/scheme")
+Butterfly.agile("test/xxx")
     .carry {
         val result = it.getStringExtra("result")
         binding.tvResult.text = result
     }
 ```
 
-#### 2.传递参数
+### 通信
 
-Agile支持附带参数导航，有两种方式，一种是通过拼接scheme，将参数添加到scheme中 另一种是通过调用params方法手动传入参数，或者两者混合进行， 随后可在导航后的页面中获取对应的参数
+Butterfly支持任意组件之间进行通信
+
+在Module A中定义接口，添加Evade注解：
+
+```kotlin
+@Evade
+interface Home {
+    //定义方法
+    fun showHome(fragmentManager: FragmentManager, container: Int)
+}
+```
+
+在Module B中定义实现，添加EvadeImpl注解：
+
+```kotlin
+//实现类名必须以Impl结尾
+@EvadeImpl
+class HomeImpl {
+    val TAG = "home_tag"
+
+    //实现Home接口中的方法, 方法名和方法参数必须相同
+    fun showHome(fragmentManager: FragmentManager, container: Int) {
+        val homeFragment = HomeFragment()
+        fragmentManager.beginTransaction()
+            .replace(container, homeFragment, TAG)
+            .commit()
+    }
+}
+```
+
+> Module A和Module B之间没有依赖关系
+
+即可通过Butterfly完成Module A和B之间的通信：
+
+```kotlin
+val home = Butterfly.evade<Home>()
+home.showHome(supportFragmentManager, R.id.container)
+```
+
+### 参数传递
+
+可以通过以下两种方式在导航的过程中传递参数：
+
+- 通过拼接scheme，将参数添加到scheme中
+- 通过调用params方法手动传入参数，或者两者混合进行，随后可在导航后的页面中获取对应的参数
+
+传递参数：
 
 ```kotlin
 //拼接scheme
@@ -77,11 +125,10 @@ Butterfly.agile("test/scheme?a=1&b=2")
     .carry()
 ```
 
-#### 3.解析参数
-
-在导航目的页面，可通过参数的key字段来获取传递的参数值
+解析参数：
 
 ```kotlin
+//在导航目的页面，可通过参数的key字段来获取传递的参数值
 @Agile("test/scheme")
 class AgileTestActivity : AppCompatActivity() {
     val a by lazy { intent?.getStringExtra("a") ?: "" }
@@ -90,9 +137,8 @@ class AgileTestActivity : AppCompatActivity() {
 }
 ```
 
-除了手动解析参数以外，还可以装备Bracer来实现全自动进行参数解析
-
 ```kotlin
+//除了手动解析参数以外，还可以装备Bracer来实现全自动进行参数解析
 @Agile("test/scheme")
 class AgileTestActivity : AppCompatActivity() {
     val a by params<String>()
@@ -103,12 +149,12 @@ class AgileTestActivity : AppCompatActivity() {
 
 > Bracer 使用方式详情见: Github 地址 [Bracer](https://github.com/ssseasonnn/Bracer)
 
-#### 4.拦截器
+### 拦截器
 
-Agile支持拦截器，可用于在导航前预处理部分逻辑，如进行登录检测 此外拦截器中也可进行导航，但为了避免拦截器套娃，需要添加skipInterceptor()方法以忽略拦截器
+Butterfly支持全局拦截器和一次性拦截器
 
 ```kotlin
-//实现自定义拦截器
+//自定义拦截器
 class TestInterceptor : ButterflyInterceptor {
     override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
         //检测是否需要拦截
@@ -122,17 +168,32 @@ class TestInterceptor : ButterflyInterceptor {
         println("intercept finish")
     }
 }
-
-//注册拦截器
-ButterflyCore.addInterceptor(TestInterceptor())
-
-//跳过拦截器
-Butterfly.agile("test/scheme").skipInterceptor().carry()
 ```
 
-#### 5.Action
+配置全局拦截器：
 
-Agile除了支持页面导航以外，还支持导航Action，Action无页面，可进行某些逻辑处理 首先让自定义的Class继承Action，然后添加@Agile注解并设置scheme，其余和页面导航一致
+```kotlin
+//添加全局拦截器
+ButterflyCore.addInterceptor(TestInterceptor())
+
+//跳过所有全局拦截器
+Butterfly.agile("test/scheme").skipGlobalInterceptor().carry()
+```
+
+配置一次性拦截器：
+
+```kotlin
+//仅当前导航使用该拦截器
+Butterfly.agile(Schemes.SCHEME_AGILE_TEST)
+    .addInterceptor(TestInterceptor())
+    .carry()
+```
+
+### Action
+
+Butterfly除了支持页面导航以外，还支持导航Action，Action没有页面，可进行某些逻辑处理
+
+首先让自定义的Class继承Action，然后添加@Agile注解并设置scheme，其余和页面导航一致
 
 ```kotlin
 @Agile("test/action")
@@ -155,103 +216,24 @@ Butterfly.agile("test/action")
     .carry()
 ```
 
-#### 6.流程控制
+> Action 不支持获取返回数据
 
-Agile除了直接调用carry导航以外，还可以调用flow返回Flow对象， 利用Flow对象可对导航流程进行处理
+### 使用Flow
+
+除了直接调用**carry**完成导航以外，还可以调用**flow**或者**resultFlow**返回Flow
 
 ```kotlin
 Butterfly.agile("test/scheme").flow()
     .onStart { println("start") }
     .onCompletion { println("complete") }
+    .launchIn(lifecycleScope)
+
+//or
+Butterfly.agile("test/scheme").resultFlow()
+    .onStart { println("start") }
+    .onCompletion { println("complete") }
     .onEach { println("process result") }
     .launchIn(lifecycleScope)
-```
-
-### Evade
-
-蝴蝶使用简单的两个注解即可实现任意组件之间进行通信，而组件之间无需任何直接或间接依赖
-
-例如有两个组件：Module Foo 和Module Bar 需要通信
-
-在Module Foo中，定义接口，并添加Evade注解：
-
-```kotlin
-@Evade
-interface Home {
-    //定义方法
-    fun showHome(fragmentManager: FragmentManager, container: Int)
-}
-```
-
-在Module Bar中，定义实现,，并添加EvadeImpl注解：
-
-```kotlin
-//实现类名必须以Impl结尾
-@EvadeImpl
-class HomeImpl {
-    val TAG = "home_tag"
-
-    //实现Home接口中的方法, 方法名和方法参数必须相同
-    fun showHome(fragmentManager: FragmentManager, container: Int) {
-        val homeFragment = HomeFragment()
-        fragmentManager.beginTransaction()
-            .replace(container, homeFragment, TAG)
-            .commit()
-    }
-}
-```
-
-> 由于Evade使用类名称作为定义和实现关联的重要依据，因此接口类名和实现类名必须相同，并且实现类名以Impl结尾． 如无法以类名作为关联，也可使用相同的字符串类型作为关联key
->```kotlin
->@Evade(identity = "same key")
->interface Home
->
->@EvadeImpl(identity = "same key")
->class OtherNameImpl
->```
-
-随后即可在Module Foo中，使用evade方法获取Home并调用:
-
-```kotlin
-val home = Butterfly.evade<Home>()
-home.showHome(supportFragmentManager, R.id.container)
-```
-
-除此之外, Evade也支持通过下沉依赖的形式, 进行强关联类型的通信
-
-例如以下三个组件：公共组件Module Base，Module Foo，Module Bar
-
-首先将Home接口下沉至公共组件Module Base中:
-
-```kotlin
-@Evade
-interface Home {
-    fun showHome(fragmentManager: FragmentManager, container: Int)
-}
-```
-
-然后在Module Bar中，实现接口:
-
-```kotlin
-//同样需要使用相同的命名规则, 实现类名必须以Impl结尾
-@EvadeImpl
-class HomeImpl : Home {
-    val TAG = "home_tag"
-
-    override fun showHome(fragmentManager: FragmentManager, container: Int) {
-        val homeFragment = HomeFragment()
-        fragmentManager.beginTransaction()
-            .replace(container, homeFragment, TAG)
-            .commit()
-    }
-}
-```
-
-之后便可在Module Foo中，使用evade方法获取Home并调用:
-
-```kotlin
-val home = Butterfly.evade<Home>()
-home.showHome(supportFragmentManager, R.id.container)
 ```
 
 ### 路由表
@@ -308,20 +290,89 @@ class DemoApplication : Application() {
 }
 ```
 
-### 混淆配置
+## Extra Config
 
-```pro
--keep public class zlc.season.butterfly.module.**
--keep public class zlc.season.butterfly.annotation.**
--keep public class zlc.season.butterfly.ButterflyCore {*;}
--keep public class * extends zlc.season.butterfly.Action
+### Activity配置
 
--keep @zlc.season.butterfly.annotation.Agile class * {*;}
--keep @zlc.season.butterfly.annotation.Evade class * {*;}
--keep @zlc.season.butterfly.annotation.EvadeImpl class * {*;}
+```kotlin
+Butterfly.agile("test/activity")
+    .clearTop()                  //启动模式
+    //or .singleTop()
+    .addFlag(Intent.Flag_XXX)    //添加其他Flag
+    .enterAnim(R.anim.xxx)       //添加动画
+    .exitAnim(R.anim.xxx)
+    .carry()
 ```
 
-### License
+### Fragment配置
+
+```kotlin
+Butterfly.agile("test/fragment")
+    .clearTop()                  //Fragment同样支持启动模式
+    //or .singleTop()
+    .disableBackStack()          //不添加到返回栈中
+    .enterAnim(R.anim.xxx)       //添加动画
+    .exitAnim(R.anim.xxx)
+    .container(R.id.container)   //设置Fragment添加到的容器ID
+    .tag("customTag")            //设置Fragment的tag
+    .carry()
+```
+
+### DialogFragment配置
+
+```kotlin
+Butterfly.agile("test/dialog")
+    .disableBackStack()         //不添加到返回栈中
+    .tag("customTag")           //设置Dialog的tag
+    .carry()
+```
+
+### Dialog和Fragment回退
+
+Butterfly支持Fragment和DialogFragment的回退栈
+
+在任意地点回退栈顶页面：
+
+```kotlin
+//回退栈顶页面, 并返回数据
+Butterfly.retreat("result" to "123")
+
+//回退栈顶Fragment, 并返回数据
+Butterfly.retreatFragment("result" to "123")
+
+//回退栈顶DialogFragment, 并返回数据
+Butterfly.retreatDialog("result" to "123")
+```
+
+在页面内部回退自身：
+
+```kotlin
+//在Fragment内部回退
+@Agile("test/fragment")
+class TestFragment : Fragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            //回退当前Fragment并返回数据
+            retreat("result" to "123")
+        }
+    }
+}
+
+//在DialogFragment内部回退
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            //回退当前DialogFragment并返回数据
+            retreat("result" to "123")
+        }
+    }
+}
+```
+
+## License
 
 > ```
 > Copyright 2022 Season.Zlc

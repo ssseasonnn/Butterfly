@@ -13,5 +13,23 @@
             android:layout_gravity="center"
             android:text="This is a dialog fragment!"
             android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:text="Back"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="90dp"
+            android:text="Next"
+            android:textColor="@android:color/black" />
     </FrameLayout>
 </FrameLayout>

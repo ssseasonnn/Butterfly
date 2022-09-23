@@ -1,15 +1,12 @@
 package zlc.season.butterfly
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import zlc.season.butterfly.ButterflyHelper.scope
+import kotlinx.coroutines.flow.*
 
 object Butterfly {
     const val RAW_SCHEME = "butterfly_scheme"
@@ -35,7 +32,7 @@ object Butterfly {
     }
 
     fun AgileRequest.skipGlobalInterceptor(): AgileRequest {
-        return copy(shouldIntercept = false)
+        return copy(enableGlobalInterceptor = false)
     }
 
     fun AgileRequest.addInterceptor(interceptor: ButterflyInterceptor): AgileRequest {
@@ -48,25 +45,63 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.config(
-        activityConfig: ActivityConfig.() -> Unit = {},
-        fragmentConfig: FragmentConfig.() -> Unit = {}
-    ): AgileRequest {
+    fun AgileRequest.container(containerViewId: Int): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId))
+    }
+
+    fun AgileRequest.tag(tag: String): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(tag = tag))
+    }
+
+    fun AgileRequest.clearTop(): AgileRequest {
         return copy(
-            activityConfig = this.activityConfig.apply(activityConfig),
-            fragmentConfig = this.fragmentConfig.apply(fragmentConfig)
+            activityConfig = activityConfig.copy(clearTop = true),
+            fragmentConfig = fragmentConfig.copy(clearTop = true)
         )
     }
 
-    fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Bundle>> {
-        return ButterflyCore.dispatchAgile(copy(needResult = needResult))
+    fun AgileRequest.singleTop(): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(singleTop = true),
+            fragmentConfig = fragmentConfig.copy(singleTop = true)
+        )
+    }
+
+    fun AgileRequest.disableBackStack(): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(enableBackStack = false))
+    }
+
+    fun AgileRequest.addFlag(flag: Int): AgileRequest {
+        return copy(activityConfig = activityConfig.copy(flags = activityConfig.flags or flag))
+    }
+
+    fun AgileRequest.enterAnim(enterAnim: Int = 0): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(enterAnim = enterAnim),
+            fragmentConfig = fragmentConfig.copy(enterAnim = enterAnim)
+        )
+    }
+
+    fun AgileRequest.exitAnim(exitAnim: Int = 0): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(exitAnim = exitAnim),
+            fragmentConfig = fragmentConfig.copy(exitAnim = exitAnim)
+        )
+    }
+
+    fun AgileRequest.flow(): Flow<Unit> {
+        return ButterflyCore.dispatchAgile(copy(needResult = false)).flatMapConcat { flowOf(Unit) }
+    }
+
+    fun AgileRequest.resultFlow(): Flow<Result<Bundle>> {
+        return ButterflyCore.dispatchAgile(copy(needResult = true))
     }
 
     fun AgileRequest.carry(
         onError: (Throwable) -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
-        carry(scope, onError, onResult)
+        carry(ButterflyHelper.scope, onError, onResult)
     }
 
     fun AgileRequest.carry(
@@ -75,9 +110,9 @@ object Butterfly {
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
         if (onResult == EMPTY_LAMBDA) {
-            flow(false).launchIn(scope)
+            flow().launchIn(scope)
         } else {
-            flow(true).onEach {
+            resultFlow().onEach {
                 if (it.isSuccess) {
                     onResult(it.getOrDefault(Bundle()))
                 } else {
@@ -87,12 +122,48 @@ object Butterfly {
         }
     }
 
-    fun Activity.setResult(vararg pair: Pair<String, Any?>) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundleOf(*pair)) })
+    fun retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(Any::class.java, bundleOf(*result))
     }
 
-    fun Fragment.setResult(vararg pair: Pair<String, Any?>) {
-        parentFragmentManager.setFragmentResult(javaClass.name, bundleOf(*pair))
+    fun retreatDialog(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(DialogFragment::class.java, bundleOf(*result))
+    }
+
+    fun retreatFragment(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(Fragment::class.java, bundleOf(*result))
+    }
+
+    fun retreatFragmentCount(): Int {
+        return ButterflyCore.getRetreatCount(Fragment::class.java)
+    }
+
+    fun retreatDialogCount(): Int {
+        return ButterflyCore.getRetreatCount(DialogFragment::class.java)
+    }
+
+    fun canRetreat(): Boolean {
+        return canRetreatDialog() || canRetreatFragment()
+    }
+
+    fun canRetreatFragment(): Boolean {
+        return retreatFragmentCount() > 0
+    }
+
+    fun canRetreatDialog(): Boolean {
+        return retreatDialogCount() > 0
+    }
+
+    fun Activity.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
+    }
+
+    fun Fragment.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
+    }
+
+    fun DialogFragment.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

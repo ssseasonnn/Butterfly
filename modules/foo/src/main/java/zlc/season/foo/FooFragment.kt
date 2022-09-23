@@ -6,13 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import zlc.season.base.Schemes.SCHEME_FOO_FRAGMENT
-import zlc.season.butterfly.Butterfly.setResult
+import zlc.season.bracer.params
+import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.FragmentFooBinding
 
 @Agile(SCHEME_FOO_FRAGMENT)
 class FooFragment : Fragment() {
+    val number by params<Int>()
+
     var binding: FragmentFooBinding? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -24,9 +28,9 @@ class FooFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
+            tvContent.text = "This is Fragment $number"
             btnSetResult.setOnClickListener {
-                setResult("abc" to "123")
-                parentFragmentManager.popBackStack()
+                retreat("abc" to "123")
             }
         }
     }
