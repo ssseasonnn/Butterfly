@@ -6,6 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import zlc.season.base.Schemes.SCHEME_FOO_FRAGMENT
+import zlc.season.butterfly.Butterfly
+import zlc.season.butterfly.Butterfly.popBack
+import zlc.season.butterfly.Butterfly.popBackWithResult
 import zlc.season.butterfly.Butterfly.setResult
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.FragmentFooBinding
@@ -25,8 +28,7 @@ class FooFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding?.apply {
             btnSetResult.setOnClickListener {
-                setResult("abc" to "123")
-                parentFragmentManager.popBackStack()
+                popBackWithResult("abc" to "123")
             }
         }
     }

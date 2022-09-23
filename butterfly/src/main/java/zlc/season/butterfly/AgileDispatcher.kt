@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
 import zlc.season.butterfly.ButterflyHelper.context
 import zlc.season.butterfly.ButterflyHelper.fragmentActivity
 import zlc.season.butterfly.ButterflyHelper.fragmentManager
@@ -99,6 +100,9 @@ object ActivityDispatcher : InnerDispatcher {
         intent.putExtra(Butterfly.RAW_SCHEME, request.scheme)
         intent.setClassName(context.packageName, request.className)
         intent.putExtras(request.bundle)
+        if (request.activityConfig.flags != 0) {
+            intent.addFlags(request.activityConfig.flags)
+        }
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }

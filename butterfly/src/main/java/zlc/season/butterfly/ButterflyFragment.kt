@@ -13,6 +13,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import zlc.season.butterfly.ButterflyHelper.awaitFragmentResume
+import zlc.season.butterfly.ButterflyHelper.remove
 
 class ButterflyFragment : Fragment() {
     companion object {

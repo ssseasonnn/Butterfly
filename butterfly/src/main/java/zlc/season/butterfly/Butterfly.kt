@@ -6,9 +6,8 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
+import zlc.season.butterfly.ButterflyHelper.remove
 import zlc.season.butterfly.ButterflyHelper.scope
 
 object Butterfly {
@@ -35,7 +34,7 @@ object Butterfly {
     }
 
     fun AgileRequest.skipGlobalInterceptor(): AgileRequest {
-        return copy(shouldIntercept = false)
+        return copy(enableGlobalInterceptor = false)
     }
 
     fun AgileRequest.addInterceptor(interceptor: ButterflyInterceptor): AgileRequest {
@@ -48,18 +47,46 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.config(
-        activityConfig: ActivityConfig.() -> Unit = {},
-        fragmentConfig: FragmentConfig.() -> Unit = {}
-    ): AgileRequest {
+    fun AgileRequest.add(containerViewId: Int = 0): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, op = FragmentOp.ADD))
+    }
+
+    fun AgileRequest.replace(containerViewId: Int = 0): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, op = FragmentOp.REPLACE))
+    }
+
+    fun AgileRequest.remove(containerViewId: Int = 0): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(op = FragmentOp.REMOVE))
+    }
+
+    fun AgileRequest.backStack(name: String): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = true, backStack = name))
+    }
+
+    fun AgileRequest.addFlag(flag: Int): AgileRequest {
+        return copy(activityConfig = activityConfig.copy(flags = activityConfig.flags or flag))
+    }
+
+    fun AgileRequest.enterAnim(enterAnim: Int = 0, popEnterAnim: Int = 0): AgileRequest {
         return copy(
-            activityConfig = this.activityConfig.apply(activityConfig),
-            fragmentConfig = this.fragmentConfig.apply(fragmentConfig)
+            activityConfig = activityConfig.copy(enterAnim = enterAnim),
+            fragmentConfig = fragmentConfig.copy(enterAnim = enterAnim, popEnterAnim = popEnterAnim)
         )
     }
 
-    fun AgileRequest.flow(needResult: Boolean = true): Flow<Result<Bundle>> {
-        return ButterflyCore.dispatchAgile(copy(needResult = needResult))
+    fun AgileRequest.exitAnim(exitAnim: Int = 0, popExitAnim: Int = 0): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(exitAnim = exitAnim),
+            fragmentConfig = fragmentConfig.copy(exitAnim = exitAnim, popExitAnim = popExitAnim)
+        )
+    }
+
+    fun AgileRequest.flow(): Flow<Unit> {
+        return ButterflyCore.dispatchAgile(copy(needResult = false)).flatMapConcat { flowOf(Unit) }
+    }
+
+    fun AgileRequest.resultFlow(): Flow<Result<Bundle>> {
+        return ButterflyCore.dispatchAgile(copy(needResult = true))
     }
 
     fun AgileRequest.carry(
@@ -75,9 +102,9 @@ object Butterfly {
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
         if (onResult == EMPTY_LAMBDA) {
-            flow(false).launchIn(scope)
+            flow().launchIn(scope)
         } else {
-            flow(true).onEach {
+            resultFlow().onEach {
                 if (it.isSuccess) {
                     onResult(it.getOrDefault(Bundle()))
                 } else {
@@ -91,8 +118,26 @@ object Butterfly {
         setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundleOf(*pair)) })
     }
 
+    fun Activity.popBack() {
+        finish()
+    }
+
+    fun Activity.popBackWithResult(vararg pair: Pair<String, Any?>) {
+        setResult(*pair)
+        finish()
+    }
+
     fun Fragment.setResult(vararg pair: Pair<String, Any?>) {
         parentFragmentManager.setFragmentResult(javaClass.name, bundleOf(*pair))
+    }
+
+    fun Fragment.popBack() {
+        parentFragmentManager.popBackStack()
+    }
+
+    fun Fragment.popBackWithResult(vararg pair: Pair<String, Any?>) {
+        setResult(*pair)
+        parentFragmentManager.popBackStack()
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

@@ -10,15 +10,12 @@ data class AgileRequest(
     val activityConfig: ActivityConfig = ActivityConfig(),
     val fragmentConfig: FragmentConfig = FragmentConfig(),
     val interceptorController: InterceptorController = InterceptorController(),
-    val shouldIntercept: Boolean = true,
+    val enableGlobalInterceptor: Boolean = true,
     val needResult: Boolean = true
 )
 
 data class EvadeRequest(
-    val identity: String,
-    val className: String,
-    val implClassName: String,
-    val isSingleton: Boolean
+    val identity: String, val className: String, val implClassName: String, val isSingleton: Boolean
 ) {
     override fun toString(): String {
         return """[identity="$identity", className="$className", implClassName="$implClassName", isSingleton="$isSingleton"]"""
@@ -28,14 +25,21 @@ data class EvadeRequest(
 data class ActivityConfig(
     val enterAnim: Int = 0,
     val exitAnim: Int = 0,
-    val activityOptions: ActivityOptionsCompat? = null
+    val activityOptions: ActivityOptionsCompat? = null,
+    val flags: Int = 0
 )
 
+enum class FragmentOp {
+    ADD, REPLACE, REMOVE
+}
+
 data class FragmentConfig(
-    var isAdd: Boolean = false,
-    var addToBackStack: Boolean = false,
-    var enterAnim: Int = 0,
-    var exitAnim: Int = 0,
-    var popEnterAnim: Int = 0,
-    var popExitAnim: Int = 0
+    val containerViewId: Int = 0,
+    val addToBackStack: Boolean = false,
+    val backStack: String = "",
+    val enterAnim: Int = 0,
+    val exitAnim: Int = 0,
+    val popEnterAnim: Int = 0,
+    val popExitAnim: Int = 0,
+    val op: FragmentOp = FragmentOp.REPLACE
 )

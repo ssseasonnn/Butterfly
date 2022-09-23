@@ -32,27 +32,24 @@ object ButterflyCore {
 
     fun removeModule(module: Module) = moduleController.removeModule(module)
 
-    fun addInterceptor(interceptor: ButterflyInterceptor) =
-        interceptorController.addInterceptor(interceptor)
+    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorController.addInterceptor(interceptor)
 
-    fun removeInterceptor(interceptor: ButterflyInterceptor) =
-        interceptorController.removeInterceptor(interceptor)
+    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorController.removeInterceptor(interceptor)
 
     fun queryAgile(scheme: String): AgileRequest = moduleController.queryAgile(scheme)
 
     fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
 
     fun dispatchAgile(agileRequest: AgileRequest): Flow<Result<Bundle>> {
-        return flowOf(Unit)
-            .onEach {
-                if (agileRequest.shouldIntercept) {
-                    interceptorController.intercept(agileRequest)
-                }
-            }.onEach {
-                agileRequest.interceptorController.intercept(agileRequest)
-            }.flatMapConcat {
-                agileDispatcher.dispatch(agileRequest)
+        return flowOf(Unit).onEach {
+            if (agileRequest.enableGlobalInterceptor) {
+                interceptorController.intercept(agileRequest)
             }
+        }.onEach {
+            agileRequest.interceptorController.intercept(agileRequest)
+        }.flatMapConcat {
+            agileDispatcher.dispatch(agileRequest)
+        }
     }
 
     fun dispatchEvade(evadeRequest: EvadeRequest): Any {
