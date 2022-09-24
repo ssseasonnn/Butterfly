@@ -7,8 +7,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import zlc.season.butterfly.ButterflyHelper.remove
-import zlc.season.butterfly.ButterflyHelper.scope
 
 object Butterfly {
     const val RAW_SCHEME = "butterfly_scheme"
@@ -47,20 +45,40 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.add(containerViewId: Int = 0): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, op = FragmentOp.ADD))
+    fun AgileRequest.add(containerViewId: Int = 0, tag: String = ""): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, tag = tag, op = FragmentOp.ADD))
     }
 
-    fun AgileRequest.replace(containerViewId: Int = 0): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, op = FragmentOp.REPLACE))
+    fun AgileRequest.replace(containerViewId: Int = 0, tag: String = ""): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, tag = tag, op = FragmentOp.REPLACE))
     }
 
-    fun AgileRequest.remove(containerViewId: Int = 0): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(op = FragmentOp.REMOVE))
+    fun AgileRequest.show(tag: String = ""): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.SHOW))
     }
 
-    fun AgileRequest.backStack(name: String): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = true, backStack = name))
+    fun AgileRequest.hide(tag: String = ""): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.HIDE))
+    }
+
+    fun AgileRequest.remove(tag: String): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.REMOVE))
+    }
+
+    fun AgileRequest.container(containerViewId: Int): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId))
+    }
+
+    fun AgileRequest.tag(tag: String): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(tag = tag))
+    }
+
+    fun AgileRequest.singleton(): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(isSingleton = true))
+    }
+
+    fun AgileRequest.useBackStack(backStackName: String = ""): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = true, backStack = backStackName))
     }
 
     fun AgileRequest.addFlag(flag: Int): AgileRequest {
@@ -93,7 +111,7 @@ object Butterfly {
         onError: (Throwable) -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
-        carry(scope, onError, onResult)
+        carry(ButterflyHelper.scope, onError, onResult)
     }
 
     fun AgileRequest.carry(
@@ -114,15 +132,27 @@ object Butterfly {
         }
     }
 
+    fun AgileRequest.retreat() {
+        ButterflyCore.dispatchRetreat(this)
+    }
+
+    fun AgileRequest.retreatWithResult(vararg pair: Pair<String, Any?>) {
+        ButterflyCore.dispatchRetreat(this, bundleOf(*pair))
+    }
+
     fun Activity.setResult(vararg pair: Pair<String, Any?>) {
         setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundleOf(*pair)) })
     }
 
-    fun Activity.popBack() {
+    fun Activity.setResult(bundle: Bundle) {
+        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
+    }
+
+    fun Activity.retreat() {
         finish()
     }
 
-    fun Activity.popBackWithResult(vararg pair: Pair<String, Any?>) {
+    fun Activity.retreatWithResult(vararg pair: Pair<String, Any?>) {
         setResult(*pair)
         finish()
     }
@@ -131,11 +161,15 @@ object Butterfly {
         parentFragmentManager.setFragmentResult(javaClass.name, bundleOf(*pair))
     }
 
-    fun Fragment.popBack() {
+    fun Fragment.setResult(bundle: Bundle) {
+        parentFragmentManager.setFragmentResult(javaClass.name, bundle)
+    }
+
+    fun Fragment.retreat() {
         parentFragmentManager.popBackStack()
     }
 
-    fun Fragment.popBackWithResult(vararg pair: Pair<String, Any?>) {
+    fun Fragment.retreatWithResult(vararg pair: Pair<String, Any?>) {
         setResult(*pair)
         parentFragmentManager.popBackStack()
     }

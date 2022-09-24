@@ -5,16 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import zlc.season.butterfly.Butterfly.setResult
+import zlc.season.butterfly.ButterflyHelper.activity
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
 import zlc.season.butterfly.ButterflyHelper.context
 import zlc.season.butterfly.ButterflyHelper.fragmentActivity
 import zlc.season.butterfly.ButterflyHelper.fragmentManager
+import zlc.season.butterfly.ButterflyHelper.remove
 
 class AgileDispatcher {
     companion object {
@@ -52,10 +56,22 @@ class AgileDispatcher {
         val cls = Class.forName(request.className)
         return dispatcherMap[getAgileType(cls)]!!.dispatch(request)
     }
+
+    fun retreat(request: AgileRequest, bundle: Bundle) {
+        if (request.className.isEmpty()) {
+            "Agile --> class not found!".logw()
+            return
+        }
+
+        val cls = Class.forName(request.className)
+        return dispatcherMap[getAgileType(cls)]!!.retreat(request, bundle)
+    }
 }
 
 interface InnerDispatcher {
     fun dispatch(request: AgileRequest): Flow<Result<Bundle>>
+
+    fun retreat(request: AgileRequest, bundle: Bundle) {}
 }
 
 object NoneDispatcher : InnerDispatcher {
@@ -75,6 +91,11 @@ object ActionDispatcher : InnerDispatcher {
 }
 
 object ActivityDispatcher : InnerDispatcher {
+    override fun retreat(request: AgileRequest, bundle: Bundle) {
+        activity?.setResult(bundle)
+        activity?.finish()
+    }
+
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         return if (!request.needResult) {
             val context = context
@@ -128,6 +149,17 @@ object ActivityDispatcher : InnerDispatcher {
 }
 
 object DialogFragmentDispatcher : InnerDispatcher {
+    override fun retreat(request: AgileRequest, bundle: Bundle) {
+        val fragmentManager = ButterflyHelper.fragmentManager ?: return
+        if (request.fragmentConfig.tag.isNotEmpty()) {
+            val dialogFragment = fragmentManager.findFragmentByTag(request.fragmentConfig.tag)
+            if (dialogFragment != null && dialogFragment is DialogFragment) {
+                dialogFragment.setResult(bundle)
+                dialogFragment.dismissAllowingStateLoss()
+            }
+        }
+    }
+
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val activity = fragmentActivity
             ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
@@ -137,7 +169,13 @@ object DialogFragmentDispatcher : InnerDispatcher {
 
         if (fragment is DialogFragment) {
             fragment.show(fragmentManager, fragment.javaClass.name)
+            return if (request.needResult) {
+                fragmentManager.awaitFragmentResult(activity, fragment)
+            } else {
+                flowOf(Result.success(Bundle()))
+            }
         }
+
         return flowOf(Result.success(Bundle()))
     }
 
@@ -155,12 +193,48 @@ object DialogFragmentDispatcher : InnerDispatcher {
 }
 
 object FragmentDispatcher : InnerDispatcher {
+    override fun retreat(request: AgileRequest, bundle: Bundle) {
+        val fragmentManager = ButterflyHelper.fragmentManager ?: return
+        if (request.fragmentConfig.tag.isNotEmpty()) {
+            val fragment = fragmentManager.findFragmentByTag(request.fragmentConfig.tag)
+            if (fragment != null) {
+                fragment.setResult(bundle)
+                fragmentManager.remove(fragment)
+            }
+        }
+    }
+
     override fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val activity = fragmentActivity
-            ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
+            ?: return flowOf(Result.failure(IllegalStateException("No FragmentActivity exists.")))
 
-        val fragment = createFragment(activity, request)
+        var isFragmentExist = false
         val fragmentManager = activity.supportFragmentManager
+
+        val fragment = if (request.fragmentConfig.isSingleton) {
+            val realTag = request.fragmentConfig.tag.ifEmpty {
+                parseScheme(request.scheme)
+            }
+            var fragment = fragmentManager.findFragmentByTag(realTag)
+            if (fragment == null) {
+                fragment = createFragment(activity, request)
+            } else {
+                fragment.arguments = request.bundle
+                isFragmentExist = true
+            }
+            fragment
+        } else {
+            createFragment(activity, request)
+        }
+
+//        val fragment = createFragment(activity, request)
+
+        if (isFragmentExist) {
+
+        } else {
+
+        }
+
         fragmentManager.commit(fragment, request)
         return if (request.needResult) {
             fragmentManager.awaitFragmentResult(activity, fragment)
@@ -181,21 +255,33 @@ object FragmentDispatcher : InnerDispatcher {
             config.popExitAnim
         )
 
+        clearBackStack()
         if (config.addToBackStack && isAddToBackStackAllowed) {
             addToBackStack(null)
         }
 
-        if (config.isAdd) {
-            add(android.R.id.content, fragment)
-        } else {
-            replace(android.R.id.content, fragment)
+        when (config.op) {
+            FragmentOp.ADD -> {
+                add(if (config.containerViewId == 0) android.R.id.content else config.containerViewId, fragment, config.tag)
+            }
+            FragmentOp.REPLACE -> {
+                replace(if (config.containerViewId == 0) android.R.id.content else config.containerViewId, fragment, config.tag)
+            }
+            FragmentOp.REMOVE -> {
+                remove(fragment)
+            }
+            FragmentOp.SHOW -> {
+                show(fragment)
+            }
+            FragmentOp.HIDE -> {
+                hide(fragment)
+            }
         }
 
-        if (isStateSaved) {
-            commitAllowingStateLoss()
-        } else {
-            commit()
-        }
+
+
+        commitAllowingStateLoss()
+
     }
 
 

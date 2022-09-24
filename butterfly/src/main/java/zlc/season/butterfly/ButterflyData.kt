@@ -30,11 +30,13 @@ data class ActivityConfig(
 )
 
 enum class FragmentOp {
-    ADD, REPLACE, REMOVE
+    ADD, REPLACE, REMOVE, SHOW, HIDE
 }
 
 data class FragmentConfig(
     val containerViewId: Int = 0,
+    val tag: String = "",
+    val isSingleton: Boolean = false,
     val addToBackStack: Boolean = false,
     val backStack: String = "",
     val enterAnim: Int = 0,
