@@ -45,26 +45,6 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.add(containerViewId: Int = 0, tag: String = ""): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, tag = tag, op = FragmentOp.ADD))
-    }
-
-    fun AgileRequest.replace(containerViewId: Int = 0, tag: String = ""): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId, tag = tag, op = FragmentOp.REPLACE))
-    }
-
-    fun AgileRequest.show(tag: String = ""): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.SHOW))
-    }
-
-    fun AgileRequest.hide(tag: String = ""): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.HIDE))
-    }
-
-    fun AgileRequest.remove(tag: String): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(tag = tag, op = FragmentOp.REMOVE))
-    }
-
     fun AgileRequest.container(containerViewId: Int): AgileRequest {
         return copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId))
     }
@@ -73,11 +53,18 @@ object Butterfly {
         return copy(fragmentConfig = fragmentConfig.copy(tag = tag))
     }
 
-    fun AgileRequest.singleton(): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(isSingleton = true))
+    fun AgileRequest.clearTop(): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(clearTop = true),
+            fragmentConfig = fragmentConfig.copy(clearTop = true)
+        )
     }
 
-    fun AgileRequest.useBackStack(backStackName: String = ""): AgileRequest {
+    fun AgileRequest.disableBackStack(): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = false))
+    }
+
+    fun AgileRequest.backStack(backStackName: String = ""): AgileRequest {
         return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = true, backStack = backStackName))
     }
 

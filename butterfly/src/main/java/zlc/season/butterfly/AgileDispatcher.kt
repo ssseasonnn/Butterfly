@@ -10,6 +10,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.Butterfly.setResult
@@ -19,6 +22,7 @@ import zlc.season.butterfly.ButterflyHelper.context
 import zlc.season.butterfly.ButterflyHelper.fragmentActivity
 import zlc.season.butterfly.ButterflyHelper.fragmentManager
 import zlc.season.butterfly.ButterflyHelper.remove
+import zlc.season.claritypotion.ClarityPotion
 
 class AgileDispatcher {
     companion object {
@@ -124,6 +128,9 @@ object ActivityDispatcher : InnerDispatcher {
         if (request.activityConfig.flags != 0) {
             intent.addFlags(request.activityConfig.flags)
         }
+        if (request.activityConfig.clearTop) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
@@ -193,8 +200,24 @@ object DialogFragmentDispatcher : InnerDispatcher {
 }
 
 object FragmentDispatcher : InnerDispatcher {
+    class FragmentBackEntry(val agileRequest: AgileRequest, val fragment: Fragment)
+
+    private val fragmentBackEntryMap = mapOf<String, MutableList<FragmentBackEntry>>()
+
+    private val lifecycleEventObserver = object : LifecycleEventObserver {
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+
+        }
+    }
+
+    init {
+
+    }
+
     override fun retreat(request: AgileRequest, bundle: Bundle) {
         val fragmentManager = ButterflyHelper.fragmentManager ?: return
+        val backStackEntry = fragmentManager.getBackStackEntryAt(0)
+        backStackEntry.id
         if (request.fragmentConfig.tag.isNotEmpty()) {
             val fragment = fragmentManager.findFragmentByTag(request.fragmentConfig.tag)
             if (fragment != null) {
@@ -210,6 +233,14 @@ object FragmentDispatcher : InnerDispatcher {
 
         var isFragmentExist = false
         val fragmentManager = activity.supportFragmentManager
+
+        if (activity.lifecycle.)
+        activity.lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+
+            }
+        })
+        fragmentManager.registerFragmentLifecycleCallbacks()
 
         val fragment = if (request.fragmentConfig.isSingleton) {
             val realTag = request.fragmentConfig.tag.ifEmpty {

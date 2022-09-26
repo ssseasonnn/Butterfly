@@ -26,7 +26,8 @@ data class ActivityConfig(
     val enterAnim: Int = 0,
     val exitAnim: Int = 0,
     val activityOptions: ActivityOptionsCompat? = null,
-    val flags: Int = 0
+    val flags: Int = 0,
+    val clearTop: Boolean = false
 )
 
 enum class FragmentOp {
@@ -37,7 +38,8 @@ data class FragmentConfig(
     val containerViewId: Int = 0,
     val tag: String = "",
     val isSingleton: Boolean = false,
-    val addToBackStack: Boolean = false,
+    val clearTop: Boolean = false,
+    val addToBackStack: Boolean = true,
     val backStack: String = "",
     val enterAnim: Int = 0,
     val exitAnim: Int = 0,
