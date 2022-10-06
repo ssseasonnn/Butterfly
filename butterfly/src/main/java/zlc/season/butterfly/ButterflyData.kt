@@ -27,23 +27,20 @@ data class ActivityConfig(
     val exitAnim: Int = 0,
     val activityOptions: ActivityOptionsCompat? = null,
     val flags: Int = 0,
-    val clearTop: Boolean = false
+    val clearTop: Boolean = false,
+    val singleTop: Boolean = false,
 )
-
-enum class FragmentOp {
-    ADD, REPLACE, REMOVE, SHOW, HIDE
-}
 
 data class FragmentConfig(
     val containerViewId: Int = 0,
     val tag: String = "",
-    val isSingleton: Boolean = false,
     val clearTop: Boolean = false,
-    val addToBackStack: Boolean = true,
-    val backStack: String = "",
+    val singleTop: Boolean = false,
+    val enableBackStack: Boolean = true,
+    val useReplace: Boolean = false,
+
     val enterAnim: Int = 0,
     val exitAnim: Int = 0,
     val popEnterAnim: Int = 0,
-    val popExitAnim: Int = 0,
-    val op: FragmentOp = FragmentOp.REPLACE
+    val popExitAnim: Int = 0
 )

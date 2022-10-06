@@ -61,11 +61,7 @@ object Butterfly {
     }
 
     fun AgileRequest.disableBackStack(): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = false))
-    }
-
-    fun AgileRequest.backStack(backStackName: String = ""): AgileRequest {
-        return copy(fragmentConfig = fragmentConfig.copy(addToBackStack = true, backStack = backStackName))
+        return copy(fragmentConfig = fragmentConfig.copy(enableBackStack = false))
     }
 
     fun AgileRequest.addFlag(flag: Int): AgileRequest {
