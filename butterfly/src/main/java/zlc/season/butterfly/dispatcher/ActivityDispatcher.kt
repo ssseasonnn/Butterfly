@@ -24,11 +24,10 @@ object ActivityDispatcher : InnerDispatcher {
 
             flowOf(Result.success(Bundle()))
         } else {
-            val fm = ButterflyHelper.fragmentManager
-            if (fm != null) {
-                val context = ButterflyHelper.context
-                val intent = createIntent(context, request)
-                ButterflyFragment.showAsFlow(fm, intent, createActivityOptions(context, request))
+            val activity = ButterflyHelper.fragmentActivity
+            if (activity != null) {
+                val intent = createIntent(activity, request)
+                ButterflyFragment.showAsFlow(activity, intent, createActivityOptions(activity, request))
             } else {
                 "Agile --> activity not found".logw()
                 flowOf(Result.failure(IllegalStateException("Activity not found")))

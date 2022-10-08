@@ -7,10 +7,10 @@ import androidx.fragment.app.FragmentTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.Butterfly.setResult
 import zlc.season.butterfly.ButterflyHelper
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
 import zlc.season.butterfly.ButterflyHelper.remove
+import zlc.season.butterfly.ButterflyHelper.setFragmentResult
 import zlc.season.butterfly.dispatcher.FragmentBackStackManager.FragmentEntry
 import zlc.season.butterfly.parseScheme
 import java.lang.ref.WeakReference
@@ -31,14 +31,15 @@ object FragmentDispatcher : InnerDispatcher {
         )
     }
 
+
     override fun retreat(bundle: Bundle) {
         val activity = ButterflyHelper.fragmentActivity ?: return
         val topEntry = fragmentBackStackManager.getTopEntry(activity)
         topEntry?.let {
             fragmentBackStackManager.removeEntry(activity, it)
             it.reference.get()?.apply {
-                setResult(bundle)
-                activity.supportFragmentManager.remove(this)
+                activity.setFragmentResult(this, bundle)
+                activity.remove(this)
             }
         }
     }

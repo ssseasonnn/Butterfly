@@ -122,12 +122,12 @@ object Butterfly {
         }
     }
 
-    fun AgileRequest.retreat() {
-        ButterflyCore.dispatchRetreat(this)
+    fun retreat() {
+
     }
 
-    fun AgileRequest.retreatWithResult(vararg pair: Pair<String, Any?>) {
-        ButterflyCore.dispatchRetreat(this, bundleOf(*pair))
+    fun retreatDialog() {
+
     }
 
     fun retreatFragment(bundle: Bundle = Bundle()) {
@@ -151,21 +151,12 @@ object Butterfly {
         finish()
     }
 
-    fun Fragment.setResult(vararg pair: Pair<String, Any?>) {
-        parentFragmentManager.setFragmentResult(javaClass.name, bundleOf(*pair))
-    }
-
-    fun Fragment.setResult(bundle: Bundle) {
-        parentFragmentManager.setFragmentResult(javaClass.name, bundle)
-    }
-
     fun Fragment.retreat() {
-        parentFragmentManager.popBackStack()
+        ButterflyCore.dispatchRetreat()
     }
 
     fun Fragment.retreatWithResult(vararg pair: Pair<String, Any?>) {
-        setResult(*pair)
-        parentFragmentManager.popBackStack()
+        ButterflyCore.dispatchRetreat()
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

@@ -53,7 +53,7 @@ internal object ButterflyHelper {
         get() = lifecycleOwner?.lifecycleScope ?: internalScope
 
 
-    internal fun FragmentManager.awaitFragmentResume(
+    internal fun FragmentActivity.awaitFragmentResume(
         fragment: Fragment,
         callback: ProducerScope<Result<Bundle>>.() -> Unit
     ) = callbackFlow {
@@ -61,18 +61,18 @@ internal object ButterflyHelper {
             override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
                 if (fragment === f) {
                     callback()
-                    unregisterFragmentLifecycleCallbacks(this)
+                    supportFragmentManager.unregisterFragmentLifecycleCallbacks(this)
                 }
             }
         }
 
         if (!isDestroyed && isActive) {
-            registerFragmentLifecycleCallbacks(cb, false)
+            supportFragmentManager.registerFragmentLifecycleCallbacks(cb, false)
             add(fragment)
         }
 
         awaitClose {
-            unregisterFragmentLifecycleCallbacks(cb)
+            supportFragmentManager.unregisterFragmentLifecycleCallbacks(cb)
         }
     }
 
@@ -97,12 +97,15 @@ internal object ButterflyHelper {
         }
     }
 
-
-    internal fun FragmentManager.add(fragment: Fragment) {
-        beginTransaction().add(fragment, fragment.javaClass.name).commitAllowingStateLoss()
+    internal fun FragmentActivity.setFragmentResult(fragment: Fragment, bundle: Bundle) {
+        supportFragmentManager.setFragmentResult(javaClass.name, bundle)
     }
 
-    internal fun FragmentManager.remove(fragment: Fragment) {
-        beginTransaction().remove(fragment).commitAllowingStateLoss()
+    internal fun FragmentActivity.add(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().add(fragment, fragment.javaClass.name).commitAllowingStateLoss()
+    }
+
+    internal fun FragmentActivity.remove(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss()
     }
 }
