@@ -14,18 +14,31 @@ class FragmentBackStackManager {
     init {
         ClarityPotion.application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
             override fun onActivityDestroyed(activity: Activity) {
-                synchronized(this@FragmentBackStackManager) {
-                    if (fragmentBackStackMap[activity.hashCode()] != null) {
-                        fragmentBackStackMap.remove(activity.hashCode())
-                    }
-                }
+                removeBackStack(activity.hashCode())
             }
         })
     }
 
     @Synchronized
+    fun removeBackStack(hashCode: Int) {
+        fragmentBackStackMap.remove(hashCode)
+    }
+
+    @Synchronized
     fun addEntry(activity: FragmentActivity, entry: FragmentEntry) {
         getBackStackList(activity).add(entry)
+    }
+
+    @Synchronized
+    fun removeEntry(activity: FragmentActivity, entry: FragmentEntry) {
+        val backStackList = getBackStackList(activity)
+        backStackList.remove(entry)
+    }
+
+    @Synchronized
+    fun removeEntries(activity: FragmentActivity, entryList: List<FragmentEntry>) {
+        val backStackList = getBackStackList(activity)
+        backStackList.removeAll(entryList)
     }
 
     @Synchronized
@@ -36,7 +49,7 @@ class FragmentBackStackManager {
         val index = backStackList.indexOfLast { it.request.className == request.className }
         if (index != -1) {
             for (i in index until backStackList.size) {
-                val entry = backStackList.removeAt(i)
+                val entry = backStackList[i]
                 result.add(entry)
             }
         }

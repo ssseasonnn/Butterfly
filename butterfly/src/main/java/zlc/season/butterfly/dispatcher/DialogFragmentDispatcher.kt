@@ -27,12 +27,13 @@ object DialogFragmentDispatcher : InnerDispatcher {
         val activity = ButterflyHelper.fragmentActivity ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
 
         val fragment = createFragment(activity, request)
-        val fragmentManager = activity.supportFragmentManager
 
         if (fragment is DialogFragment) {
-            fragment.show(fragmentManager, fragment.javaClass.name)
+            fragment.show(
+                activity.supportFragmentManager, fragment.javaClass.name
+            )
             return if (request.needResult) {
-                fragmentManager.awaitFragmentResult(activity, fragment)
+                activity.awaitFragmentResult(fragment)
             } else {
                 flowOf(Result.success(Bundle()))
             }

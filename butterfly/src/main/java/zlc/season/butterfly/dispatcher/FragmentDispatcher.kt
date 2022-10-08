@@ -34,6 +34,7 @@ object FragmentDispatcher : InnerDispatcher {
         val activity = ButterflyHelper.fragmentActivity ?: return
         val topEntry = fragmentBackStackManager.getTopEntry(activity)
         topEntry?.let {
+            fragmentBackStackManager.removeEntry(activity, it)
             it.fragment.setResult(bundle)
             activity.supportFragmentManager.remove(it.fragment)
         }
@@ -78,6 +79,7 @@ object FragmentDispatcher : InnerDispatcher {
             } else {
                 val target = topEntryList.removeFirst().fragment
                 topEntryList.forEach { remove(it.fragment) }
+                fragmentBackStackManager.removeEntries(this@clearTop, topEntryList)
 
                 show(request, target)
             }
