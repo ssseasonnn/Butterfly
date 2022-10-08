@@ -84,14 +84,14 @@ class FragmentBackStackManager {
     private fun clearUselessEntry(backStackList: MutableList<FragmentEntry>) {
         val shouldRemoveList = mutableListOf<FragmentEntry>()
         backStackList.forEach {
-            if (it.fragment.get() == null) {
+            if (it.reference.get() == null) {
                 shouldRemoveList.add(it)
             }
         }
         backStackList.removeAll(shouldRemoveList)
     }
 
-    data class FragmentEntry(val request: AgileRequest, val fragment: WeakReference<Fragment>)
+    data class FragmentEntry(val request: AgileRequest, val reference: WeakReference<Fragment>)
 
     open class ActivityLifecycleCallbacksAdapter : Application.ActivityLifecycleCallbacks {
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {

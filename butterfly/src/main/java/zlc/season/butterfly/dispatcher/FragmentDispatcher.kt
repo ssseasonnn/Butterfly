@@ -13,6 +13,7 @@ import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
 import zlc.season.butterfly.ButterflyHelper.remove
 import zlc.season.butterfly.dispatcher.FragmentBackStackManager.FragmentEntry
 import zlc.season.butterfly.parseScheme
+import java.lang.ref.WeakReference
 
 object FragmentDispatcher : InnerDispatcher {
     private val fragmentBackStackManager = FragmentBackStackManager()
@@ -35,8 +36,10 @@ object FragmentDispatcher : InnerDispatcher {
         val topEntry = fragmentBackStackManager.getTopEntry(activity)
         topEntry?.let {
             fragmentBackStackManager.removeEntry(activity, it)
-            it.fragment.setResult(bundle)
-            activity.supportFragmentManager.remove(it.fragment)
+            it.reference.get()?.apply {
+                setResult(bundle)
+                activity.supportFragmentManager.remove(this)
+            }
         }
     }
 
@@ -54,47 +57,55 @@ object FragmentDispatcher : InnerDispatcher {
             }
         }
 
-        return if (realRequest.needResult) {
+        return if (fragment == null) {
+            flowOf(Result.failure(IllegalStateException("Fragment is NULL.")))
+        } else if (realRequest.needResult) {
             activity.awaitFragmentResult(fragment)
         } else {
             flowOf(Result.success(Bundle()))
         }
     }
 
-    private fun FragmentActivity.normal(request: AgileRequest): Fragment =
+    private fun FragmentActivity.normal(request: AgileRequest): Fragment? =
         with(supportFragmentManager.beginTransaction()) {
             val fragment = createFragment(this@normal, request)
             if (request.fragmentConfig.enableBackStack) {
-                fragmentBackStackManager.addEntry(this@normal, FragmentEntry(request, fragment))
+                fragmentBackStackManager.addEntry(this@normal, FragmentEntry(request, WeakReference(fragment)))
             }
             show(request, fragment)
         }
 
 
-    private fun FragmentActivity.clearTop(request: AgileRequest): Fragment =
+    private fun FragmentActivity.clearTop(request: AgileRequest): Fragment? =
         with(supportFragmentManager.beginTransaction()) {
             val topEntryList = fragmentBackStackManager.getTopEntryList(this@clearTop, request)
             return if (topEntryList.isEmpty()) {
                 normal(request)
             } else {
-                val target = topEntryList.removeFirst().fragment
-                topEntryList.forEach { remove(it.fragment) }
+                val targetEntry = topEntryList.removeFirst()
+                topEntryList.forEach {
+                    it.reference.get()?.apply { remove(this) }
+                }
                 fragmentBackStackManager.removeEntries(this@clearTop, topEntryList)
 
-                show(request, target)
+                show(request, targetEntry.reference)
             }
         }
 
-    private fun FragmentActivity.singleTop(request: AgileRequest): Fragment =
+    private fun FragmentActivity.singleTop(request: AgileRequest): Fragment? =
         with(supportFragmentManager.beginTransaction()) {
             val topEntry = fragmentBackStackManager.getTopEntry(this@singleTop)
             return if (topEntry?.request?.className == request.className) {
-                val target = topEntry.fragment
-                show(request, target)
+                show(request, topEntry.reference)
             } else {
                 normal(request)
             }
         }
+
+    private fun FragmentTransaction.show(request: AgileRequest, weakReference: WeakReference<Fragment>): Fragment? {
+        val target = weakReference.get() ?: return null
+        return show(request, target)
+    }
 
     private fun FragmentTransaction.show(request: AgileRequest, target: Fragment): Fragment {
         target.arguments = request.bundle
