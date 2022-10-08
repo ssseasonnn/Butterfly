@@ -8,4 +8,6 @@ interface InnerDispatcher {
     suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>>
 
     fun retreat(request: AgileRequest, bundle: Bundle) {}
+
+    fun retreat(bundle: Bundle) {}
 }

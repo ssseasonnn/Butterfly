@@ -6,10 +6,8 @@ import zlc.season.bar.databinding.ActivityAgileTestBinding
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.add
 import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.Butterfly.params
-import zlc.season.butterfly.Butterfly.backStack
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_AGILE_TEST)
@@ -48,8 +46,6 @@ class AgileTestActivity : AppCompatActivity() {
 
         binding.startFragment.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT)
-                .backStack()
-                .add()
                 .carry {
                     val abc by it.params<String>()
                     println(abc)

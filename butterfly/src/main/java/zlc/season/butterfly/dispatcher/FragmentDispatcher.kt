@@ -27,11 +27,9 @@ object FragmentDispatcher : InnerDispatcher {
         )
     }
 
-    override fun retreat(request: AgileRequest, bundle: Bundle) {
+    override fun retreat(bundle: Bundle) {
         val activity = ButterflyHelper.fragmentActivity ?: return
-        val realRequest = request.createRealRequest()
-
-        fragmentBackStackManager.popFragment(activity, realRequest)
+        fragmentBackStackManager.popFragment(activity, bundle)
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
@@ -66,7 +64,7 @@ object FragmentDispatcher : InnerDispatcher {
             } else {
                 add(containerViewId, fragment, tag)
             }
-            setCustomAnimations(enterAnim, exitAnim, popEnterAnim, popExitAnim)
+            setCustomAnimations(enterAnim, exitAnim, 0, 0)
             if (enableBackStack) {
                 fragmentBackStackManager.pushFragment(activity, fragment, request)
             }
@@ -100,7 +98,7 @@ object FragmentDispatcher : InnerDispatcher {
             } else {
                 add(config.containerViewId, target, config.tag)
             }
-            setCustomAnimations(config.enterAnim, config.exitAnim, config.popEnterAnim, config.popExitAnim)
+            setCustomAnimations(config.enterAnim, config.exitAnim, 0, 0)
             commitAllowingStateLoss()
             return@with target
         }
@@ -122,7 +120,7 @@ object FragmentDispatcher : InnerDispatcher {
             } else {
                 add(config.containerViewId, target, config.tag)
             }
-            setCustomAnimations(config.enterAnim, config.exitAnim, config.popEnterAnim, config.popExitAnim)
+            setCustomAnimations(config.enterAnim, config.exitAnim, 0, 0)
             commitAllowingStateLoss()
             return@with target
         }

@@ -9,6 +9,9 @@
         <activity
             android:name=".AgileTestActivity"
             android:exported="false" />
+        <activity
+            android:name=".FragmentTestActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

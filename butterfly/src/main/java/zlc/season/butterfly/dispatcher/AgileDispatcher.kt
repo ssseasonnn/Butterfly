@@ -67,4 +67,8 @@ class AgileDispatcher {
         val cls = Class.forName(request.className)
         return dispatcherMap[getAgileType(cls)]!!.retreat(request, bundle)
     }
+
+    fun retreatFragment(bundle: Bundle) {
+        return dispatcherMap[AGILE_TYPE_FRAGMENT]!!.retreat(bundle)
+    }
 }

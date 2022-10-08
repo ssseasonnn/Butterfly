@@ -60,6 +60,13 @@ object Butterfly {
         )
     }
 
+    fun AgileRequest.singleTop(): AgileRequest {
+        return copy(
+            activityConfig = activityConfig.copy(singleTop = true),
+            fragmentConfig = fragmentConfig.copy(singleTop = true)
+        )
+    }
+
     fun AgileRequest.disableBackStack(): AgileRequest {
         return copy(fragmentConfig = fragmentConfig.copy(enableBackStack = false))
     }
@@ -68,17 +75,17 @@ object Butterfly {
         return copy(activityConfig = activityConfig.copy(flags = activityConfig.flags or flag))
     }
 
-    fun AgileRequest.enterAnim(enterAnim: Int = 0, popEnterAnim: Int = 0): AgileRequest {
+    fun AgileRequest.enterAnim(enterAnim: Int = 0): AgileRequest {
         return copy(
             activityConfig = activityConfig.copy(enterAnim = enterAnim),
-            fragmentConfig = fragmentConfig.copy(enterAnim = enterAnim, popEnterAnim = popEnterAnim)
+            fragmentConfig = fragmentConfig.copy(enterAnim = enterAnim)
         )
     }
 
-    fun AgileRequest.exitAnim(exitAnim: Int = 0, popExitAnim: Int = 0): AgileRequest {
+    fun AgileRequest.exitAnim(exitAnim: Int = 0): AgileRequest {
         return copy(
             activityConfig = activityConfig.copy(exitAnim = exitAnim),
-            fragmentConfig = fragmentConfig.copy(exitAnim = exitAnim, popExitAnim = popExitAnim)
+            fragmentConfig = fragmentConfig.copy(exitAnim = exitAnim)
         )
     }
 
@@ -121,6 +128,10 @@ object Butterfly {
 
     fun AgileRequest.retreatWithResult(vararg pair: Pair<String, Any?>) {
         ButterflyCore.dispatchRetreat(this, bundleOf(*pair))
+    }
+
+    fun retreatFragment(bundle: Bundle = Bundle()) {
+        ButterflyCore.dispatchRetreat(bundle)
     }
 
     fun Activity.setResult(vararg pair: Pair<String, Any?>) {

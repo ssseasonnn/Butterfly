@@ -58,6 +58,10 @@ object ButterflyCore {
         agileDispatcher.retreat(agileRequest, bundle)
     }
 
+    fun dispatchRetreat(bundle: Bundle = Bundle()) {
+        agileDispatcher.retreatFragment(bundle)
+    }
+
     fun dispatchEvade(evadeRequest: EvadeRequest): Any {
         return evadeDispatcher.dispatch(evadeRequest)
     }

@@ -40,7 +40,5 @@ data class FragmentConfig(
     val useReplace: Boolean = false,
 
     val enterAnim: Int = 0,
-    val exitAnim: Int = 0,
-    val popEnterAnim: Int = 0,
-    val popExitAnim: Int = 0
+    val exitAnim: Int = 0
 )

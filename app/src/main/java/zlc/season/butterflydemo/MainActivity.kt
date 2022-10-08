@@ -22,6 +22,9 @@ class MainActivity : AppCompatActivity() {
         binding.startAgileTest.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_AGILE_TEST).carry()
         }
+        binding.btnFragmentTest.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FRAGMENT_TEST).carry()
+        }
 
         binding.startEvadeTest.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_EVADE_TEST).carry()

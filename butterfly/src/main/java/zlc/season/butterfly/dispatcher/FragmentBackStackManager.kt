@@ -29,22 +29,15 @@ class FragmentBackStackManager {
         getBackStackList(activity).add(FragmentEntry(request, fragment))
     }
 
-    fun popFragment(activity: FragmentActivity, request: AgileRequest) {
+    fun popFragment(activity: FragmentActivity, bundle: Bundle) {
         val fragmentManager = activity.supportFragmentManager
-        val fragment = fragmentManager.findFragmentByTag(request.fragmentConfig.tag)
-        if (fragment != null) {
-            synchronized(this) {
-                val backStackList = getBackStackList(activity)
-                if (backStackList.isNotEmpty()) {
-                    val index = backStackList.indexOfLast { it.request.className == request.className }
-                    if (index != -1) {
-                        backStackList.removeAt(index)
-                    }
-                }
+        synchronized(this) {
+            val backStackList = getBackStackList(activity)
+            if (backStackList.isNotEmpty()) {
+                val entry = backStackList.removeLast()
+                entry.fragment.setResult(bundle)
+                fragmentManager.remove(entry.fragment)
             }
-
-            fragment.setResult(request.bundle)
-            fragmentManager.remove(fragment)
         }
     }
 
