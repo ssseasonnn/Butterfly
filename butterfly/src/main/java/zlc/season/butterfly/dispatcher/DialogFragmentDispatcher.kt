@@ -7,20 +7,12 @@ import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.Butterfly.setResult
 import zlc.season.butterfly.ButterflyHelper
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
 
 object DialogFragmentDispatcher : InnerDispatcher {
-    override fun retreat(request: AgileRequest, bundle: Bundle) {
-        val fragmentManager = ButterflyHelper.fragmentManager ?: return
-        if (request.fragmentConfig.tag.isNotEmpty()) {
-            val dialogFragment = fragmentManager.findFragmentByTag(request.fragmentConfig.tag)
-            if (dialogFragment != null && dialogFragment is DialogFragment) {
-                dialogFragment.setResult(bundle)
-                dialogFragment.dismissAllowingStateLoss()
-            }
-        }
+    override fun retreat(bundle: Bundle): Boolean {
+        return false
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {

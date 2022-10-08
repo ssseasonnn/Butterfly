@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import zlc.season.base.Schemes.SCHEME_FOO_FRAGMENT
 import zlc.season.bracer.params
-import zlc.season.butterfly.Butterfly.retreatWithResult
+import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.FragmentFooBinding
 
@@ -30,7 +30,7 @@ class FooFragment : Fragment() {
         binding?.apply {
             tvContent.text = "This is Fragment $number"
             btnSetResult.setOnClickListener {
-                retreatWithResult("abc" to "123")
+                retreat("abc" to "123")
             }
         }
     }

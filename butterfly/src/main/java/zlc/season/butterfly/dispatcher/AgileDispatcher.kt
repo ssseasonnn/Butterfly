@@ -1,25 +1,14 @@
 package zlc.season.butterfly.dispatcher
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
-import androidx.core.app.ActivityOptionsCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import zlc.season.butterfly.*
-import zlc.season.butterfly.Butterfly.setResult
-import zlc.season.butterfly.ButterflyHelper
-import zlc.season.butterfly.ButterflyHelper.activity
-import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
-import zlc.season.butterfly.ButterflyHelper.context
-import zlc.season.butterfly.ButterflyHelper.fragmentActivity
-import zlc.season.butterfly.ButterflyHelper.fragmentManager
-import zlc.season.butterfly.parseScheme
+import zlc.season.butterfly.Action
+import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.logw
 
 class AgileDispatcher {
     companion object {
@@ -58,17 +47,7 @@ class AgileDispatcher {
         return dispatcherMap[getAgileType(cls)]!!.dispatch(request)
     }
 
-    fun retreat(request: AgileRequest, bundle: Bundle) {
-        if (request.className.isEmpty()) {
-            "Agile --> class not found!".logw()
-            return
-        }
-
-        val cls = Class.forName(request.className)
-        return dispatcherMap[getAgileType(cls)]!!.retreat(request, bundle)
-    }
-
-    fun retreatFragment(bundle: Bundle) {
-        return dispatcherMap[AGILE_TYPE_FRAGMENT]!!.retreat(bundle)
+    fun retreat(cls: Class<*>, bundle: Bundle): Boolean {
+        return dispatcherMap[getAgileType(cls)]!!.retreat(bundle)
     }
 }

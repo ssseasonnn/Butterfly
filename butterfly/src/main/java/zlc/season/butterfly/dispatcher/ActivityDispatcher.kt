@@ -9,11 +9,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.*
 import zlc.season.butterfly.Butterfly.setResult
+import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
 object ActivityDispatcher : InnerDispatcher {
-    override fun retreat(request: AgileRequest, bundle: Bundle) {
-        ButterflyHelper.activity?.setResult(bundle)
+    override fun retreat(bundle: Bundle): Boolean {
+        ButterflyHelper.activity?.setActivityResult(bundle)
         ButterflyHelper.activity?.finish()
+        return false
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {

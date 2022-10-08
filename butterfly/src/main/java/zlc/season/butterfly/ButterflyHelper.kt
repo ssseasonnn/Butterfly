@@ -2,6 +2,7 @@ package zlc.season.butterfly
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -36,9 +37,6 @@ internal object ButterflyHelper {
                 null
             }
         }
-
-    internal val fragmentManager: FragmentManager?
-        get() = fragmentActivity?.supportFragmentManager
 
     internal val lifecycleOwner: LifecycleOwner?
         get() = with(activity) {
@@ -97,8 +95,12 @@ internal object ButterflyHelper {
         }
     }
 
+    internal fun Activity.setActivityResult(bundle: Bundle) {
+        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
+    }
+
     internal fun FragmentActivity.setFragmentResult(fragment: Fragment, bundle: Bundle) {
-        supportFragmentManager.setFragmentResult(javaClass.name, bundle)
+        supportFragmentManager.setFragmentResult(fragment.javaClass.name, bundle)
     }
 
     internal fun FragmentActivity.add(fragment: Fragment) {

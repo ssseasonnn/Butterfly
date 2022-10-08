@@ -1,9 +1,9 @@
 package zlc.season.butterfly
 
 import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import androidx.core.os.bundleOf
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
@@ -122,41 +122,32 @@ object Butterfly {
         }
     }
 
-    fun retreat() {
-
+    fun retreat(vararg result: Pair<String, Any?>) {
+        ButterflyCore.dispatchRetreat(Any::class.java, bundleOf(*result))
     }
 
-    fun retreatDialog() {
-
+    fun retreatActivity(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(Activity::class.java, bundleOf(*result))
     }
 
-    fun retreatFragment(bundle: Bundle = Bundle()) {
-        ButterflyCore.dispatchRetreat(bundle)
+    fun retreatDialog(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(DialogFragment::class.java, bundleOf(*result))
     }
 
-    fun Activity.setResult(vararg pair: Pair<String, Any?>) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundleOf(*pair)) })
+    fun retreatFragment(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(Fragment::class.java, bundleOf(*result))
     }
 
-    fun Activity.setResult(bundle: Bundle) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
+    fun Activity.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
     }
 
-    fun Activity.retreat() {
-        finish()
+    fun Fragment.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
     }
 
-    fun Activity.retreatWithResult(vararg pair: Pair<String, Any?>) {
-        setResult(*pair)
-        finish()
-    }
-
-    fun Fragment.retreat() {
-        ButterflyCore.dispatchRetreat()
-    }
-
-    fun Fragment.retreatWithResult(vararg pair: Pair<String, Any?>) {
-        ButterflyCore.dispatchRetreat()
+    fun DialogFragment.retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

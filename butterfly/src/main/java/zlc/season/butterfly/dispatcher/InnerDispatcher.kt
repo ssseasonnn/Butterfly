@@ -7,7 +7,7 @@ import zlc.season.butterfly.AgileRequest
 interface InnerDispatcher {
     suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>>
 
-    fun retreat(request: AgileRequest, bundle: Bundle) {}
-
-    fun retreat(bundle: Bundle) {}
+    fun retreat(bundle: Bundle): Boolean {
+        return false
+    }
 }

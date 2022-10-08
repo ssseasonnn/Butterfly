@@ -32,8 +32,8 @@ object FragmentDispatcher : InnerDispatcher {
     }
 
 
-    override fun retreat(bundle: Bundle) {
-        val activity = ButterflyHelper.fragmentActivity ?: return
+    override fun retreat(bundle: Bundle): Boolean {
+        val activity = ButterflyHelper.fragmentActivity ?: return false
         val topEntry = fragmentBackStackManager.getTopEntry(activity)
         topEntry?.let {
             fragmentBackStackManager.removeEntry(activity, it)
@@ -41,7 +41,9 @@ object FragmentDispatcher : InnerDispatcher {
                 activity.setFragmentResult(this, bundle)
                 activity.remove(this)
             }
+            return true
         }
+        return false
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
