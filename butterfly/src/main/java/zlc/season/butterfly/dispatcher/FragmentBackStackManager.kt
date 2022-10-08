@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
 import zlc.season.claritypotion.ClarityPotion
+import java.lang.ref.WeakReference
 
 class FragmentBackStackManager {
     private val fragmentBackStackMap = mutableMapOf<Int, MutableList<FragmentEntry>>()
@@ -59,10 +60,11 @@ class FragmentBackStackManager {
     @Synchronized
     fun getTopEntry(activity: FragmentActivity): FragmentEntry? {
         val backStackList = getBackStackList(activity)
-        return if (backStackList.isNotEmpty()) {
-            backStackList.last()
-        } else {
+
+        return if (backStackList.isEmpty()) {
             null
+        } else {
+            return backStackList.lastOrNull()
         }
     }
 
@@ -73,10 +75,23 @@ class FragmentBackStackManager {
             backStackList = mutableListOf()
             fragmentBackStackMap[activity.hashCode()] = backStackList
         }
+
+        clearUselessEntry(backStackList)
+
         return backStackList
     }
 
-    data class FragmentEntry(val request: AgileRequest, val fragment: Fragment)
+    private fun clearUselessEntry(backStackList: MutableList<FragmentEntry>) {
+        val shouldRemoveList = mutableListOf<FragmentEntry>()
+        backStackList.forEach {
+            if (it.fragment.get() == null) {
+                shouldRemoveList.add(it)
+            }
+        }
+        backStackList.removeAll(shouldRemoveList)
+    }
+
+    data class FragmentEntry(val request: AgileRequest, val fragment: WeakReference<Fragment>)
 
     open class ActivityLifecycleCallbacksAdapter : Application.ActivityLifecycleCallbacks {
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
