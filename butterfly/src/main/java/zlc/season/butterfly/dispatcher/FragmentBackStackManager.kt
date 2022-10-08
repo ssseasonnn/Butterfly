@@ -6,8 +6,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.Butterfly.setResult
-import zlc.season.butterfly.ButterflyHelper.remove
 import zlc.season.claritypotion.ClarityPotion
 
 class FragmentBackStackManager {
@@ -25,24 +23,38 @@ class FragmentBackStackManager {
         })
     }
 
-    fun pushFragment(activity: FragmentActivity, fragment: Fragment, request: AgileRequest) {
-        getBackStackList(activity).add(FragmentEntry(request, fragment))
+    @Synchronized
+    fun addEntry(activity: FragmentActivity, entry: FragmentEntry) {
+        getBackStackList(activity).add(entry)
     }
 
-    fun popFragment(activity: FragmentActivity, bundle: Bundle) {
-        val fragmentManager = activity.supportFragmentManager
-        synchronized(this) {
-            val backStackList = getBackStackList(activity)
-            if (backStackList.isNotEmpty()) {
-                val entry = backStackList.removeLast()
-                entry.fragment.setResult(bundle)
-                fragmentManager.remove(entry.fragment)
+    @Synchronized
+    fun getTopEntryList(activity: FragmentActivity, request: AgileRequest): MutableList<FragmentEntry> {
+        val result = mutableListOf<FragmentEntry>()
+
+        val backStackList = getBackStackList(activity)
+        val index = backStackList.indexOfLast { it.request.className == request.className }
+        if (index != -1) {
+            for (i in index until backStackList.size) {
+                val entry = backStackList.removeAt(i)
+                result.add(entry)
             }
+        }
+        return result
+    }
+
+    @Synchronized
+    fun getTopEntry(activity: FragmentActivity): FragmentEntry? {
+        val backStackList = getBackStackList(activity)
+        return if (backStackList.isNotEmpty()) {
+            backStackList.last()
+        } else {
+            null
         }
     }
 
     @Synchronized
-    fun getBackStackList(activity: FragmentActivity): MutableList<FragmentEntry> {
+    private fun getBackStackList(activity: FragmentActivity): MutableList<FragmentEntry> {
         var backStackList = fragmentBackStackMap[activity.hashCode()]
         if (backStackList == null) {
             backStackList = mutableListOf()

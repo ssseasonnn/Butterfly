@@ -76,27 +76,24 @@ internal object ButterflyHelper {
         }
     }
 
-    internal fun FragmentManager.awaitFragmentResult(
-        lifecycleOwner: LifecycleOwner,
-        fragment: Fragment
-    ) = callbackFlow {
+    internal fun FragmentActivity.awaitFragmentResult(fragment: Fragment) = callbackFlow {
         val requestKey = fragment.javaClass.name
         val listener = FragmentResultListener { key, result ->
             if (requestKey == key) {
                 trySend(Result.success(result))
                 close()
-                clearFragmentResultListener(requestKey)
+                supportFragmentManager.clearFragmentResultListener(requestKey)
             }
         }
         if (!isDestroyed && isActive) {
-            setFragmentResultListener(
+            supportFragmentManager.setFragmentResultListener(
                 requestKey,
-                lifecycleOwner,
+                this@awaitFragmentResult,
                 listener
             )
         }
         awaitClose {
-            clearFragmentResultListener(requestKey)
+            supportFragmentManager.clearFragmentResultListener(requestKey)
         }
     }
 

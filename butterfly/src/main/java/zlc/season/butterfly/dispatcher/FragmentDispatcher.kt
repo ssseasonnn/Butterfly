@@ -3,12 +3,15 @@ package zlc.season.butterfly.dispatcher
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.Butterfly.setResult
 import zlc.season.butterfly.ButterflyHelper
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
+import zlc.season.butterfly.ButterflyHelper.remove
+import zlc.season.butterfly.dispatcher.FragmentBackStackManager.FragmentEntry
 import zlc.season.butterfly.parseScheme
 
 object FragmentDispatcher : InnerDispatcher {
@@ -29,110 +32,92 @@ object FragmentDispatcher : InnerDispatcher {
 
     override fun retreat(bundle: Bundle) {
         val activity = ButterflyHelper.fragmentActivity ?: return
-        fragmentBackStackManager.popFragment(activity, bundle)
+        val topEntry = fragmentBackStackManager.getTopEntry(activity)
+        topEntry?.let {
+            it.fragment.setResult(bundle)
+            activity.supportFragmentManager.remove(it.fragment)
+        }
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val activity = ButterflyHelper.fragmentActivity ?: return flowOf(Result.failure(IllegalStateException("No FragmentActivity exists.")))
-        val fragmentManager = activity.supportFragmentManager
-        val realRequest = request.createRealRequest()
 
-        val config = realRequest.fragmentConfig
-        val fragment = if (config.clearTop) {
-            fragmentManager.clearTopAndShowFragment(activity, realRequest)
-        } else if (config.singleTop) {
-            fragmentManager.showSingleTopFragment(activity, realRequest)
-        } else {
-            fragmentManager.showNewFragment(activity, realRequest)
+        val realRequest = request.createRealRequest()
+        val fragment = with(activity) {
+            if (realRequest.fragmentConfig.clearTop) {
+                clearTop(realRequest)
+            } else if (realRequest.fragmentConfig.singleTop) {
+                singleTop(realRequest)
+            } else {
+                normal(realRequest)
+            }
         }
 
         return if (realRequest.needResult) {
-            fragmentManager.awaitFragmentResult(activity, fragment)
+            activity.awaitFragmentResult(fragment)
         } else {
             flowOf(Result.success(Bundle()))
         }
     }
 
-    private fun FragmentManager.showNewFragment(
-        activity: FragmentActivity, request: AgileRequest
-    ): Fragment = with(beginTransaction()) {
-        val fragment = createFragment(activity, request)
-
-        request.fragmentConfig.apply {
-            if (useReplace) {
-                replace(containerViewId, fragment, tag)
-            } else {
-                add(containerViewId, fragment, tag)
+    private fun FragmentActivity.normal(request: AgileRequest): Fragment =
+        with(supportFragmentManager.beginTransaction()) {
+            val fragment = createFragment(this@normal, request)
+            if (request.fragmentConfig.enableBackStack) {
+                fragmentBackStackManager.addEntry(this@normal, FragmentEntry(request, fragment))
             }
-            setCustomAnimations(enterAnim, exitAnim, 0, 0)
-            if (enableBackStack) {
-                fragmentBackStackManager.pushFragment(activity, fragment, request)
+            show(request, fragment)
+        }
+
+
+    private fun FragmentActivity.clearTop(request: AgileRequest): Fragment =
+        with(supportFragmentManager.beginTransaction()) {
+            val topEntryList = fragmentBackStackManager.getTopEntryList(this@clearTop, request)
+            return if (topEntryList.isEmpty()) {
+                normal(request)
+            } else {
+                val target = topEntryList.removeFirst().fragment
+                topEntryList.forEach { remove(it.fragment) }
+
+                show(request, target)
+            }
+        }
+
+    private fun FragmentActivity.singleTop(request: AgileRequest): Fragment =
+        with(supportFragmentManager.beginTransaction()) {
+            val topEntry = fragmentBackStackManager.getTopEntry(this@singleTop)
+            return if (topEntry?.request?.className == request.className) {
+                val target = topEntry.fragment
+                show(request, target)
+            } else {
+                normal(request)
+            }
+        }
+
+    private fun FragmentTransaction.show(request: AgileRequest, target: Fragment): Fragment {
+        target.arguments = request.bundle
+
+        val config = request.fragmentConfig
+        setCustomAnimations(config.enterAnim, config.exitAnim, 0, 0)
+
+        if (target.isAdded) {
+            show(target)
+        } else {
+            if (config.useReplace) {
+                replace(config.containerViewId, target, config.tag)
+            } else {
+                add(config.containerViewId, target, config.tag)
             }
         }
 
         commitAllowingStateLoss()
-        return fragment
+
+        return target
     }
 
-
-    private fun FragmentManager.clearTopAndShowFragment(
-        activity: FragmentActivity, request: AgileRequest
-    ): Fragment = with(beginTransaction()) {
-        val backStackList = fragmentBackStackManager.getBackStackList(activity)
-        val index = backStackList.indexOfLast { it.request.className == request.className }
-        if (index == -1) {
-            return@with showNewFragment(activity, request)
-        } else {
-            if (index != backStackList.lastIndex) {
-                for (i in index + 1 until backStackList.size) {
-                    remove(backStackList[i].fragment)
-                    backStackList.removeAt(i)
-                }
-            }
-            val config = request.fragmentConfig
-            val target = backStackList[index].fragment
-            target.arguments = request.bundle
-
-            if (target.isAdded) {
-                show(target)
-            } else {
-                add(config.containerViewId, target, config.tag)
-            }
-            setCustomAnimations(config.enterAnim, config.exitAnim, 0, 0)
-            commitAllowingStateLoss()
-            return@with target
-        }
-    }
-
-    private fun FragmentManager.showSingleTopFragment(
-        activity: FragmentActivity, request: AgileRequest
-    ): Fragment = with(beginTransaction()) {
-        val backStackList = fragmentBackStackManager.getBackStackList(activity)
-        val index = backStackList.indexOfLast { it.request.className == request.className }
-        if (index == -1 || index != backStackList.lastIndex) {
-            return@with showNewFragment(activity, request)
-        } else {
-            val config = request.fragmentConfig
-            val target = backStackList[index].fragment
-            target.arguments = request.bundle
-            if (target.isAdded) {
-                show(target)
-            } else {
-                add(config.containerViewId, target, config.tag)
-            }
-            setCustomAnimations(config.enterAnim, config.exitAnim, 0, 0)
-            commitAllowingStateLoss()
-            return@with target
-        }
-    }
-
-    private fun createFragment(
-        activity: FragmentActivity, request: AgileRequest
-    ): Fragment {
-        val fragment = activity.supportFragmentManager.fragmentFactory.instantiate(
+    private fun createFragment(activity: FragmentActivity, request: AgileRequest): Fragment {
+        return activity.supportFragmentManager.fragmentFactory.instantiate(
             activity.classLoader, request.className
         )
-        fragment.arguments = request.bundle
-        return fragment
     }
 }
