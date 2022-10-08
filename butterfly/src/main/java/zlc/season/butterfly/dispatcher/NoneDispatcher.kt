@@ -11,4 +11,8 @@ object NoneDispatcher : InnerDispatcher {
         "Agile --> type error".logw()
         return flowOf(Result.failure(IllegalStateException("Agile type error")))
     }
+
+    override fun retreat(bundle: Bundle): Boolean {
+        return super.retreat(bundle)
+    }
 }

@@ -8,7 +8,6 @@ import androidx.core.app.ActivityOptionsCompat
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.*
-import zlc.season.butterfly.Butterfly.setResult
 import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
 object ActivityDispatcher : InnerDispatcher {
