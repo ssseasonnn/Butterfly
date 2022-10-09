@@ -12,8 +12,6 @@ Butterfly - 小巧而强大的武器，拥有它，让你的Android开发如虎�
 
 *Read this in other languages: [中文](README.zh.md), [English](README.md), [Change Log](CHANGELOG.md)*
 
-## Usage
-
 ### 特性
 
 蝴蝶主要包含两大功能：
@@ -21,7 +19,7 @@ Butterfly - 小巧而强大的武器，拥有它，让你的Android开发如虎�
 - Agile 页面导航
 - Evade 组件化通信
 
-### 依赖
+### 集成
 
 ```gradle
 repositories {
@@ -38,9 +36,11 @@ dependencies {
 }
 ```
 
+## Basic Usage
+
 ### Agile
 
-#### 1.导航
+#### 1.导航Activity
 
 通过给Activity添加Agile注解，并设置对应的scheme，随后即可通过Butterfly进行导航，或者导航并获取返回数据
 
@@ -61,9 +61,76 @@ Butterfly.agile("test/scheme")
     }
 ```
 
-#### 2.传递参数
+启动模式：
 
-Agile支持附带参数导航，有两种方式，一种是通过拼接scheme，将参数添加到scheme中 另一种是通过调用params方法手动传入参数，或者两者混合进行， 随后可在导航后的页面中获取对应的参数
+```kotlin
+//ClearTop
+Butterfly.agile("test/scheme").clearTop().carry()
+
+//SingleTop
+Butterfly.agile("test/scheme").singleTop().carry()
+```
+
+#### 2.导航Fragment
+
+和Activity一样，通过给Fragment添加注解，其余和Activity一样
+
+```kotlin
+@Agile("test/fragment")
+class TestFragment : Fragment() {
+    //...
+}
+
+//导航Fragment
+Butterfly.agile("test/fragment").carry()
+
+//导航Fragment并获取返回数据
+Butterfly.agile("test/fragment")
+    .carry {
+        val result = it.getStringExtra("result")
+        binding.tvResult.text = result
+    }
+```
+
+Fragment也同样支持SingleTop和ClearTop启动模式：
+
+```kotlin
+//ClearTop
+Butterfly.agile("test/fragment").clearTop().carry()
+
+//SingleTop
+Butterfly.agile("test/fragment").singleTop().carry()
+```
+
+#### 3.导航DialogFragment
+
+```kotlin
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment() {
+    //...
+}
+
+//导航dialog
+Butterfly.agile("test/dialog").carry()
+
+//导航dialog并获取返回数据
+Butterfly.agile("test/dialog")
+    .carry {
+        val result = it.getStringExtra("result")
+        binding.tvResult.text = result
+    }
+```
+
+> DialogFragment不支持启动模式
+
+#### 4.参数传递
+
+可以通过以下两种方式在导航的过程中传递参数：
+
+- 通过拼接scheme，将参数添加到scheme中
+- 通过调用params方法手动传入参数，或者两者混合进行，随后可在导航后的页面中获取对应的参数
+
+传递参数：
 
 ```kotlin
 //拼接scheme
@@ -77,11 +144,10 @@ Butterfly.agile("test/scheme?a=1&b=2")
     .carry()
 ```
 
-#### 3.解析参数
-
-在导航目的页面，可通过参数的key字段来获取传递的参数值
+解析参数：
 
 ```kotlin
+//在导航目的页面，可通过参数的key字段来获取传递的参数值
 @Agile("test/scheme")
 class AgileTestActivity : AppCompatActivity() {
     val a by lazy { intent?.getStringExtra("a") ?: "" }
@@ -90,9 +156,8 @@ class AgileTestActivity : AppCompatActivity() {
 }
 ```
 
-除了手动解析参数以外，还可以装备Bracer来实现全自动进行参数解析
-
 ```kotlin
+//除了手动解析参数以外，还可以装备Bracer来实现全自动进行参数解析
 @Agile("test/scheme")
 class AgileTestActivity : AppCompatActivity() {
     val a by params<String>()
@@ -103,12 +168,57 @@ class AgileTestActivity : AppCompatActivity() {
 
 > Bracer 使用方式详情见: Github 地址 [Bracer](https://github.com/ssseasonnn/Bracer)
 
-#### 4.拦截器
+#### 4.BackStack与回退
 
-Agile支持拦截器，可用于在导航前预处理部分逻辑，如进行登录检测 此外拦截器中也可进行导航，但为了避免拦截器套娃，需要添加skipInterceptor()方法以忽略拦截器
+Butterfly支持Fragment和DialogFragment的回退栈
+
+回退Fragment：
 
 ```kotlin
-//实现自定义拦截器
+//在任意地点回退顶部Fragment, 并返回数据
+Butterfly.retreatFragment("result" to "123")
+
+//在Fragment内部回退
+@Agile("test/fragment")
+class TestFragment : Fragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            //回退当前Fragment并返回数据
+            retreat("result" to "123")
+        }
+    }
+}
+```
+
+回退DialogFragment：
+
+```kotlin
+//在任意地点回退顶部DialogFragment, 并返回数据
+Butterfly.retreatDialog("result" to "123")
+
+//在DialogFragment内部回退
+@Agile("test/dialog")
+class TestDialogFragment : DialogFragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        btnBack.setOnClickListener {
+            //回退当前DialogFragment并返回数据
+            retreat("result" to "123")
+        }
+    }
+}
+```
+
+#### 3.拦截器
+
+可以添加以下两种类型的拦截器：
+
+- 全局拦截器
+- 一次性拦截器
+
+```kotlin
+//自定义拦截器
 class TestInterceptor : ButterflyInterceptor {
     override fun shouldIntercept(agileRequest: AgileRequest): Boolean {
         //检测是否需要拦截
@@ -122,12 +232,25 @@ class TestInterceptor : ButterflyInterceptor {
         println("intercept finish")
     }
 }
+```
 
-//注册拦截器
+配置全局拦截器：
+
+```kotlin
+//添加全局拦截器
 ButterflyCore.addInterceptor(TestInterceptor())
 
-//跳过拦截器
+//跳过所有全局拦截器
 Butterfly.agile("test/scheme").skipInterceptor().carry()
+```
+
+配置一次性拦截器：
+
+```kotlin
+//仅当前导航使用该拦截器
+Butterfly.agile(Schemes.SCHEME_AGILE_TEST)
+    .addInterceptor(TestInterceptor())
+    .carry()
 ```
 
 #### 5.Action
@@ -166,6 +289,8 @@ Butterfly.agile("test/scheme").flow()
     .onEach { println("process result") }
     .launchIn(lifecycleScope)
 ```
+
+#### 7.Fragment支持
 
 ### Evade
 
