@@ -50,4 +50,8 @@ class AgileDispatcher {
     fun retreat(cls: Class<*>, bundle: Bundle): Boolean {
         return dispatcherMap[getAgileType(cls)]!!.retreat(bundle)
     }
+
+    fun retreatCount(cls: Class<*>): Int {
+        return dispatcherMap[getAgileType(cls)]!!.retreatCount()
+    }
 }

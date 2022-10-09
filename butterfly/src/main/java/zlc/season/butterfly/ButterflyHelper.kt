@@ -11,7 +11,6 @@ import androidx.fragment.app.FragmentResultListener
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import zlc.season.claritypotion.ClarityPotion
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal object ButterflyHelper {
     private val internalScope by lazy { MainScope() }
 
@@ -28,6 +26,9 @@ internal object ButterflyHelper {
 
     internal val activity: Activity?
         get() = ClarityPotion.activity
+
+    internal val activitySize: Int
+        get() = ClarityPotion.activityList.filter { it.get() != null }.size
 
     internal val fragmentActivity: FragmentActivity?
         get() = with(activity) {
@@ -95,12 +96,21 @@ internal object ButterflyHelper {
         }
     }
 
-    internal fun Activity.setActivityResult(bundle: Bundle) {
-        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
-    }
-
     internal fun FragmentActivity.setFragmentResult(fragment: Fragment, bundle: Bundle) {
         supportFragmentManager.setFragmentResult(fragment.javaClass.name, bundle)
+    }
+
+    internal fun FragmentActivity.createFragment(request: AgileRequest): Fragment {
+        val fragment = supportFragmentManager.fragmentFactory.instantiate(
+            classLoader, request.className
+        )
+        fragment.arguments = request.bundle
+        return fragment
+    }
+
+
+    internal fun Activity.setActivityResult(bundle: Bundle) {
+        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
     }
 
     internal fun FragmentActivity.add(fragment: Fragment) {

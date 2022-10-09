@@ -9,14 +9,16 @@ import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.ButterflyHelper
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
+import zlc.season.butterfly.ButterflyHelper.createFragment
 import zlc.season.butterfly.ButterflyHelper.remove
 import zlc.season.butterfly.ButterflyHelper.setFragmentResult
-import zlc.season.butterfly.dispatcher.FragmentBackStackManager.FragmentEntry
+import zlc.season.butterfly.backstack.FragmentEntry
+import zlc.season.butterfly.backstack.FragmentEntryManager
 import zlc.season.butterfly.parseScheme
 import java.lang.ref.WeakReference
 
 object FragmentDispatcher : InnerDispatcher {
-    private val fragmentBackStackManager = FragmentBackStackManager()
+    private val fragmentEntryManager = FragmentEntryManager()
 
     private fun AgileRequest.createRealRequest(): AgileRequest {
         return copy(
@@ -31,17 +33,21 @@ object FragmentDispatcher : InnerDispatcher {
         )
     }
 
+    override fun retreatCount(): Int {
+        val activity = ButterflyHelper.fragmentActivity ?: return 0
+        return fragmentEntryManager.getEntrySize(activity)
+    }
 
     override fun retreat(bundle: Bundle): Boolean {
         val activity = ButterflyHelper.fragmentActivity ?: return false
-        val topEntry = fragmentBackStackManager.getTopEntry(activity)
-        topEntry?.let {
-            fragmentBackStackManager.removeEntry(activity, it)
-            it.reference.get()?.apply {
-                activity.setFragmentResult(this, bundle)
-                activity.remove(this)
+        val topEntry = fragmentEntryManager.getTopEntry(activity)
+        topEntry?.let { entry ->
+            fragmentEntryManager.removeEntry(activity, entry)
+            entry.reference.get()?.let {
+                activity.setFragmentResult(it, bundle)
+                activity.remove(it)
+                return true
             }
-            return true
         }
         return false
     }
@@ -69,19 +75,18 @@ object FragmentDispatcher : InnerDispatcher {
         }
     }
 
-    private fun FragmentActivity.normal(request: AgileRequest): Fragment? =
+    private fun FragmentActivity.normal(request: AgileRequest): Fragment =
         with(supportFragmentManager.beginTransaction()) {
-            val fragment = createFragment(this@normal, request)
+            val fragment = createFragment(request)
             if (request.fragmentConfig.enableBackStack) {
-                fragmentBackStackManager.addEntry(this@normal, FragmentEntry(request, WeakReference(fragment)))
+                fragmentEntryManager.addEntry(this@normal, FragmentEntry(request, WeakReference(fragment)))
             }
             show(request, fragment)
         }
 
-
     private fun FragmentActivity.clearTop(request: AgileRequest): Fragment? =
         with(supportFragmentManager.beginTransaction()) {
-            val topEntryList = fragmentBackStackManager.getTopEntryList(this@clearTop, request)
+            val topEntryList = fragmentEntryManager.getTopEntryList(this@clearTop, request)
             return if (topEntryList.isEmpty()) {
                 normal(request)
             } else {
@@ -89,7 +94,7 @@ object FragmentDispatcher : InnerDispatcher {
                 topEntryList.forEach {
                     it.reference.get()?.apply { remove(this) }
                 }
-                fragmentBackStackManager.removeEntries(this@clearTop, topEntryList)
+                fragmentEntryManager.removeEntries(this@clearTop, topEntryList)
 
                 show(request, targetEntry.reference)
             }
@@ -97,7 +102,7 @@ object FragmentDispatcher : InnerDispatcher {
 
     private fun FragmentActivity.singleTop(request: AgileRequest): Fragment? =
         with(supportFragmentManager.beginTransaction()) {
-            val topEntry = fragmentBackStackManager.getTopEntry(this@singleTop)
+            val topEntry = fragmentEntryManager.getTopEntry(this@singleTop)
             return if (topEntry?.request?.className == request.className) {
                 show(request, topEntry.reference)
             } else {
@@ -129,11 +134,5 @@ object FragmentDispatcher : InnerDispatcher {
         commitAllowingStateLoss()
 
         return target
-    }
-
-    private fun createFragment(activity: FragmentActivity, request: AgileRequest): Fragment {
-        return activity.supportFragmentManager.fragmentFactory.instantiate(
-            activity.classLoader, request.className
-        )
     }
 }

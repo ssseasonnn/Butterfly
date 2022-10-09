@@ -13,6 +13,14 @@ object NoneDispatcher : InnerDispatcher {
     }
 
     override fun retreat(bundle: Bundle): Boolean {
-        return super.retreat(bundle)
+        return if (DialogFragmentDispatcher.retreatCount() > 0) {
+            DialogFragmentDispatcher.retreat(bundle)
+        } else if (FragmentDispatcher.retreatCount() > 0) {
+            FragmentDispatcher.retreat(bundle)
+        } else if (ActivityDispatcher.retreatCount() > 0) {
+            ActivityDispatcher.retreat(bundle)
+        } else {
+            return false
+        }
     }
 }

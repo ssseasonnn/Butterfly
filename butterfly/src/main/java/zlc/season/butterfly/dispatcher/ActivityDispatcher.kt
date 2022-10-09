@@ -11,9 +11,16 @@ import zlc.season.butterfly.*
 import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
 object ActivityDispatcher : InnerDispatcher {
+    override fun retreatCount(): Int {
+        return ButterflyHelper.activitySize
+    }
+
     override fun retreat(bundle: Bundle): Boolean {
-        ButterflyHelper.activity?.setActivityResult(bundle)
-        ButterflyHelper.activity?.finish()
+        ButterflyHelper.activity?.let {
+            it.setActivityResult(bundle)
+            it.finish()
+            return true
+        }
         return false
     }
 
@@ -41,11 +48,14 @@ object ActivityDispatcher : InnerDispatcher {
         intent.putExtra(Butterfly.RAW_SCHEME, request.scheme)
         intent.setClassName(context.packageName, request.className)
         intent.putExtras(request.bundle)
-        if (request.activityConfig.flags != 0) {
-            intent.addFlags(request.activityConfig.flags)
-        }
+
         if (request.activityConfig.clearTop) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        } else if (request.activityConfig.singleTop) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        if (request.activityConfig.flags != 0) {
+            intent.addFlags(request.activityConfig.flags)
         }
         if (context !is Activity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

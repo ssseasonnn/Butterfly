@@ -5,7 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import zlc.season.base.Schemes
 import zlc.season.base.Schemes.SCHEME_FOO_DIALOG_FRAGMENT
+import zlc.season.butterfly.Butterfly
+import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.DialogFooBinding
 
@@ -23,6 +26,10 @@ class FooDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return DialogFooBinding.inflate(inflater, container, false).root
+        return DialogFooBinding.inflate(inflater, container, false).also {
+            it.click.setOnClickListener {
+                Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT_A).carry()
+            }
+        }.root
     }
 }

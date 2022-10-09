@@ -10,4 +10,8 @@ interface InnerDispatcher {
     fun retreat(bundle: Bundle): Boolean {
         return false
     }
+
+    fun retreatCount(): Int {
+        return 0
+    }
 }

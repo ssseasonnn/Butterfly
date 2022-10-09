@@ -54,8 +54,12 @@ object ButterflyCore {
         }
     }
 
-    fun dispatchRetreat(cls: Class<*>, bundle: Bundle = Bundle()): Boolean {
+    fun dispatchRetreat(cls: Class<*>, bundle: Bundle): Boolean {
         return agileDispatcher.retreat(cls, bundle)
+    }
+
+    fun getRetreatCount(cls: Class<*>): Int {
+        return agileDispatcher.retreatCount(cls)
     }
 
     fun dispatchEvade(evadeRequest: EvadeRequest): Any {

@@ -138,6 +138,18 @@ object Butterfly {
         return ButterflyCore.dispatchRetreat(Fragment::class.java, bundleOf(*result))
     }
 
+    fun canRetreatFragment(): Boolean {
+        return ButterflyCore.getRetreatCount(Fragment::class.java) > 0
+    }
+
+    fun canRetreatDialog(): Boolean {
+        return ButterflyCore.getRetreatCount(DialogFragment::class.java) > 0
+    }
+
+    fun canRetreatActivity(): Boolean {
+        return ButterflyCore.getRetreatCount(Activity::class.java) > 0
+    }
+
     fun Activity.retreat(vararg result: Pair<String, Any?>): Boolean {
         return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
     }
