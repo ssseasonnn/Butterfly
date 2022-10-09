@@ -32,6 +32,13 @@ class CFragment : Fragment() {
         btnBack.setOnClickListener {
             retreat("result" to "Result from C")
         }
+        btnDialog.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT)
+                .carry {
+                    val result by it.params<String>()
+                    tvResult.text = result
+                }
+        }
         btnNextA.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT_A)
                 .run {

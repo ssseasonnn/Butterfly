@@ -24,6 +24,14 @@
         android:textColor="@android:color/black" />
 
     <Button
+        android:id="@+id/btnDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Show Dialog"
+        android:textColor="@android:color/black" />
+
+    <Button
         android:id="@+id/btnNextA"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
