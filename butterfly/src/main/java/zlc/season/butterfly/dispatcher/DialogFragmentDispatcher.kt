@@ -28,7 +28,7 @@ object DialogFragmentDispatcher : InnerDispatcher {
         topEntry?.let { entry ->
             dialogFragmentEntryManager.removeEntry(activity, entry)
             entry.reference.get()?.let {
-                activity.setFragmentResult(it, bundle)
+                activity.setFragmentResult(entry.request.hashCode().toString(), bundle)
                 it.dismissAllowingStateLoss()
                 return true
             }
@@ -50,7 +50,7 @@ object DialogFragmentDispatcher : InnerDispatcher {
             fragment.show(activity.supportFragmentManager, realTag)
 
             return if (request.needResult) {
-                activity.awaitFragmentResult(fragment)
+                activity.awaitFragmentResult(fragment, request.hashCode().toString())
             } else {
                 flowOf(Result.success(Bundle()))
             }

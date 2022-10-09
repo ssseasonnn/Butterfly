@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package zlc.season.butterfly
 
 import android.app.Activity
@@ -11,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import zlc.season.butterfly.ButterflyHelper.awaitFragmentResume
 import zlc.season.butterfly.ButterflyHelper.remove

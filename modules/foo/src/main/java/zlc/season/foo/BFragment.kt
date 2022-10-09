@@ -4,11 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import zlc.season.base.Schemes
+import zlc.season.bracer.params
+import zlc.season.butterfly.Butterfly
+import zlc.season.butterfly.Butterfly.carry
+import zlc.season.butterfly.Butterfly.clearTop
+import zlc.season.butterfly.Butterfly.retreat
+import zlc.season.butterfly.Butterfly.singleTop
 import zlc.season.butterfly.annotation.Agile
+import zlc.season.foo.databinding.FragmentCommonBinding
 
 @Agile(Schemes.SCHEME_FOO_FRAGMENT_B)
 class BFragment : Fragment() {
@@ -16,17 +21,64 @@ class BFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_b, container, false)
+        return FragmentCommonBinding.inflate(inflater, container, false).also {
+            it.setup()
+        }.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val tvContent = view.findViewById<TextView>(R.id.tvContent)
-        val btnBack = view.findViewById<Button>(R.id.btnSetResult)
-
-        tvContent.text = "This is Fragment B ${hashCode()}"
+    private fun FragmentCommonBinding.setup() {
+        root.setBackgroundResource(R.color.green)
+        tvContent.text = "Fragment B ${hashCode()}"
         btnBack.setOnClickListener {
-
+            retreat("result" to "Result from B")
+        }
+        btnNextA.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT_A)
+                .run {
+                    if (cbClearTop.isChecked) {
+                        clearTop()
+                    } else if (cbSingleTop.isChecked) {
+                        singleTop()
+                    } else {
+                        this
+                    }
+                }
+                .carry {
+                    val result by it.params<String>()
+                    tvResult.text = result
+                }
+        }
+        btnNextB.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT_B)
+                .run {
+                    if (cbClearTop.isChecked) {
+                        clearTop()
+                    } else if (cbSingleTop.isChecked) {
+                        singleTop()
+                    } else {
+                        this
+                    }
+                }
+                .carry {
+                    val result by it.params<String>()
+                    tvResult.text = result
+                }
+        }
+        btnNextC.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT_C)
+                .run {
+                    if (cbClearTop.isChecked) {
+                        clearTop()
+                    } else if (cbSingleTop.isChecked) {
+                        singleTop()
+                    } else {
+                        this
+                    }
+                }
+                .carry {
+                    val result by it.params<String>()
+                    tvResult.text = result
+                }
         }
     }
 }

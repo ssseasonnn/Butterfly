@@ -75,8 +75,7 @@ internal object ButterflyHelper {
         }
     }
 
-    internal fun FragmentActivity.awaitFragmentResult(fragment: Fragment) = callbackFlow {
-        val requestKey = fragment.javaClass.name
+    internal fun FragmentActivity.awaitFragmentResult(fragment: Fragment, requestKey: String) = callbackFlow {
         val listener = FragmentResultListener { key, result ->
             if (requestKey == key) {
                 trySend(Result.success(result))
@@ -87,7 +86,7 @@ internal object ButterflyHelper {
         if (!isDestroyed && isActive) {
             supportFragmentManager.setFragmentResultListener(
                 requestKey,
-                this@awaitFragmentResult,
+                fragment,
                 listener
             )
         }
@@ -96,8 +95,8 @@ internal object ButterflyHelper {
         }
     }
 
-    internal fun FragmentActivity.setFragmentResult(fragment: Fragment, bundle: Bundle) {
-        supportFragmentManager.setFragmentResult(fragment.javaClass.name, bundle)
+    internal fun FragmentActivity.setFragmentResult(requestKey: String, bundle: Bundle) {
+        supportFragmentManager.setFragmentResult(requestKey, bundle)
     }
 
     internal fun FragmentActivity.createFragment(request: AgileRequest): Fragment {

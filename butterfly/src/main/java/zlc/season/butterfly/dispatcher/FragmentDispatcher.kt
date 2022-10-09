@@ -44,7 +44,7 @@ object FragmentDispatcher : InnerDispatcher {
         topEntry?.let { entry ->
             fragmentEntryManager.removeEntry(activity, entry)
             entry.reference.get()?.let {
-                activity.setFragmentResult(it, bundle)
+                activity.setFragmentResult(entry.request.hashCode().toString(), bundle)
                 activity.remove(it)
                 return true
             }
@@ -69,7 +69,7 @@ object FragmentDispatcher : InnerDispatcher {
         return if (fragment == null) {
             flowOf(Result.failure(IllegalStateException("Fragment is NULL.")))
         } else if (realRequest.needResult) {
-            activity.awaitFragmentResult(fragment)
+            activity.awaitFragmentResult(fragment, realRequest.hashCode().toString())
         } else {
             flowOf(Result.success(Bundle()))
         }

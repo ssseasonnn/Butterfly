@@ -17,8 +17,6 @@ object NoneDispatcher : InnerDispatcher {
             DialogFragmentDispatcher.retreat(bundle)
         } else if (FragmentDispatcher.retreatCount() > 0) {
             FragmentDispatcher.retreat(bundle)
-        } else if (ActivityDispatcher.retreatCount() > 0) {
-            ActivityDispatcher.retreat(bundle)
         } else {
             return false
         }

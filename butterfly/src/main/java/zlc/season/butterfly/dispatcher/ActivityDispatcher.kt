@@ -11,10 +11,6 @@ import zlc.season.butterfly.*
 import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
 object ActivityDispatcher : InnerDispatcher {
-    override fun retreatCount(): Int {
-        return ButterflyHelper.activitySize
-    }
-
     override fun retreat(bundle: Bundle): Boolean {
         ButterflyHelper.activity?.let {
             it.setActivityResult(bundle)
