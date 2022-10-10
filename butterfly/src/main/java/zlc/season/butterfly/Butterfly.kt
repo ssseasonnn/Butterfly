@@ -122,8 +122,8 @@ object Butterfly {
         }
     }
 
-    fun retreat(vararg result: Pair<String, Any?>) {
-        ButterflyCore.dispatchRetreat(Any::class.java, bundleOf(*result))
+    fun retreat(vararg result: Pair<String, Any?>): Boolean {
+        return ButterflyCore.dispatchRetreat(Any::class.java, bundleOf(*result))
     }
 
     fun retreatDialog(vararg result: Pair<String, Any?>): Boolean {
@@ -140,6 +140,10 @@ object Butterfly {
 
     fun retreatDialogCount(): Int {
         return ButterflyCore.getRetreatCount(DialogFragment::class.java)
+    }
+
+    fun canRetreat(): Boolean {
+        return canRetreatDialog() || canRetreatFragment()
     }
 
     fun canRetreatFragment(): Boolean {

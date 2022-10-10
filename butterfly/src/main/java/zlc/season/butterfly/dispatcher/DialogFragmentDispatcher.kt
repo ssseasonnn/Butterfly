@@ -44,7 +44,9 @@ object DialogFragmentDispatcher : InnerDispatcher {
         }
 
         if (fragment is DialogFragment) {
-            dialogFragmentEntryManager.addEntry(activity, DialogFragmentEntry(request, WeakReference(fragment)))
+            if (request.fragmentConfig.enableBackStack) {
+                dialogFragmentEntryManager.addEntry(activity, DialogFragmentEntry(request, WeakReference(fragment)))
+            }
 
             val realTag = request.fragmentConfig.tag.ifEmpty { parseScheme(request.scheme) }
             fragment.show(activity.supportFragmentManager, realTag)

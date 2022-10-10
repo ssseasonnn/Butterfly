@@ -18,7 +18,7 @@ object NoneDispatcher : InnerDispatcher {
         } else if (FragmentDispatcher.retreatCount() > 0) {
             FragmentDispatcher.retreat(bundle)
         } else {
-            return false
+            false
         }
     }
 }
