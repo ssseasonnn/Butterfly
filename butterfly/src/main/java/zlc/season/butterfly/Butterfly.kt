@@ -155,15 +155,15 @@ object Butterfly {
     }
 
     fun Activity.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
     }
 
     fun Fragment.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
     }
 
     fun DialogFragment.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(javaClass, bundleOf(*result))
+        return ButterflyCore.dispatchRetreatDirectly(javaClass, this, bundleOf(*result))
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

@@ -67,4 +67,10 @@ abstract class BaseEntryManager<E : BaseEntry> {
             return entryList.lastOrNull()
         }
     }
+
+    @Synchronized
+    fun findEntry(activity: FragmentActivity, block: (E) -> Boolean): E? {
+        val entryList = getEntryList(activity)
+        return entryList.lastOrNull(block)
+    }
 }

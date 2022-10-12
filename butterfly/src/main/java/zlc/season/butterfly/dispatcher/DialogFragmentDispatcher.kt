@@ -22,6 +22,24 @@ object DialogFragmentDispatcher : InnerDispatcher {
         return dialogFragmentEntryManager.getEntrySize(activity)
     }
 
+    override fun retreatDirectly(target: Any, bundle: Bundle): Boolean {
+        if (target is DialogFragment) {
+            val activity = ButterflyHelper.fragmentActivity ?: return false
+            val findEntry = dialogFragmentEntryManager.findEntry(activity) {
+                it.reference.get() == target
+            }
+            findEntry?.let { entry ->
+                dialogFragmentEntryManager.removeEntry(activity, entry)
+                entry.reference.get()?.let {
+                    activity.setFragmentResult(entry.request.hashCode().toString(), bundle)
+                    it.dismissAllowingStateLoss()
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     override fun retreat(bundle: Bundle): Boolean {
         val activity = ButterflyHelper.fragmentActivity ?: return false
         val topEntry = dialogFragmentEntryManager.getTopEntry(activity)

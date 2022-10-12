@@ -11,6 +11,15 @@ import zlc.season.butterfly.*
 import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
 object ActivityDispatcher : InnerDispatcher {
+    override fun retreatDirectly(target: Any, bundle: Bundle): Boolean {
+        if (target is Activity) {
+            target.setActivityResult(bundle)
+            target.finish()
+            return true
+        }
+        return false
+    }
+
     override fun retreat(bundle: Bundle): Boolean {
         ButterflyHelper.activity?.let {
             it.setActivityResult(bundle)

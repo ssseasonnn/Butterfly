@@ -58,6 +58,10 @@ object ButterflyCore {
         return agileDispatcher.retreat(cls, bundle)
     }
 
+    fun dispatchRetreatDirectly(cls: Class<*>, target: Any, bundle: Bundle): Boolean {
+        return agileDispatcher.retreatDirectly(cls, target, bundle)
+    }
+
     fun getRetreatCount(cls: Class<*>): Int {
         return agileDispatcher.retreatCount(cls)
     }

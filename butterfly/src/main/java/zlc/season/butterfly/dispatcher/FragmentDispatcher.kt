@@ -38,6 +38,24 @@ object FragmentDispatcher : InnerDispatcher {
         return fragmentEntryManager.getEntrySize(activity)
     }
 
+    override fun retreatDirectly(target: Any, bundle: Bundle): Boolean {
+        if (target is Fragment) {
+            val activity = ButterflyHelper.fragmentActivity ?: return false
+            val findEntry = fragmentEntryManager.findEntry(activity) {
+                it.reference.get() == target
+            }
+            findEntry?.let { entry ->
+                fragmentEntryManager.removeEntry(activity, entry)
+                entry.reference.get()?.let {
+                    activity.setFragmentResult(entry.request.hashCode().toString(), bundle)
+                    activity.remove(it)
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     override fun retreat(bundle: Bundle): Boolean {
         val activity = ButterflyHelper.fragmentActivity ?: return false
         val topEntry = fragmentEntryManager.getTopEntry(activity)
