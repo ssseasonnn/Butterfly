@@ -331,10 +331,10 @@ Butterfly.agile("test/dialog")
 
 Butterfly支持Fragment和DialogFragment的回退栈
 
-在任意地点回退栈顶组件：
+在任意地点回退栈顶页面：
 
 ```kotlin
-//回退栈顶组件, 并返回数据
+//回退栈顶页面, 并返回数据
 Butterfly.retreat("result" to "123")
 
 //回退栈顶Fragment, 并返回数据
@@ -344,7 +344,7 @@ Butterfly.retreatFragment("result" to "123")
 Butterfly.retreatDialog("result" to "123")
 ```
 
-在组件内部回退自身：
+在页面内部回退自身：
 
 ```kotlin
 //在Fragment内部回退
@@ -372,7 +372,7 @@ class TestDialogFragment : DialogFragment() {
 }
 ```
 
-### License
+## License
 
 > ```
 > Copyright 2022 Season.Zlc
