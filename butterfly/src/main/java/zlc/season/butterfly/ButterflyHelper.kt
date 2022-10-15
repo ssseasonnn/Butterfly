@@ -119,4 +119,12 @@ internal object ButterflyHelper {
     internal fun FragmentActivity.remove(fragment: Fragment) {
         supportFragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss()
     }
+
+    internal fun FragmentActivity.hide(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().hide(fragment).commitAllowingStateLoss()
+    }
+
+    internal fun FragmentActivity.show(fragment: Fragment) {
+        supportFragmentManager.beginTransaction().show(fragment).commitAllowingStateLoss()
+    }
 }

@@ -25,7 +25,9 @@ class MainActivity : AppCompatActivity() {
         binding.btnFragmentTest.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT_TEST).carry()
         }
-
+        binding.btnBottomTabTest.setOnClickListener {
+            Butterfly.agile(Schemes.SCHEME_BOTTOM_TAB_TEST).carry()
+        }
         binding.startEvadeTest.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_EVADE_TEST).carry()
         }

@@ -57,9 +57,7 @@ object DialogFragmentDispatcher : InnerDispatcher {
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val activity = ButterflyHelper.fragmentActivity ?: return flowOf(Result.failure(IllegalStateException("Activity not found")))
 
-        val fragment = activity.createFragment(request).apply {
-            arguments = request.bundle
-        }
+        val fragment = activity.createFragment(request)
 
         if (fragment is DialogFragment) {
             if (request.fragmentConfig.enableBackStack) {

@@ -3,9 +3,7 @@
     package="zlc.season.home">
 
     <application>
-        <activity
-            android:name=".SecondActivity"
-            android:exported="false" />
+
     </application>
 
 </manifest>

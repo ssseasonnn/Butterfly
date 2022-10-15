@@ -4,6 +4,9 @@
 
     <application>
         <activity
+            android:name=".BottomTabActivity"
+            android:exported="false" />
+        <activity
             android:name=".EvadeTestActivity"
             android:exported="false" />
         <activity

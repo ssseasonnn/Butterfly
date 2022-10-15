@@ -53,6 +53,10 @@ object Butterfly {
         return copy(fragmentConfig = fragmentConfig.copy(tag = tag))
     }
 
+    fun AgileRequest.group(groupName: String): AgileRequest {
+        return copy(fragmentConfig = fragmentConfig.copy(groupName = groupName))
+    }
+
     fun AgileRequest.clearTop(): AgileRequest {
         return copy(
             activityConfig = activityConfig.copy(clearTop = true),

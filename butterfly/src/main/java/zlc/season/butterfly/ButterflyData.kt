@@ -38,7 +38,7 @@ data class FragmentConfig(
     val singleTop: Boolean = false,
     val enableBackStack: Boolean = true,
     val useReplace: Boolean = false,
-
+    val groupName: String = "",
     val enterAnim: Int = 0,
     val exitAnim: Int = 0
 )

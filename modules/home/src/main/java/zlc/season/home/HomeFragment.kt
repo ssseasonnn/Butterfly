@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import coil.load
 import kotlinx.coroutines.CoroutineScope
+import zlc.season.base.Schemes
+import zlc.season.butterfly.annotation.Agile
 import zlc.season.home.databinding.FragmentHomeBinding
 import zlc.season.home.databinding.ItemGoodsBinding
 import zlc.season.home.databinding.ItemHeaderBinding
@@ -17,6 +19,7 @@ import zlc.season.yasha.YashaItem
 import zlc.season.yasha.grid
 import zlc.season.yasha.linear
 
+@Agile(Schemes.SCHEME_HOME)
 class HomeFragment : Fragment() {
     var binding: FragmentHomeBinding? = null
 

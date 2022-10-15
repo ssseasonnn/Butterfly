@@ -5,6 +5,7 @@ object Schemes {
 
     const val SCHEME_AGILE_TEST = "agile/test"
     const val SCHEME_FRAGMENT_TEST = "fragment/test"
+    const val SCHEME_BOTTOM_TAB_TEST = "bottom_tab/test"
     const val SCHEME_EVADE_TEST = "evade/test"
 
     const val SCHEME_FOO = "${HOST}://foo"
@@ -18,6 +19,10 @@ object Schemes {
 
     const val SCHEME_FOO_DIALOG_FRAGMENT = "${HOST}://foo_dialog_fragment"
     const val SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT = "${HOST}://foo_bottom_sheet_dialog_fragment"
+
+    const val SCHEME_DASHBOARD = "${HOST}://dashboard"
+    const val SCHEME_NOTIFICATION = "${HOST}://notification"
+    const val SCHEME_HOME = "${HOST}://home"
 
     const val SCHEME_ACTION = "${HOST}://action"
 }
