@@ -1,16 +1,15 @@
 package zlc.season.bar
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import zlc.season.bar.databinding.ActivityFragmentTestBinding
+import zlc.season.base.BaseActivity
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_FRAGMENT_TEST)
-class FragmentTestActivity : AppCompatActivity() {
+class FragmentTestActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityFragmentTestBinding.inflate(layoutInflater)
@@ -41,8 +40,6 @@ class FragmentTestActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (!Butterfly.retreatFragment("result" to "Result from Activity")) {
-            super.onBackPressed()
-        }
+        Butterfly.retreat("result" to "Result from Activity")
     }
 }

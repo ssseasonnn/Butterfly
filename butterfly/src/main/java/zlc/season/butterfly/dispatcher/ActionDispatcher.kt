@@ -7,7 +7,7 @@ import zlc.season.butterfly.Action
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.ButterflyHelper
 
-object ActionDispatcher : InnerDispatcher {
+object ActionDispatcher : InnerDispatcher<Unit> {
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
         val cls = Class.forName(request.className)
         val action = cls.newInstance() as Action

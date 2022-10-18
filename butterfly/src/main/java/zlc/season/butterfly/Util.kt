@@ -2,6 +2,7 @@ package zlc.season.butterfly
 
 import android.util.Log
 import androidx.core.net.toUri
+import java.util.*
 
 internal fun <T> T.logd(tag: String = ""): T {
     val realTag = tag.ifEmpty { "Butterfly" }
@@ -46,4 +47,12 @@ internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
         return result.toTypedArray()
     }
     return arrayOf()
+}
+
+internal fun createRequestId(): String {
+    return UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
+}
+
+internal fun AgileRequest.containerId(): Int {
+    return if (fragmentConfig.containerViewId != 0) fragmentConfig.containerViewId else android.R.id.content
 }

@@ -4,14 +4,10 @@ import android.os.Bundle
 import kotlinx.coroutines.flow.Flow
 import zlc.season.butterfly.AgileRequest
 
-interface InnerDispatcher {
+interface InnerDispatcher<T> {
     suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>>
 
-    fun retreat(bundle: Bundle): Boolean {
-        return false
-    }
-
-    fun retreatDirectly(target: Any, bundle: Bundle): Boolean {
+    fun retreat(target: T?, bundle: Bundle): Boolean {
         return false
     }
 

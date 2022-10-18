@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
@@ -96,6 +97,7 @@ internal object ButterflyHelper {
     }
 
     internal fun FragmentActivity.setFragmentResult(requestKey: String, bundle: Bundle) {
+        if (bundle.isEmpty) return
         supportFragmentManager.setFragmentResult(requestKey, bundle)
     }
 
@@ -107,9 +109,21 @@ internal object ButterflyHelper {
         return fragment
     }
 
+    internal fun FragmentActivity.createDialogFragment(request: AgileRequest): DialogFragment {
+        return createFragment(request) as DialogFragment
+    }
 
     internal fun Activity.setActivityResult(bundle: Bundle) {
+        if (bundle.isEmpty) return
         setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
+    }
+
+    internal fun FragmentActivity.findFragment(request: AgileRequest): Fragment? {
+        return supportFragmentManager.findFragmentByTag(request.uniqueId)
+    }
+
+    internal fun FragmentActivity.findDialogFragment(request: AgileRequest): DialogFragment? {
+        return supportFragmentManager.findFragmentByTag(request.uniqueId) as? DialogFragment
     }
 
     internal fun FragmentActivity.add(fragment: Fragment) {
@@ -118,6 +132,13 @@ internal object ButterflyHelper {
 
     internal fun FragmentActivity.remove(fragment: Fragment) {
         supportFragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss()
+    }
+
+    internal fun FragmentActivity.remove(tag: String) {
+        val find = supportFragmentManager.findFragmentByTag(tag)
+        if (find != null) {
+            supportFragmentManager.beginTransaction().remove(find).commitAllowingStateLoss()
+        }
     }
 
     internal fun FragmentActivity.hide(fragment: Fragment) {

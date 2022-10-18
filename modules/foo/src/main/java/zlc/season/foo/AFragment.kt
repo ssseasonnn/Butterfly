@@ -4,19 +4,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import zlc.season.base.BaseFragment
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.Butterfly.clearTop
 import zlc.season.butterfly.Butterfly.retreat
-import zlc.season.butterfly.Butterfly.singleTop
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.FragmentCommonBinding
 
 @Agile(Schemes.SCHEME_FOO_FRAGMENT_A)
-class AFragment : Fragment() {
+class AFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -34,7 +32,7 @@ class AFragment : Fragment() {
         }
         btnDialog.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT)
-                .carry {
+                .carry(lifecycleScope) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -50,7 +48,7 @@ class AFragment : Fragment() {
                         this
                     }
                 }
-                .carry {
+                .carry(lifecycleScope) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -66,7 +64,7 @@ class AFragment : Fragment() {
                         this
                     }
                 }
-                .carry {
+                .carry(lifecycleScope) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -82,7 +80,7 @@ class AFragment : Fragment() {
                         this
                     }
                 }
-                .carry {
+                .carry(lifecycleScope) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }

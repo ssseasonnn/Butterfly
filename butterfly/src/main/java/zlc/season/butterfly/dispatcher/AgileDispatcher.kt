@@ -47,15 +47,13 @@ class AgileDispatcher {
         return dispatcherMap[getAgileType(cls)]!!.dispatch(request)
     }
 
-    fun retreat(cls: Class<*>, bundle: Bundle): Boolean {
-        return dispatcherMap[getAgileType(cls)]!!.retreat(bundle)
-    }
-
-    fun retreatDirectly(cls: Class<*>, target: Any, bundle: Bundle): Boolean {
-        return dispatcherMap[getAgileType(cls)]!!.retreatDirectly(target, bundle)
-    }
-
-    fun retreatCount(cls: Class<*>): Int {
-        return dispatcherMap[getAgileType(cls)]!!.retreatCount()
+    fun retreat(target: Any?, bundle: Bundle): Boolean {
+        return when (target) {
+            is Unit -> NoneDispatcher.retreat(target, bundle)
+            is DialogFragment -> DialogFragmentDispatcher.retreat(target, bundle)
+            is Fragment -> FragmentDispatcher.retreat(target, bundle)
+            is Activity -> ActivityDispatcher.retreat(target, bundle)
+            else -> false
+        }
     }
 }

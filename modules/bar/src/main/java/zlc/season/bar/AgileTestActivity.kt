@@ -6,8 +6,6 @@ import zlc.season.bar.databinding.ActivityAgileTestBinding
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.Butterfly.params
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_AGILE_TEST)

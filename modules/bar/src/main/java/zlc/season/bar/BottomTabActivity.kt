@@ -10,9 +10,6 @@ import androidx.navigation.ui.setupWithNavController
 import zlc.season.bar.databinding.ActivityBottomTabBinding
 import zlc.season.base.Schemes
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
-import zlc.season.butterfly.Butterfly.container
-import zlc.season.butterfly.Butterfly.group
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_BOTTOM_TAB_TEST)

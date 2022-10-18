@@ -31,8 +31,8 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.1'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.1'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.2'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.2'
 }
 ```
 
@@ -314,7 +314,6 @@ Butterfly.agile("test/fragment")
     .enterAnim(R.anim.xxx)       //添加动画
     .exitAnim(R.anim.xxx)
     .container(R.id.container)   //设置Fragment添加到的容器ID
-    .tag("customTag")            //设置Fragment的tag
     .carry()
 ```
 
@@ -323,25 +322,21 @@ Butterfly.agile("test/fragment")
 ```kotlin
 Butterfly.agile("test/dialog")
     .disableBackStack()         //不添加到返回栈中
-    .tag("customTag")           //设置Dialog的tag
     .carry()
 ```
 
 ### Dialog和Fragment回退
 
-Butterfly支持Fragment和DialogFragment的回退栈
+Butterfly支持Activity、Fragment和DialogFragment的回退栈
 
 在任意地点回退栈顶页面：
 
 ```kotlin
-//回退栈顶页面, 并返回数据
+//关闭栈顶页面
+Butterfly.retreat()
+
+//关闭栈顶页面, 并返回数据
 Butterfly.retreat("result" to "123")
-
-//回退栈顶Fragment, 并返回数据
-Butterfly.retreatFragment("result" to "123")
-
-//回退栈顶DialogFragment, 并返回数据
-Butterfly.retreatDialog("result" to "123")
 ```
 
 在页面内部回退自身：
@@ -353,8 +348,11 @@ class TestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btnBack.setOnClickListener {
-            //回退当前Fragment并返回数据
-            retreat("result" to "123")
+            //关闭当前页面
+            retreat()
+            //or
+            //关闭当前Fragment并返回数据
+            //retreat("result" to "123")
         }
     }
 }
@@ -371,6 +369,19 @@ class TestDialogFragment : DialogFragment() {
     }
 }
 ```
+
+### Fragment Group管理
+
+除了利用栈来管理Fragment之外，Butterfly还支持以Group的形式管理Fragment，如APP首页有多个tab，每个tab对应一个Fragment
+
+```kotlin
+Butterfly.agile("test/fragment")
+    .group("groupName")             //使用相同groupName的页面会添加到同一个组中
+    .carry()
+```
+
+> 使用相同groupName的页面会添加到同一个组中，并且每个Fragment只会存在一个实例，对这些Fragment进行切换时将会使用**hide**和**show**方法，而不是add或replace
+
 
 ## License
 

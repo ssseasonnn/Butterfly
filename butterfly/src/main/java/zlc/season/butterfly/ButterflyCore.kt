@@ -42,28 +42,20 @@ object ButterflyCore {
 
     fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
 
-    fun dispatchAgile(agileRequest: AgileRequest): Flow<Result<Bundle>> {
+    fun dispatchAgile(handler: AgileRequestHandler): Flow<Result<Bundle>> {
         return flowOf(Unit).onEach {
-            if (agileRequest.enableGlobalInterceptor) {
-                interceptorController.intercept(agileRequest)
+            if (handler.request.enableGlobalInterceptor) {
+                interceptorController.intercept(handler.request)
             }
         }.onEach {
-            agileRequest.interceptorController.intercept(agileRequest)
+            handler.interceptorController.intercept(handler.request)
         }.flatMapConcat {
-            agileDispatcher.dispatch(agileRequest)
+            agileDispatcher.dispatch(handler.request)
         }
     }
 
-    fun dispatchRetreat(cls: Class<*>, bundle: Bundle): Boolean {
-        return agileDispatcher.retreat(cls, bundle)
-    }
-
-    fun dispatchRetreatDirectly(cls: Class<*>, target: Any, bundle: Bundle): Boolean {
-        return agileDispatcher.retreatDirectly(cls, target, bundle)
-    }
-
-    fun getRetreatCount(cls: Class<*>): Int {
-        return agileDispatcher.retreatCount(cls)
+    fun dispatchRetreat(target: Any?, bundle: Bundle): Boolean {
+        return agileDispatcher.retreat(target, bundle)
     }
 
     fun dispatchEvade(evadeRequest: EvadeRequest): Any {

@@ -4,11 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import zlc.season.base.Schemes
 import zlc.season.base.Schemes.SCHEME_FOO_BOTTOM_SHEET_DIALOG_FRAGMENT
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.DialogFooBinding
@@ -22,8 +22,8 @@ class FooBottomSheetDialogFragment : BottomSheetDialogFragment() {
     ): View? {
         return DialogFooBinding.inflate(inflater, container, false).also {
             it.btnNext.setOnClickListener {
-                Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry()
-                dismiss()
+                Butterfly.agile(Schemes.SCHEME_FOO_FRAGMENT).carry(lifecycleScope)
+                retreat()
             }
             it.btnBack.setOnClickListener {
                 retreat("result" to "Result from dialog!")

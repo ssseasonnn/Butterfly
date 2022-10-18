@@ -6,7 +6,6 @@ import kotlinx.coroutines.delay
 import zlc.season.base.Schemes
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.carry
 import zlc.season.butterfly.ButterflyInterceptor
 import zlc.season.butterflydemo.databinding.ActivityMainBinding
 

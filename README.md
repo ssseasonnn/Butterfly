@@ -31,8 +31,8 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.1'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.1'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.2'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.2'
 }
 ```
 
@@ -313,7 +313,6 @@ Butterfly.agile("test/fragment")
     .enterAnim(R.anim.xxx)       //Add anim
     .exitAnim(R.anim.xxx)
     .container(R.id.container)   //Set the container ID to which Fragment is added
-    .tag("customTag")            //Set Fragment tag
     .carry()
 ```
 
@@ -322,7 +321,6 @@ Butterfly.agile("test/fragment")
 ```kotlin
 Butterfly.agile("test/dialog")
     .disableBackStack()         //Do not add to the backstack
-    .tag("customTag")           //Set tag
     .carry()
 ```
 
@@ -333,11 +331,10 @@ Butterfly supports the backstack of Fragment and DialogFragment
 Back the top page anywhere:
 
 ```kotlin
+Butterfly.retreat()
+
+//or
 Butterfly.retreat("result" to "123")
-
-Butterfly.retreatFragment("result" to "123")
-
-Butterfly.retreatDialog("result" to "123")
 ```
 
 Back itself inside the page:
@@ -348,6 +345,8 @@ class TestFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         btnBack.setOnClickListener {
+            retreat()
+            //or
             retreat("result" to "123")
         }
     }
@@ -363,6 +362,23 @@ class TestDialogFragment : DialogFragment() {
     }
 }
 ```
+
+### Fragment Group manage
+
+In addition to using the stack to manage fragments, Butterfly also supports managing fragments in the form of a group. 
+
+For example, there are multiple tabs on the APP homepage, and each tab corresponds to a fragment
+
+```kotlin
+Butterfly.agile("test/fragment")
+    .group("groupName")             //Pages that use the same groupName will be added to the same group
+    .carry()
+```
+
+> Pages with the same groupName will be added to the same group, and only one instance of each fragment will exist. 
+> When switching these fragments, **hide** and **show** methods will be used instead of add or replace
+
+
 
 ## License
 

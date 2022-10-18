@@ -10,22 +10,24 @@ import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.*
 import zlc.season.butterfly.ButterflyHelper.setActivityResult
 
-object ActivityDispatcher : InnerDispatcher {
-    override fun retreatDirectly(target: Any, bundle: Bundle): Boolean {
-        if (target is Activity) {
+object ActivityDispatcher : InnerDispatcher<Activity> {
+    override fun retreatCount(): Int {
+        return ButterflyHelper.activitySize
+    }
+
+    override fun retreat(target: Activity?, bundle: Bundle): Boolean {
+        if (target == null) {
+            ButterflyHelper.activity?.let {
+                it.setActivityResult(bundle)
+                it.finish()
+                return true
+            }
+        } else {
             target.setActivityResult(bundle)
             target.finish()
             return true
         }
-        return false
-    }
 
-    override fun retreat(bundle: Bundle): Boolean {
-        ButterflyHelper.activity?.let {
-            it.setActivityResult(bundle)
-            it.finish()
-            return true
-        }
         return false
     }
 
@@ -72,7 +74,7 @@ object ActivityDispatcher : InnerDispatcher {
         context: Context, request: AgileRequest
     ): ActivityOptionsCompat? {
         val config = request.activityConfig
-        return config.activityOptions ?: if (config.enterAnim != 0 || config.exitAnim != 0) {
+        return if (config.enterAnim != 0 || config.exitAnim != 0) {
             ActivityOptionsCompat.makeCustomAnimation(
                 context, config.enterAnim, config.exitAnim
             )
