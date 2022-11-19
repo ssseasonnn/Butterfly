@@ -14,10 +14,19 @@ Only the mightiest and most experienced of warriors can wield the Butterfly, but
 
 ### Feature
 
-The butterfly mainly contains two major features：
+The butterfly provides these features：
 
-- Agile page navigation
-- Evade module communicate
+✅ Support navigation to Activity <br>
+✅ Support navigation to Fragment <br>
+✅ Support navigation to DialogFragment <br>
+✅ Support navigation to Compose UI <br>
+✅ Support navigation to Action <br>
+✅ Support navigation parameters pass and receive <br>
+✅ Support navigation interceptor <br>
+✅ Support Fragment and Compose UI backstack <br>
+✅ Support Fragment and Compose UI group manage <br>
+✅ Support Fragment and Compose UI launch mode，such as SingleTop、ClearTop <br>
+✅ Support communicate between modules<br>
 
 ### Setup
 
@@ -31,8 +40,11 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.2'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.2'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.0'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.0'
+
+  //for compose
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.0'
 }
 ```
 
@@ -40,7 +52,7 @@ dependencies {
 
 ### Navigation
 
-Butterfly supports navigation for Activity、Fragment and DialogFragment
+Butterfly supports navigation for Activity、Fragment and DialogFragment and Compose UI component
 
 ```kotlin
 @Agile("test/activity")
@@ -51,6 +63,10 @@ class TestFragment : Fragment()
 
 @Agile("test/dialog")
 class TestDialogFragment : DialogFragment()
+
+@Agile("test/compose")
+@Composable
+fun HomeScreen() {}
 
 //Navigation
 Butterfly.agile("test/xxx").carry()
@@ -378,6 +394,92 @@ Butterfly.agile("test/fragment")
 > Pages with the same groupName will be added to the same group, and only one instance of each fragment will exist. 
 > When switching these fragments, **hide** and **show** methods will be used instead of add or replace
 
+
+
+### Compose UI Support
+
+Butterfly also support Compose UI's navigation：
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen() {
+    Box() {
+        ...
+    }
+}
+
+//navigate to HomeScreen
+Butterfly.agile("test/compose").carry()
+```
+
+Compose UI Parameter pass also supports URL splicing and params：
+
+Just add a bundle type parameter to the compose component to pass the parameters passed by through the Bundle access navigation process
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(bundle: Bundle) {
+    val a by bundle.params<Int>()
+    Box() {
+        Text(text = a)
+    }
+}
+
+//Splicing scheme
+Butterfly.agile("test/compose?a=1&b=2").carry()
+
+//or use params
+Butterfly.agile("test/compose?a=1&b=2")
+    .params("intValue" to 1)
+    .params("booleanValue" to true)
+    .params("stringValue" to "test value")
+    .carry()
+
+```
+
+Compose UI and ViewModel：
+
+If you need to use ViewModel, you only need to add the corresponding ViewModel type to the compose component. 
+Butterfly will automatically create ViewModel for you to use it.
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(homeViewModel: HomeViewModel) {
+    val textFromViewModel = homeViewModel.text.asFlow().collectAsState(initial = "")
+
+    Box() {
+        Text(text = textFromViewModel.value)
+    }
+}
+
+//no other config
+Butterfly.agile("test/compose").carry()
+```
+
+Use Bundle and ViewModel at the same time:
+
+Butterfly can support the use of Bundle and ViewModel parameters at the same time，
+but it should be noted that the order must be bundle in front, ViewModel is behind
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(bundle: Bundle, homeViewModel: HomeViewModel) {
+    val a by bundle.params<Int>()
+    val textFromViewModel = homeViewModel.text.asFlow().collectAsState(initial = "")
+
+    Box() {
+        Text(text = a)
+        Text(text = textFromViewModel.value)
+    }
+}
+
+//no other config
+Butterfly.agile("test/compose?a=1&b=2").carry()
+```
 
 
 ## License

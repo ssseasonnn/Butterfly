@@ -14,10 +14,21 @@ Butterfly - 小巧而强大的武器，拥有它，让你的Android开发如虎�
 
 ### 特性
 
-蝴蝶主要包含两大功能：
+蝴蝶提供以下功能：
 
-- Agile 页面导航
-- Evade 组件化通信
+✅ 支持导航Activity <br>
+✅ 支持导航Fragment <br>
+✅ 支持导航DialogFragment <br>
+✅ 支持导航Compose UI <br>
+✅ 支持导航Action <br>
+✅ 支持导航参数传递和解析 <br>
+✅ 支持导航拦截器 <br>
+✅ 支持Fragment和Compose UI回退栈 <br>
+✅ 支持Fragment和Compose UI组管理 <br>
+✅ 支持Fragment和Compose UI启动模式，如SingleTop、ClearTop <br>
+✅ 支持组件化通信 <br>
+
+
 
 ### 集成
 
@@ -31,8 +42,11 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.1.2'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.1.2'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.0'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.0'
+
+  //for compose
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.0'
 }
 ```
 
@@ -40,7 +54,7 @@ dependencies {
 
 ### 导航
 
-Butterfly支持Activity、Fragment和DialogFragment的导航
+Butterfly支持Activity、Fragment和DialogFragment以及Compose UI组件的导航
 
 ```kotlin
 @Agile("test/activity")
@@ -51,6 +65,10 @@ class TestFragment : Fragment()
 
 @Agile("test/dialog")
 class TestDialogFragment : DialogFragment()
+
+@Agile("test/compose")
+@Composable
+fun HomeScreen() {}
 
 //导航
 Butterfly.agile("test/xxx").carry()
@@ -382,6 +400,89 @@ Butterfly.agile("test/fragment")
 
 > 使用相同groupName的页面会添加到同一个组中，并且每个Fragment只会存在一个实例，对这些Fragment进行切换时将会使用**hide**和**show**方法，而不是add或replace
 
+
+### Compose UI支持
+
+Butterfly同样支持Compose UI的导航：
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen() {
+    Box() {
+        ...
+    }
+}
+
+//导航到HomeScreen页面
+Butterfly.agile("test/compose").carry()
+```
+
+Compose UI参数传递同样支持url拼接和params传参：
+
+只需要在Compose组件中添加一个Bundle类型的参数，即可通过该bundle访问导航过程中传递过来的参数
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(bundle: Bundle) {
+    val a by bundle.params<Int>()
+    Box() {
+        Text(text = a)
+    }
+}
+
+//拼接scheme
+Butterfly.agile("test/compose?a=1&b=2").carry()
+
+//或者调用params
+Butterfly.agile("test/compose?a=1&b=2")
+    .params("intValue" to 1)
+    .params("booleanValue" to true)
+    .params("stringValue" to "test value")
+    .carry()
+
+```
+
+Compose UI和ViewModel：
+
+如需使用ViewModel，只需要在Compose组件中添加对应的ViewModel类型即可，Butterfly会自动创建好ViewModel供你使用
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(homeViewModel: HomeViewModel) {
+    val textFromViewModel = homeViewModel.text.asFlow().collectAsState(initial = "")
+
+    Box() {
+        Text(text = textFromViewModel.value)
+    }
+}
+
+//无需额外操作
+Butterfly.agile("test/compose").carry()
+```
+
+同时使用Bundle和ViewModel:
+
+Butterfly可以同时支持使用Bundle和ViewModel参数，但需要注意的是顺序必须是Bundle在前，ViewModel在后
+
+```kotlin
+@Agile("test/compose")
+@Composable
+fun HomeScreen(bundle: Bundle，homeViewModel: HomeViewModel) {
+    val a by bundle.params<Int>()
+    val textFromViewModel = homeViewModel.text.asFlow().collectAsState(initial = "")
+
+    Box() {
+        Text(text = a)
+        Text(text = textFromViewModel.value)
+    }
+}
+
+//无需额外操作
+Butterfly.agile("test/compose?a=1&b=2").carry()
+```
 
 ## License
 
