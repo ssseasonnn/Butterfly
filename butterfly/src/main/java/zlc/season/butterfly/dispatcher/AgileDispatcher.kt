@@ -8,32 +8,43 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import zlc.season.butterfly.Action
 import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.ButterflyHelper
+import zlc.season.butterfly.backstack.BackStackEntryManager
+import zlc.season.butterfly.group.GroupEntryManager
 import zlc.season.butterfly.logw
 
 class AgileDispatcher {
     companion object {
-        private const val AGILE_TYPE_NONE = 0
-        private const val AGILE_TYPE_ACTION = 1
-        private const val AGILE_TYPE_ACTIVITY = 2
-        private const val AGILE_TYPE_DIALOG_FRAGMENT = 3
-        private const val AGILE_TYPE_FRAGMENT = 4
+        private const val COMPOSABLE_CLASS = "zlc.season.butterfly.compose.AgileComposable"
+        private const val COMPOSE_DISPATCHER_CLASS = "zlc.season.butterfly.compose.ComposeDispatcher"
     }
 
-    private val dispatcherMap = mapOf(
-        AGILE_TYPE_NONE to NoneDispatcher,
-        AGILE_TYPE_ACTION to ActionDispatcher,
-        AGILE_TYPE_ACTIVITY to ActivityDispatcher,
-        AGILE_TYPE_DIALOG_FRAGMENT to DialogFragmentDispatcher,
-        AGILE_TYPE_FRAGMENT to FragmentDispatcher
-    )
+    private val dispatcherMaps = LinkedHashMap<Class<*>, InnerDispatcher>()
 
-    private fun getAgileType(cls: Class<*>): Int {
-        return when {
-            Action::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTION
-            Activity::class.java.isAssignableFrom(cls) -> AGILE_TYPE_ACTIVITY
-            DialogFragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_DIALOG_FRAGMENT
-            Fragment::class.java.isAssignableFrom(cls) -> AGILE_TYPE_FRAGMENT
-            else -> AGILE_TYPE_NONE
+    private val backStackEntryManager = BackStackEntryManager()
+    private val groupEntryManager = GroupEntryManager()
+
+    init {
+        dispatcherMaps.apply {
+            putAll(
+                listOf(
+                    Action::class.java to ActionDispatcher,
+                    Activity::class.java to ActivityDispatcher(backStackEntryManager),
+                    DialogFragment::class.java to DialogFragmentDispatcher(backStackEntryManager),
+                    Fragment::class.java to FragmentDispatcher(backStackEntryManager, groupEntryManager)
+                )
+            )
+            try {
+                val agileComposableCls = Class.forName(COMPOSABLE_CLASS)
+                val composeDispatcherCls = Class.forName(COMPOSE_DISPATCHER_CLASS)
+                val composableDispatcher = composeDispatcherCls.getConstructor(BackStackEntryManager::class.java, GroupEntryManager::class.java)
+                    .newInstance(backStackEntryManager, groupEntryManager) as InnerDispatcher
+                put(agileComposableCls, composableDispatcher)
+            } catch (e: Exception) {
+                e.logw()
+            }
+
+            put(Any::class.java, NoneDispatcher)
         }
     }
 
@@ -43,17 +54,31 @@ class AgileDispatcher {
             return flowOf(Result.failure(IllegalStateException("Agile class not found!")))
         }
 
-        val cls = Class.forName(request.className)
-        return dispatcherMap[getAgileType(cls)]!!.dispatch(request)
+        val fragmentActivity = ButterflyHelper.fragmentActivity
+        return if (fragmentActivity == null) {
+            findDispatcher(request).dispatch(request)
+        } else {
+            findDispatcher(request).dispatch(fragmentActivity, request)
+        }
     }
 
-    fun retreat(target: Any?, bundle: Bundle): Boolean {
-        return when (target) {
-            is Unit -> NoneDispatcher.retreat(target, bundle)
-            is DialogFragment -> DialogFragmentDispatcher.retreat(target, bundle)
-            is Fragment -> FragmentDispatcher.retreat(target, bundle)
-            is Activity -> ActivityDispatcher.retreat(target, bundle)
-            else -> false
+    fun retreat(bundle: Bundle): AgileRequest? {
+        val fragmentActivity = ButterflyHelper.fragmentActivity
+        if (fragmentActivity == null) {
+            "Agile --> FragmentActivity not found".logw()
+            return null
         }
+
+        val topEntry = backStackEntryManager.removeTopEntry(fragmentActivity) ?: return null
+        findDispatcher(topEntry.request).retreat(fragmentActivity, topEntry, bundle)
+
+        dispatcherMaps.values.forEach { it.onRetreat(fragmentActivity, topEntry) }
+
+        return topEntry.request
+    }
+
+    private fun findDispatcher(request: AgileRequest): InnerDispatcher {
+        val cls = Class.forName(request.className)
+        return dispatcherMaps[dispatcherMaps.keys.find { it.isAssignableFrom(cls) }]!!
     }
 }

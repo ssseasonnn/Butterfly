@@ -21,7 +21,7 @@ class AgileRequestHandler(
     }
 
     fun params(bundle: Bundle): AgileRequestHandler {
-        return apply { bundle.putAll(bundle) }
+        return apply { request.bundle.putAll(bundle) }
     }
 
     fun skipGlobalInterceptor(): AgileRequestHandler {
@@ -40,56 +40,40 @@ class AgileRequestHandler(
 
     fun container(containerViewId: Int): AgileRequestHandler {
         return configRequest {
-            copy(fragmentConfig = fragmentConfig.copy(containerViewId = containerViewId))
+            copy(containerViewId = containerViewId)
         }
     }
 
     fun group(groupName: String = DEFAULT_GROUP): AgileRequestHandler {
-        return configRequest { copy(fragmentConfig = fragmentConfig.copy(groupId = groupName)) }
+        return configRequest { copy(groupId = groupName) }
     }
 
     fun clearTop(): AgileRequestHandler {
-        return configRequest {
-            copy(
-                activityConfig = activityConfig.copy(clearTop = true),
-                fragmentConfig = fragmentConfig.copy(clearTop = true)
-            )
-        }
+        return configRequest { copy(clearTop = true) }
     }
 
     fun singleTop(): AgileRequestHandler {
-        return configRequest {
-            copy(
-                activityConfig = activityConfig.copy(singleTop = true),
-                fragmentConfig = fragmentConfig.copy(singleTop = true)
-            )
-        }
+        return configRequest { copy(singleTop = true) }
+    }
+
+    fun asRoot(): AgileRequestHandler {
+        return configRequest { copy(isRoot = true) }
     }
 
     fun disableBackStack(): AgileRequestHandler {
-        return configRequest { copy(fragmentConfig = fragmentConfig.copy(enableBackStack = false)) }
+        return configRequest { copy(enableBackStack = false) }
     }
 
     fun addFlag(flag: Int): AgileRequestHandler {
-        return configRequest { copy(activityConfig = activityConfig.copy(flags = activityConfig.flags or flag)) }
+        return configRequest { copy(flags = flags or flag) }
     }
 
     fun enterAnim(enterAnim: Int = 0): AgileRequestHandler {
-        return configRequest {
-            copy(
-                activityConfig = activityConfig.copy(enterAnim = enterAnim),
-                fragmentConfig = fragmentConfig.copy(enterAnim = enterAnim)
-            )
-        }
+        return configRequest { copy(enterAnim = enterAnim) }
     }
 
     fun exitAnim(exitAnim: Int = 0): AgileRequestHandler {
-        return configRequest {
-            copy(
-                activityConfig = activityConfig.copy(exitAnim = exitAnim),
-                fragmentConfig = fragmentConfig.copy(exitAnim = exitAnim)
-            )
-        }
+        return configRequest { copy(exitAnim = exitAnim) }
     }
 
     fun flow(): Flow<Unit> {

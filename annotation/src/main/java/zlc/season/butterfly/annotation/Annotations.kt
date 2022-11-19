@@ -1,7 +1,7 @@
 package zlc.season.butterfly.annotation
 
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 annotation class Agile(
     val scheme: String
 )

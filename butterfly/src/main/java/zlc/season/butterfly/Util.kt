@@ -52,7 +52,3 @@ internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
 internal fun createRequestId(): String {
     return UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
 }
-
-internal fun AgileRequest.containerId(): Int {
-    return if (fragmentConfig.containerViewId != 0) fragmentConfig.containerViewId else android.R.id.content
-}

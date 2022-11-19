@@ -37,7 +37,7 @@ internal class Generator(
     private val className: String,
     private val agileMap: Map<String, String>,
     private val evadeMap: Map<String, String>,
-    private val evadeImplMap: Map<String, EvadeImplInfo>
+    private val evadeImplMap: Map<String, EvadeImplInfo>,
 ) {
     private val moduleClass = Module::class.asClassName()
 

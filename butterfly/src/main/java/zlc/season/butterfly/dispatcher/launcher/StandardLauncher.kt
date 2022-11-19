@@ -6,11 +6,10 @@ import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.ButterflyHelper.createFragment
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
-import zlc.season.butterfly.containerId
 
 class StandardLauncher : FragmentModeLauncher {
     override fun FragmentActivity.launch(backStackEntryManager: BackStackEntryManager, request: AgileRequest): Fragment {
-        if (request.fragmentConfig.enableBackStack) {
+        if (request.enableBackStack) {
             backStackEntryManager.addEntry(this, BackStackEntry(request))
         }
         return show(request)
@@ -19,16 +18,18 @@ class StandardLauncher : FragmentModeLauncher {
     private fun FragmentActivity.show(request: AgileRequest): Fragment {
         val fragment = createFragment(request)
         with(supportFragmentManager.beginTransaction()) {
-            request.fragmentConfig.apply {
-                setCustomAnimations(enterAnim, exitAnim, 0, 0)
-                if (useReplace) {
-                    replace(request.containerId(), fragment, request.uniqueId)
-                } else {
-                    add(request.containerId(), fragment, request.uniqueId)
-                }
+            setCustomAnimations(request.enterAnim, request.exitAnim, 0, 0)
+            if (request.useReplace) {
+                replace(request.containerId(), fragment, request.uniqueId)
+            } else {
+                add(request.containerId(), fragment, request.uniqueId)
             }
             commitAllowingStateLoss()
         }
         return fragment
+    }
+
+    private fun AgileRequest.containerId(): Int {
+        return if (containerViewId != 0) containerViewId else android.R.id.content
     }
 }

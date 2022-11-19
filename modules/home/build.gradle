@@ -1,5 +1,0 @@
-apply from: "../module.gradle"
-
-dependencies {
-    implementation project(':modules:base')
-}

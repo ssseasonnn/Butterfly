@@ -1,15 +1,9 @@
 package zlc.season.butterfly
 
-import android.app.Activity
-import android.os.Bundle
 import androidx.core.os.bundleOf
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
 
 object Butterfly {
-    const val RAW_SCHEME = "butterfly_scheme"
+    const val AGILE_REQUEST = "butterfly_request"
 
     fun agile(scheme: String): AgileRequestHandler {
         val realScheme = parseScheme(scheme)
@@ -21,20 +15,8 @@ object Butterfly {
     }
 
 
-    fun retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(Unit, bundleOf(*result))
-    }
-
-    fun Activity.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(this, bundleOf(*result))
-    }
-
-    fun Fragment.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(this, bundleOf(*result))
-    }
-
-    fun DialogFragment.retreat(vararg result: Pair<String, Any?>): Boolean {
-        return ButterflyCore.dispatchRetreat(this, bundleOf(*result))
+    fun retreat(vararg result: Pair<String, Any?>): AgileRequest? {
+        return ButterflyCore.dispatchRetreat(bundleOf(*result))
     }
 
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->

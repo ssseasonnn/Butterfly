@@ -5,6 +5,11 @@ import java.io.File.separatorChar as s
 
 const val DEFAULT_PACKAGE = "zlc.season.butterfly.module"
 
+const val COMPOSABLE_PACKAGE_NAME = "zlc.season.butterfly.compose"
+
+const val BUNDLE_CLASS_NAME = "android.os.Bundle"
+const val VIEW_MODEL_CLASS_NAME = "androidx.lifecycle.ViewModel"
+
 internal fun getModuleName(generateDir: String): String {
     return try {
         val kaptGenDir = "${s}build${s}generated${s}source${s}kaptKotlin"
@@ -33,4 +38,6 @@ internal fun String.cap(): String {
     return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }
 
-internal data class EvadeImplInfo(val className: String, val singleton: Boolean)
+internal fun String.getPackageName(): String {
+    return substring(0, lastIndexOf('.'))
+}

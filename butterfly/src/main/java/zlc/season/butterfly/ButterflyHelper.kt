@@ -1,9 +1,11 @@
 package zlc.season.butterfly
 
 import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -19,7 +21,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import zlc.season.claritypotion.ClarityPotion
 
-internal object ButterflyHelper {
+object ButterflyHelper {
     private val internalScope by lazy { MainScope() }
 
     internal val context: Context
@@ -27,9 +29,6 @@ internal object ButterflyHelper {
 
     internal val activity: Activity?
         get() = ClarityPotion.activity
-
-    internal val activitySize: Int
-        get() = ClarityPotion.activityList.filter { it.get() != null }.size
 
     internal val fragmentActivity: FragmentActivity?
         get() = with(activity) {
@@ -40,7 +39,7 @@ internal object ButterflyHelper {
             }
         }
 
-    internal val lifecycleOwner: LifecycleOwner?
+    private val lifecycleOwner: LifecycleOwner?
         get() = with(activity) {
             if (this != null && this is LifecycleOwner) {
                 this
@@ -113,9 +112,13 @@ internal object ButterflyHelper {
         return createFragment(request) as DialogFragment
     }
 
-    internal fun Activity.setActivityResult(bundle: Bundle) {
+    fun Activity.setActivityResult(bundle: Bundle) {
         if (bundle.isEmpty) return
-        setResult(Activity.RESULT_OK, Intent().apply { putExtras(bundle) })
+        setResult(RESULT_OK, Intent().apply { putExtras(bundle) })
+    }
+
+    fun Activity.contentView(): ViewGroup {
+        return findViewById(android.R.id.content)
     }
 
     internal fun FragmentActivity.findFragment(request: AgileRequest): Fragment? {

@@ -2,54 +2,60 @@ package zlc.season.butterfly.backstack
 
 import android.app.Activity
 import android.os.Bundle
-import android.os.Parcelable
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.Butterfly
 import zlc.season.claritypotion.ActivityLifecycleCallbacksAdapter
-import zlc.season.claritypotion.ClarityPotion
 import zlc.season.claritypotion.ClarityPotion.application
 
 class BackStackEntryManager {
-    private val backStackEntryMap = mutableMapOf<Int, MutableList<BackStackEntry>>()
-
     companion object {
         private const val KEY_SAVE_STATE = "butterfly_back_stack_state"
     }
 
+    private val backStackEntryMap = mutableMapOf<Int, MutableList<BackStackEntry>>()
+
     init {
         application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+            @SuppressWarnings("deprecation")
+            override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+                val intentRequest = activity.intent.getParcelableExtra<AgileRequest>(Butterfly.AGILE_REQUEST)
+                if (intentRequest != null) {
+                    addEntry(activity, BackStackEntry(intentRequest))
+                }
                 if (savedInstanceState != null) {
                     val data = savedInstanceState.getParcelableArrayList<AgileRequest>(KEY_SAVE_STATE)
                     if (data != null) {
-                        synchronized(this@BackStackEntryManager) {
-                            val result = data.map { BackStackEntry(it) }
-                            getEntryList(activity).addAll(result)
-                        }
+                        addEntryList(activity, data.map { BackStackEntry(it) })
                     }
                 }
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                synchronized(this@BackStackEntryManager) {
-                    val list = backStackEntryMap[activity.hashCode()]
-                    if (!list.isNullOrEmpty()) {
-                        val savedData = list.mapTo(ArrayList()) { it.request }
-                        outState.putParcelableArrayList(KEY_SAVE_STATE, savedData)
-                    }
+                val list = getList(activity)
+                if (!list.isNullOrEmpty()) {
+                    val savedData = list.mapTo(ArrayList()) { it.request }
+                    outState.putParcelableArrayList(KEY_SAVE_STATE, savedData)
                 }
             }
 
-            override fun onActivityDestroyed(activity: Activity) {
-                synchronized(this@BackStackEntryManager) {
-                    backStackEntryMap.remove(activity.hashCode())
-                }
-            }
+            override fun onActivityDestroyed(activity: Activity) = removeList(activity)
         })
     }
 
     @Synchronized
-    fun getEntryList(activity: Activity): MutableList<BackStackEntry> {
+    private fun removeList(activity: Activity) {
+        backStackEntryMap.remove(activity.hashCode())
+    }
+
+    @Synchronized
+    private fun getList(activity: Activity): List<BackStackEntry>? {
+        return backStackEntryMap[activity.hashCode()]
+    }
+
+    @Synchronized
+    private fun getEntryList(activity: Activity): MutableList<BackStackEntry> {
         var backStackList = backStackEntryMap[activity.hashCode()]
         if (backStackList == null) {
             backStackList = mutableListOf()
@@ -60,23 +66,33 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    fun addEntry(activity: FragmentActivity, entry: BackStackEntry) {
-        getEntryList(activity).add(entry)
+    private fun addEntryList(activity: Activity, entryList: List<BackStackEntry>) {
+        getEntryList(activity).addAll(entryList)
     }
 
     @Synchronized
-    fun removeEntry(activity: FragmentActivity, entry: BackStackEntry) {
-        val backStackList = getEntryList(activity)
-        backStackList.remove(entry)
+    fun addEntry(activity: Activity, entry: BackStackEntry) {
+        if (isDialogEntry(entry)) {
+            getEntryList(activity).add(entry)
+        } else {
+            val list = getEntryList(activity)
+            val dialogEntry = list.firstOrNull { isDialogEntry(it) }
+            if (dialogEntry != null) {
+                val index = list.indexOf(dialogEntry)
+                list.add(index, entry)
+            } else {
+                list.add(entry)
+            }
+        }
     }
 
     @Synchronized
-    fun getEntrySize(activity: FragmentActivity): Int {
-        return getEntryList(activity).size
+    fun removeTopEntry(activity: Activity): BackStackEntry? {
+        return getEntryList(activity).removeLastOrNull()
     }
 
     @Synchronized
-    fun getTopEntry(activity: FragmentActivity): BackStackEntry? {
+    fun getTopEntry(activity: Activity): BackStackEntry? {
         val entryList = getEntryList(activity)
 
         return if (entryList.isEmpty()) {
@@ -88,8 +104,7 @@ class BackStackEntryManager {
 
     @Synchronized
     fun removeEntries(activity: FragmentActivity, entryList: List<BackStackEntry>) {
-        val backStackList = getEntryList(activity)
-        backStackList.removeAll(entryList)
+        getEntryList(activity).removeAll(entryList)
     }
 
     @Synchronized
@@ -108,8 +123,12 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    fun findEntry(activity: FragmentActivity, block: (BackStackEntry) -> Boolean): BackStackEntry? {
-        val entryList = getEntryList(activity)
-        return entryList.lastOrNull(block)
+    fun findEntry(activity: Activity, block: (BackStackEntry) -> Boolean): BackStackEntry? {
+        return getEntryList(activity).lastOrNull(block)
+    }
+
+    private fun isDialogEntry(entry: BackStackEntry): Boolean {
+        val cls = Class.forName(entry.request.className)
+        return DialogFragment::class.java.isAssignableFrom(cls)
     }
 }

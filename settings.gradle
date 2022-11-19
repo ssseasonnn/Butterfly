@@ -18,16 +18,27 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "ButterflyDemo"
-include ':app'
 include ':annotation'
 include ':butterfly'
+include ':butterfly-compose'
 include ':compiler'
 include ':plugin'
 
-include ':modules'
-include ':modules:home'
-include ':modules:base'
-include ':modules:foo'
-include ':modules:bar'
-include ':modules:dashboard'
-include ':modules:notifications'
+
+include ':samples'
+include ':samples:app'
+include ':samples:modules'
+
+include ':samples:modules:base'
+include ':samples:modules:bar'
+include ':samples:modules:foo'
+
+include ':samples:modules:compose'
+include ':samples:modules:compose:compose_home'
+include ':samples:modules:compose:compose_dashboard'
+include ':samples:modules:compose:compose_notifications'
+
+include ':samples:modules:normal'
+include ':samples:modules:normal:home'
+include ':samples:modules:normal:dashboard'
+include ':samples:modules:normal:notifications'
