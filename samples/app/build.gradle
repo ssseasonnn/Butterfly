@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-`    compileSdk 33
+    compileSdk 33
 
     defaultConfig {
         applicationId "zlc.season.butterflydemo"
