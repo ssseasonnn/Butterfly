@@ -134,11 +134,12 @@ class AgileComposableLauncher(
         }
     }
 
+    @Suppress("unchecked_cast")
     private fun FragmentActivity.getViewModel(composable: AgileComposable): ViewModel {
         return ViewModelProvider(
             viewModelStore,
             defaultViewModelProviderFactory
-        ).get(Class.forName(composable.viewModelClass) as Class<ViewModel>)
+        )[Class.forName(composable.viewModelClass) as Class<ViewModel>]
     }
 
     private fun FragmentActivity.findContainerView(request: AgileRequest): ViewGroup {

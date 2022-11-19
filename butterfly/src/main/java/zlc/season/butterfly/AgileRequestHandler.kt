@@ -3,8 +3,10 @@ package zlc.season.butterfly
 import android.os.Bundle
 import androidx.core.os.bundleOf
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 
+@OptIn(FlowPreview::class)
 class AgileRequestHandler(
     var request: AgileRequest,
     val interceptorController: InterceptorController = InterceptorController()
