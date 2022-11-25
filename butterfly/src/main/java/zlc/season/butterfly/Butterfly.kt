@@ -1,9 +1,13 @@
 package zlc.season.butterfly
 
 import androidx.core.os.bundleOf
+import zlc.season.butterfly.internal.parseScheme
+import zlc.season.butterfly.internal.parseSchemeParams
 
 object Butterfly {
-    const val AGILE_REQUEST = "butterfly_request"
+    fun enableLog(flag: Boolean) {
+        zlc.season.butterfly.internal.enableLog = flag
+    }
 
     fun agile(scheme: String): AgileRequestHandler {
         val realScheme = parseScheme(scheme)
@@ -14,11 +18,11 @@ object Butterfly {
         return AgileRequestHandler(request)
     }
 
-
     fun retreat(vararg result: Pair<String, Any?>): AgileRequest? {
         return ButterflyCore.dispatchRetreat(bundleOf(*result))
     }
 
+    // avoid inline
     val EVADE_LAMBDA: (String, Class<*>) -> Any = { identity, cls ->
         val real = identity.ifEmpty { cls.simpleName }
         var request = ButterflyCore.queryEvade(real)

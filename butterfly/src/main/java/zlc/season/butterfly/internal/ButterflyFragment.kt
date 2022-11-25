@@ -1,4 +1,4 @@
-package zlc.season.butterfly
+package zlc.season.butterfly.internal
 
 import android.app.Activity
 import android.content.Intent
@@ -10,8 +10,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.flow.Flow
-import zlc.season.butterfly.ButterflyHelper.awaitFragmentResume
-import zlc.season.butterfly.ButterflyHelper.remove
 
 class ButterflyFragment : Fragment() {
     companion object {
@@ -41,7 +39,7 @@ class ButterflyFragment : Fragment() {
         viewModel.callback.invoke(result)
 
         //clear current fragment
-        activity?.remove(this)
+        activity?.removeFragment(this)
     }
 
     class ButterflyViewModel : ViewModel() {

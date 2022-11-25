@@ -3,6 +3,7 @@ package zlc.season.butterfly
 import android.os.Bundle
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import zlc.season.butterfly.internal.createRequestId
 
 @Parcelize
 data class AgileRequest(

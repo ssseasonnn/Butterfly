@@ -3,14 +3,14 @@ package zlc.season.butterfly.dispatcher
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.emptyFlow
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
-import zlc.season.butterfly.ButterflyHelper.createDialogFragment
-import zlc.season.butterfly.ButterflyHelper.findDialogFragment
-import zlc.season.butterfly.ButterflyHelper.setFragmentResult
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
+import zlc.season.butterfly.internal.awaitFragmentResult
+import zlc.season.butterfly.internal.findDialogFragment
+import zlc.season.butterfly.internal.setFragmentResult
+import zlc.season.butterfly.internal.showDialogFragment
 
 class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager) : InnerDispatcher {
 
@@ -22,17 +22,16 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
         }
     }
 
-    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         if (request.enableBackStack) {
             backStackEntryManager.addEntry(activity, BackStackEntry(request))
         }
 
-        val dialogFragment = activity.createDialogFragment(request)
-        dialogFragment.show(activity.supportFragmentManager, request.uniqueId)
+        val dialogFragment = activity.showDialogFragment(request)
         return if (request.needResult) {
             activity.awaitFragmentResult(dialogFragment, request.uniqueId)
         } else {
-            flowOf(Result.success(Bundle()))
+            emptyFlow()
         }
     }
 }

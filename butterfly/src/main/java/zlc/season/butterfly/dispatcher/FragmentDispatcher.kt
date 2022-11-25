@@ -4,17 +4,17 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.emptyFlow
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.ButterflyHelper.awaitFragmentResult
-import zlc.season.butterfly.ButterflyHelper.findFragment
-import zlc.season.butterfly.ButterflyHelper.remove
-import zlc.season.butterfly.ButterflyHelper.setActivityResult
-import zlc.season.butterfly.ButterflyHelper.setFragmentResult
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
 import zlc.season.butterfly.dispatcher.launcher.FragmentLauncherContext
 import zlc.season.butterfly.group.GroupEntryManager
+import zlc.season.butterfly.internal.ButterflyHelper.setActivityResult
+import zlc.season.butterfly.internal.awaitFragmentResult
+import zlc.season.butterfly.internal.findFragment
+import zlc.season.butterfly.internal.removeFragment
+import zlc.season.butterfly.internal.setFragmentResult
 
 class FragmentDispatcher(
     val backStackEntryManager: BackStackEntryManager,
@@ -32,13 +32,13 @@ class FragmentDispatcher(
             } else {
                 findFragment(topEntry.request)?.let {
                     setFragmentResult(topEntry.request.uniqueId, bundle)
-                    remove(it)
+                    removeFragment(it)
                 }
             }
         }
     }
 
-    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         val fragment = with(fragmentLauncherContext) {
             activity.launch(backStackEntryManager, groupEntryManager, request)
         }
@@ -46,7 +46,7 @@ class FragmentDispatcher(
         return if (request.needResult) {
             activity.awaitFragmentResult(fragment, request.uniqueId)
         } else {
-            flowOf(Result.success(Bundle()))
+            emptyFlow()
         }
     }
 

@@ -3,8 +3,8 @@ package zlc.season.butterfly.dispatcher.launcher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.ButterflyHelper.remove
 import zlc.season.butterfly.backstack.BackStackEntryManager
+import zlc.season.butterfly.internal.removeFragment
 
 class ClearTopLauncher : NonStandardLauncher() {
     override fun FragmentActivity.launch(backStackEntryManager: BackStackEntryManager, request: AgileRequest): Fragment {
@@ -14,7 +14,7 @@ class ClearTopLauncher : NonStandardLauncher() {
         } else {
             val targetEntry = topEntryList.removeFirst()
             topEntryList.forEach {
-                remove(it.request.uniqueId)
+                removeFragment(it.request.uniqueId)
             }
             backStackEntryManager.removeEntries(this, topEntryList)
             tryLaunch(backStackEntryManager, targetEntry.request, request)

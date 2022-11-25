@@ -3,18 +3,22 @@ package zlc.season.butterfly.dispatcher
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
+import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.os.Bundle
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.app.ActivityOptionsCompat.makeCustomAnimation
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
-import zlc.season.butterfly.*
-import zlc.season.butterfly.ButterflyHelper.setActivityResult
+import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
+import zlc.season.butterfly.internal.ButterflyFragment
+import zlc.season.butterfly.internal.ButterflyHelper
+import zlc.season.butterfly.internal.ButterflyHelper.AGILE_REQUEST
+import zlc.season.butterfly.internal.ButterflyHelper.setActivityResult
 
 class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : InnerDispatcher {
 
@@ -26,24 +30,13 @@ class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : Inn
     }
 
     override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
-        return if (!request.needResult) {
-            val context = ButterflyHelper.context
-            val intent = createIntent(context, request)
-            context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
-            emptyFlow()
-        } else {
-            val activity = ButterflyHelper.fragmentActivity
-            if (activity != null) {
-                val intent = createIntent(activity, request)
-                ButterflyFragment.showAsFlow(activity, intent, createActivityOptions(activity, request))
-            } else {
-                "Agile --> activity not found".logw()
-                flowOf(Result.failure(IllegalStateException("Activity not found")))
-            }
-        }
+        val context = ButterflyHelper.context
+        val intent = createIntent(context, request)
+        context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
+        return emptyFlow()
     }
 
-    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         return if (!request.needResult) {
             val intent = createIntent(activity, request)
             activity.startActivity(intent, createActivityOptions(activity, request)?.toBundle())
@@ -56,7 +49,7 @@ class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : Inn
 
     private fun createIntent(context: Context, request: AgileRequest): Intent {
         val intent = Intent().apply {
-            putExtra(Butterfly.AGILE_REQUEST, request)
+            putExtra(AGILE_REQUEST, request)
             setClassName(context.packageName, request.className)
             putExtras(request.bundle)
 

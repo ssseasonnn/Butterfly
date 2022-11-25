@@ -1,25 +1,31 @@
-package zlc.season.butterfly
+package zlc.season.butterfly.internal
 
 import android.util.Log
 import androidx.core.net.toUri
 import java.util.*
 
+internal var enableLog = false
+
 internal fun <T> T.logd(tag: String = ""): T {
-    val realTag = tag.ifEmpty { "Butterfly" }
-    if (this is Throwable) {
-        Log.d(realTag, this.message ?: "", this)
-    } else {
-        Log.d(realTag, this.toString())
+    if (enableLog) {
+        val realTag = tag.ifEmpty { "Butterfly" }
+        if (this is Throwable) {
+            Log.d(realTag, this.message ?: "", this)
+        } else {
+            Log.d(realTag, this.toString())
+        }
     }
     return this
 }
 
 internal fun <T> T.logw(tag: String = ""): T {
-    val realTag = tag.ifEmpty { "Butterfly" }
-    if (this is Throwable) {
-        Log.w(realTag, this.message ?: "", this)
-    } else {
-        Log.w(realTag, this.toString())
+    if (enableLog) {
+        val realTag = tag.ifEmpty { "Butterfly" }
+        if (this is Throwable) {
+            Log.w(realTag, this.message ?: "", this)
+        } else {
+            Log.w(realTag, this.toString())
+        }
     }
     return this
 }
