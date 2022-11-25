@@ -13,8 +13,8 @@ import zlc.season.butterfly.dispatcher.EvadeDispatcher
 import zlc.season.butterfly.module.Module
 
 object ButterflyCore {
-    private val moduleController by lazy { ModuleController() }
-    private val interceptorController by lazy { InterceptorController() }
+    private val moduleManager by lazy { ModuleManager() }
+    private val interceptorManager by lazy { InterceptorManager() }
     private val agileDispatcher by lazy { AgileDispatcher() }
     private val evadeDispatcher by lazy { EvadeDispatcher() }
 
@@ -30,27 +30,27 @@ object ButterflyCore {
         }
     }
 
-    fun addModule(module: Module) = moduleController.addModule(module)
+    fun addModule(module: Module) = moduleManager.addModule(module)
 
-    fun removeModule(module: Module) = moduleController.removeModule(module)
+    fun removeModule(module: Module) = moduleManager.removeModule(module)
 
-    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorController.addInterceptor(interceptor)
+    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorManager.addInterceptor(interceptor)
 
-    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorController.removeInterceptor(interceptor)
+    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorManager.removeInterceptor(interceptor)
 
-    fun queryAgile(scheme: String): AgileRequest = moduleController.queryAgile(scheme)
+    fun queryAgile(scheme: String): AgileRequest = moduleManager.queryAgile(scheme)
 
-    fun queryEvade(identity: String): EvadeRequest = moduleController.queryEvade(identity)
+    fun queryEvade(identity: String): EvadeRequest = moduleManager.queryEvade(identity)
 
-    fun dispatchAgile(handler: AgileRequestHandler): Flow<Result<Bundle>> {
+    fun dispatchAgile(request: AgileRequest, interceptorManager: InterceptorManager): Flow<Result<Bundle>> {
         return flowOf(Unit).onEach {
-            if (handler.request.enableGlobalInterceptor) {
-                interceptorController.intercept(handler.request)
+            if (request.enableGlobalInterceptor) {
+                interceptorManager.intercept(request)
             }
         }.onEach {
-            handler.interceptorController.intercept(handler.request)
+            interceptorManager.intercept(request)
         }.flatMapConcat {
-            agileDispatcher.dispatch(handler.request)
+            agileDispatcher.dispatch(request)
         }
     }
 

@@ -2,6 +2,7 @@ package zlc.season.butterfly.internal
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,6 +18,9 @@ object ButterflyHelper {
     internal const val AGILE_REQUEST = "butterfly_request"
 
     private val internalScope by lazy { MainScope() }
+
+    internal val application: Application
+        get() = ClarityPotion.application
 
     internal val context: Context
         get() = activity ?: ClarityPotion.context

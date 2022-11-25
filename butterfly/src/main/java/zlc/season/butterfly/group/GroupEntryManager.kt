@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.internal.key
 import zlc.season.butterfly.internal.observeFragmentDestroy
 import zlc.season.butterfly.internal.logd
 import zlc.season.claritypotion.ActivityLifecycleCallbacksAdapter
@@ -118,9 +119,5 @@ class GroupEntryManager {
             groupEntryMap[activity.key()] = groupList
         }
         return groupList
-    }
-
-    private fun Activity.key(): String {
-        return "Activity@${hashCode()}"
     }
 }

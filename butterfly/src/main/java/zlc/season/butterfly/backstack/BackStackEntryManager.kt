@@ -5,11 +5,12 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
+import zlc.season.butterfly.internal.ButterflyHelper
 import zlc.season.butterfly.internal.ButterflyHelper.AGILE_REQUEST
-import zlc.season.butterfly.internal.observeFragmentDestroy
+import zlc.season.butterfly.internal.key
 import zlc.season.butterfly.internal.logd
+import zlc.season.butterfly.internal.observeFragmentDestroy
 import zlc.season.claritypotion.ActivityLifecycleCallbacksAdapter
-import zlc.season.claritypotion.ClarityPotion.application
 
 @Suppress("DEPRECATION")
 class BackStackEntryManager {
@@ -20,7 +21,7 @@ class BackStackEntryManager {
     private val backStackEntryMap = mutableMapOf<String, MutableList<BackStackEntry>>()
 
     init {
-        application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
+        ButterflyHelper.application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
             override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
                 val intentRequest = activity.intent.getParcelableExtra<AgileRequest>(AGILE_REQUEST)
                 if (intentRequest != null) {
@@ -43,7 +44,8 @@ class BackStackEntryManager {
                 }
             }
 
-            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = saveEntryList(activity, outState)
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) =
+                saveEntryList(activity, outState)
 
             override fun onActivityDestroyed(activity: Activity) = destroyEntryList(activity)
         })
@@ -169,9 +171,5 @@ class BackStackEntryManager {
     private fun isDialogEntry(entry: BackStackEntry): Boolean {
         val cls = Class.forName(entry.request.className)
         return DialogFragment::class.java.isAssignableFrom(cls)
-    }
-
-    private fun Activity.key(): String {
-        return "Activity@${hashCode()}"
     }
 }

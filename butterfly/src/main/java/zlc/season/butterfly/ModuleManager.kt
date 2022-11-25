@@ -2,7 +2,7 @@ package zlc.season.butterfly
 
 import zlc.season.butterfly.module.Module
 
-class ModuleController {
+class ModuleManager {
     private val modules = mutableListOf<Module>()
 
     fun addModule(vararg module: Module) {

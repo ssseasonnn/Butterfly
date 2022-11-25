@@ -10,8 +10,8 @@ import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
 import zlc.season.butterfly.dispatcher.launcher.FragmentLauncherContext
 import zlc.season.butterfly.group.GroupEntryManager
+import zlc.season.butterfly.internal.ButterflyFragment.Companion.awaitFragmentResult
 import zlc.season.butterfly.internal.ButterflyHelper.setActivityResult
-import zlc.season.butterfly.internal.awaitFragmentResult
 import zlc.season.butterfly.internal.findFragment
 import zlc.season.butterfly.internal.removeFragment
 import zlc.season.butterfly.internal.setFragmentResult
@@ -40,13 +40,13 @@ class FragmentDispatcher(
         }
     }
 
-    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
-        val fragment = with(fragmentLauncherContext) {
+    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+        with(fragmentLauncherContext) {
             activity.launch(backStackEntryManager, groupEntryManager, request)
         }
 
         return if (request.needResult) {
-            activity.awaitFragmentResult(fragment, request.uniqueId)
+            activity.awaitFragmentResult(request.scheme, request.uniqueId)
         } else {
             emptyFlow()
         }

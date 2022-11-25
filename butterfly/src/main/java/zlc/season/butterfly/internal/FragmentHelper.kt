@@ -99,6 +99,7 @@ internal fun FragmentActivity.observeFragmentDestroy(block: (Fragment) -> Unit) 
     lifecycle.addObserver(object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {
             supportFragmentManager.unregisterFragmentLifecycleCallbacks(fragmentLifecycleCallbacks)
+            lifecycle.removeObserver(this)
         }
     })
 }
@@ -115,6 +116,14 @@ internal fun FragmentActivity.awaitFragmentResume(
             }
         }
     }
+
+    lifecycle.addObserver(object : DefaultLifecycleObserver {
+        override fun onDestroy(owner: LifecycleOwner) {
+            close()
+            supportFragmentManager.unregisterFragmentLifecycleCallbacks(cb)
+            lifecycle.removeObserver(this)
+        }
+    })
 
     if (!isDestroyed && isActive) {
         supportFragmentManager.registerFragmentLifecycleCallbacks(cb, false)

@@ -45,7 +45,7 @@ class ComposeDispatcher(
         }
     }
 
-    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         with(composeLauncher) {
             activity.launch(request)
         }

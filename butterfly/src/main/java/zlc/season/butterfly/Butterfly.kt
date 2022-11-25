@@ -9,13 +9,13 @@ object Butterfly {
         zlc.season.butterfly.internal.enableLog = flag
     }
 
-    fun agile(scheme: String): AgileRequestHandler {
+    fun agile(scheme: String): AgileHandler {
         val realScheme = parseScheme(scheme)
         val request = ButterflyCore.queryAgile(realScheme).apply {
             val params = parseSchemeParams(scheme)
             bundle.putAll(bundleOf(*params))
         }
-        return AgileRequestHandler(request)
+        return AgileHandler(request)
     }
 
     fun retreat(vararg result: Pair<String, Any?>): AgileRequest? {

@@ -37,8 +37,10 @@ class AgileDispatcher {
             try {
                 val agileComposableCls = Class.forName(COMPOSABLE_CLASS)
                 val composeDispatcherCls = Class.forName(COMPOSE_DISPATCHER_CLASS)
-                val composableDispatcher = composeDispatcherCls.getConstructor(BackStackEntryManager::class.java, GroupEntryManager::class.java)
-                    .newInstance(backStackEntryManager, groupEntryManager) as InnerDispatcher
+                val composableDispatcher = composeDispatcherCls.getConstructor(
+                    BackStackEntryManager::class.java,
+                    GroupEntryManager::class.java
+                ).newInstance(backStackEntryManager, groupEntryManager) as InnerDispatcher
                 put(agileComposableCls, composableDispatcher)
             } catch (e: Exception) {
                 e.logw()
@@ -56,9 +58,9 @@ class AgileDispatcher {
 
         val fragmentActivity = ButterflyHelper.fragmentActivity
         return if (fragmentActivity == null) {
-            findDispatcher(request).dispatch(request)
+            findDispatcher(request).dispatch(ButterflyHelper.context, request)
         } else {
-            findDispatcher(request).dispatchByActivity(fragmentActivity, request)
+            findDispatcher(request).dispatch(fragmentActivity, request)
         }
     }
 

@@ -1,6 +1,6 @@
 package zlc.season.butterfly
 
-class InterceptorController {
+class InterceptorManager {
     private val interceptorList = mutableListOf<ButterflyInterceptor>()
 
     fun addInterceptor(interceptor: ButterflyInterceptor) {

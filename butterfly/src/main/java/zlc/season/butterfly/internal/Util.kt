@@ -1,5 +1,6 @@
 package zlc.season.butterfly.internal
 
+import android.app.Activity
 import android.util.Log
 import androidx.core.net.toUri
 import java.util.*
@@ -57,4 +58,8 @@ internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
 
 internal fun createRequestId(): String {
     return UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
+}
+
+internal fun Activity.key(): String {
+    return "Activity@${hashCode()}"
 }

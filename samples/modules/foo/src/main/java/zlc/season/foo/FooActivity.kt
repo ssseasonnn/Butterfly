@@ -34,7 +34,7 @@ class FooActivity : AppCompatActivity() {
 
         binding.btnFinish.setOnClickListener {
 //            finish()
-            Butterfly.retreat()
+            Butterfly.retreat("result" to "asb")
         }
     }
 }

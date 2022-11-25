@@ -7,6 +7,7 @@ import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult.Companion.EXTRA_ACTIVITY_OPTIONS_BUNDLE
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.app.ActivityOptionsCompat.makeCustomAnimation
 import androidx.fragment.app.FragmentActivity
@@ -15,8 +16,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
-import zlc.season.butterfly.internal.ButterflyFragment
-import zlc.season.butterfly.internal.ButterflyHelper
+import zlc.season.butterfly.internal.ButterflyFragment.Companion.awaitActivityResult
 import zlc.season.butterfly.internal.ButterflyHelper.AGILE_REQUEST
 import zlc.season.butterfly.internal.ButterflyHelper.setActivityResult
 
@@ -31,21 +31,23 @@ class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : Inn
         }
     }
 
-    override suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
-        val context = ButterflyHelper.context
+    override suspend fun dispatch(context: Context, request: AgileRequest): Flow<Result<Bundle>> {
         val intent = createIntent(context, request)
         context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
         return emptyFlow()
     }
 
-    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         return if (!request.needResult) {
             val intent = createIntent(activity, request)
             activity.startActivity(intent, createActivityOptions(activity, request)?.toBundle())
             emptyFlow()
         } else {
             val intent = createIntent(activity, request)
-            ButterflyFragment.showAsFlow(activity, intent, createActivityOptions(activity, request))
+            createActivityOptions(activity, request)?.toBundle()?.let {
+                intent.putExtra(EXTRA_ACTIVITY_OPTIONS_BUNDLE, it)
+            }
+            activity.awaitActivityResult(request.scheme, intent)
         }
     }
 

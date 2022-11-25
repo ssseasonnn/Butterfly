@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
-import zlc.season.butterfly.internal.awaitFragmentResult
+import zlc.season.butterfly.internal.ButterflyFragment.Companion.awaitFragmentResult
 import zlc.season.butterfly.internal.findDialogFragment
 import zlc.season.butterfly.internal.setFragmentResult
 import zlc.season.butterfly.internal.showDialogFragment
@@ -24,14 +24,15 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
         }
     }
 
-    override suspend fun dispatchByActivity(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         if (request.enableBackStack) {
             backStackEntryManager.addEntry(activity, BackStackEntry(request))
         }
 
-        val dialogFragment = activity.showDialogFragment(request)
+        activity.showDialogFragment(request)
+
         return if (request.needResult) {
-            activity.awaitFragmentResult(dialogFragment, request.uniqueId)
+            activity.awaitFragmentResult(request.scheme, request.uniqueId)
         } else {
             emptyFlow()
         }
