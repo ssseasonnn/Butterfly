@@ -1,14 +1,14 @@
 package zlc.season.butterfly
 
+import android.content.Context
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
-import zlc.season.butterfly.internal.ButterflyHelper
-import zlc.season.butterfly.internal.logw
+import zlc.season.butterfly.internal.ButterflyHelper.findScope
 
 class AgileLauncher(
+    val context: Context,
     val agileRequest: AgileRequest,
     val interceptorManager: InterceptorManager
 ) {
@@ -19,11 +19,6 @@ class AgileLauncher(
     }
 
     fun launch() {
-        val activity = ButterflyHelper.fragmentActivity
-        if (activity == null) {
-            "No valid Activity found!".logw()
-            return
-        }
-        ButterflyCore.dispatchAgile(agileRequest, interceptorManager).launchIn(activity.lifecycleScope)
+        ButterflyCore.dispatchAgile(context, agileRequest, interceptorManager).launchIn(context.findScope())
     }
 }

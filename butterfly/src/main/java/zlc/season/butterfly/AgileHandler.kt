@@ -1,12 +1,12 @@
 package zlc.season.butterfly
 
+import android.content.Context
 import android.os.Bundle
 import androidx.core.os.bundleOf
-import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
-import zlc.season.butterfly.internal.ButterflyHelper
+import zlc.season.butterfly.internal.ButterflyHelper.findActivity
+import zlc.season.butterfly.internal.ButterflyHelper.findScope
 import zlc.season.butterfly.internal.key
 
 @OptIn(FlowPreview::class)
@@ -37,7 +37,7 @@ class AgileHandler(
         return apply { interceptorManager.addInterceptor(interceptor) }
     }
 
-    fun addInterceptor(interceptor: suspend (AgileRequest) -> Unit): AgileHandler {
+    fun addInterceptor(interceptor: suspend (AgileRequest) -> AgileRequest): AgileHandler {
         return apply {
             interceptorManager.addInterceptor(DefaultButterflyInterceptor(interceptor))
         }
@@ -81,49 +81,58 @@ class AgileHandler(
         return configRequest { copy(exitAnim = exitAnim) }
     }
 
-    fun flow(): Flow<Unit> {
+    fun flow(context: Context): Flow<Unit> {
         val handler = configRequest { copy(needResult = false) }
-        return ButterflyCore.dispatchAgile(handler.request, handler.interceptorManager)
-            .flatMapConcat { flowOf(Unit) }
+        return ButterflyCore.dispatchAgile(context, handler.request, handler.interceptorManager)
+            .flatMapConcat {
+                if (it.isSuccess) {
+                    flowOf(Unit)
+                } else {
+                    throw it.exceptionOrNull() ?: Throwable()
+                }
+            }
     }
 
-    fun resultFlow(): Flow<Result<Bundle>> {
+    fun resultFlow(context: Context): Flow<Result<Bundle>> {
         val handler = configRequest { copy(needResult = true) }
-        return ButterflyCore.dispatchAgile(handler.request, handler.interceptorManager)
+        return ButterflyCore.dispatchAgile(context, handler.request, handler.interceptorManager)
     }
 
     fun carry(
-        scope: CoroutineScope = ButterflyHelper.scope,
+        context: Context,
         onError: (Throwable) -> Unit = {},
+        onSuccess: () -> Unit = {},
         onResult: (Bundle) -> Unit = EMPTY_LAMBDA
     ) {
         if (onResult == EMPTY_LAMBDA) {
-            flow().launchIn(scope)
+            flow(context).catch { onError(it) }
+                .onCompletion { onSuccess() }
+                .launchIn(context.findScope())
         } else {
-            resultFlow().onEach {
-                if (it.isSuccess) {
-                    onResult(it.getOrDefault(Bundle()))
-                } else {
-                    onError(it.exceptionOrNull() ?: Throwable())
+            resultFlow(context)
+                .onEach {
+                    if (it.isSuccess) {
+                        onResult(it.getOrDefault(Bundle()))
+                    } else {
+                        onError(it.exceptionOrNull() ?: Throwable())
+                    }
                 }
-            }.launchIn(scope)
+                .catch { onError(it) }
+                .onCompletion { onSuccess() }
+                .launchIn(context.findScope())
         }
     }
 
-    fun getLauncher(): AgileLauncher {
+    fun getLauncher(context: Context): AgileLauncher {
         val agileHandler = configRequest { copy(needResult = true) }
 
-        val activity = ButterflyHelper.fragmentActivity
-            ?: throw IllegalStateException("No FragmentActivity founded!")
-
-        if (activity.lifecycle.currentState != Lifecycle.State.INITIALIZED) {
-            throw IllegalStateException("You must call getLauncher() after activity are created.")
-        }
+        val activity = context.findActivity()
+            ?: throw IllegalStateException("No Activity founded!")
 
         val key = activity.key()
         var launcher = AgileLauncherManager.getLauncher(key, request.scheme)
         if (launcher == null) {
-            launcher = AgileLauncher(agileHandler.request, agileHandler.interceptorManager)
+            launcher = AgileLauncher(context, agileHandler.request, agileHandler.interceptorManager)
             AgileLauncherManager.addLauncher(key, launcher)
         }
 

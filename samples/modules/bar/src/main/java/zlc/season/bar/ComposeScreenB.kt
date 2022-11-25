@@ -8,6 +8,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import zlc.season.base.Schemes
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.annotation.Agile
@@ -15,6 +16,7 @@ import zlc.season.butterfly.annotation.Agile
 @Agile(Schemes.SCHEME_COMPOSE_B)
 @Composable
 fun ComposeScreenB() {
+    val ctx = LocalContext.current
     Surface(modifier = Modifier.fillMaxSize(), color = Colors.PURPLE) {
         Box {
             Column(
@@ -30,7 +32,7 @@ fun ComposeScreenB() {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry()
+                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -49,7 +51,7 @@ fun ComposeScreenB() {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next To A")
                 }
@@ -64,7 +66,7 @@ fun ComposeScreenB() {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next To B")
                 }
@@ -79,7 +81,7 @@ fun ComposeScreenB() {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next to C")
                 }

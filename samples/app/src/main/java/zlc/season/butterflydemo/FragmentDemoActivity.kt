@@ -18,7 +18,7 @@ class FragmentDemoActivity : BaseActivity() {
         binding.btnStartA.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT_A)
                 .asRoot()
-                .carry {
+                .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
                 }
@@ -26,14 +26,14 @@ class FragmentDemoActivity : BaseActivity() {
 
         binding.btnStartB.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT_B)
-                .carry {
+                .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
                 }
         }
         binding.btnStartC.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT_C)
-                .carry {
+                .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
                 }

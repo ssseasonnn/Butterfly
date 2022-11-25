@@ -1,5 +1,6 @@
 package zlc.season.butterfly.dispatcher
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -11,6 +12,7 @@ import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntryManager
 import zlc.season.butterfly.group.GroupEntryManager
 import zlc.season.butterfly.internal.ButterflyHelper
+import zlc.season.butterfly.internal.ButterflyHelper.findFragmentActivity
 import zlc.season.butterfly.internal.logw
 
 class AgileDispatcher {
@@ -50,15 +52,15 @@ class AgileDispatcher {
         }
     }
 
-    suspend fun dispatch(request: AgileRequest): Flow<Result<Bundle>> {
+    suspend fun dispatch(context: Context, request: AgileRequest): Flow<Result<Bundle>> {
         if (request.className.isEmpty()) {
             "Agile --> dispatch failed! Class not found!".logw()
             return flowOf(Result.failure(IllegalStateException("Agile class not found!")))
         }
 
-        val fragmentActivity = ButterflyHelper.fragmentActivity
+        val fragmentActivity = context.findFragmentActivity()
         return if (fragmentActivity == null) {
-            findDispatcher(request).dispatch(ButterflyHelper.context, request)
+            findDispatcher(request).dispatch(context, request)
         } else {
             findDispatcher(request).dispatch(fragmentActivity, request)
         }

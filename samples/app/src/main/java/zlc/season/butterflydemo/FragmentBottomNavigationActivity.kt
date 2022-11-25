@@ -24,19 +24,19 @@ class FragmentBottomNavigationActivity : AppCompatActivity() {
                     Butterfly.agile(Schemes.SCHEME_HOME)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
                 R.id.navigation_dashboard -> {
                     Butterfly.agile(Schemes.SCHEME_DASHBOARD)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
                 R.id.navigation_notifications -> {
                     Butterfly.agile(Schemes.SCHEME_NOTIFICATION)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
             }
             true

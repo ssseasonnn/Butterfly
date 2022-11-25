@@ -2,21 +2,22 @@
 
 package zlc.season.butterfly
 
+import android.content.Context
 import android.os.Bundle
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
 import zlc.season.butterfly.dispatcher.AgileDispatcher
 import zlc.season.butterfly.dispatcher.EvadeDispatcher
 import zlc.season.butterfly.module.Module
 
 object ButterflyCore {
-    private val moduleManager by lazy { ModuleManager() }
-    private val interceptorManager by lazy { InterceptorManager() }
-    private val agileDispatcher by lazy { AgileDispatcher() }
-    private val evadeDispatcher by lazy { EvadeDispatcher() }
+    private val moduleManager = ModuleManager()
+    private val interceptorManager = InterceptorManager()
+    private val agileDispatcher = AgileDispatcher()
+    private val evadeDispatcher = EvadeDispatcher()
 
     fun addModuleName(moduleName: String) {
         try {
@@ -42,16 +43,25 @@ object ButterflyCore {
 
     fun queryEvade(identity: String): EvadeRequest = moduleManager.queryEvade(identity)
 
-    fun dispatchAgile(request: AgileRequest, interceptorManager: InterceptorManager): Flow<Result<Bundle>> {
-        return flowOf(Unit).onEach {
-            if (request.enableGlobalInterceptor) {
-                interceptorManager.intercept(request)
+    fun dispatchAgile(
+        context: Context,
+        request: AgileRequest,
+        interceptorManager: InterceptorManager
+    ): Flow<Result<Bundle>> {
+        return flowOf(request)
+            .map {
+                if (it.enableGlobalInterceptor) {
+                    this.interceptorManager.intercept(it)
+                } else {
+                    it
+                }
             }
-        }.onEach {
-            interceptorManager.intercept(request)
-        }.flatMapConcat {
-            agileDispatcher.dispatch(request)
-        }
+            .map {
+                interceptorManager.intercept(it)
+            }
+            .flatMapConcat {
+                agileDispatcher.dispatch(context, it)
+            }
     }
 
     fun dispatchRetreat(bundle: Bundle): AgileRequest? {

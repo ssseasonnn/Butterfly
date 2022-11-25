@@ -19,22 +19,22 @@ class MainActivity : AppCompatActivity() {
 //        ButterflyCore.addInterceptor(TestInterceptor())
 
         binding.startAgileTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_AGILE_TEST).carry()
+            Butterfly.agile(Schemes.SCHEME_AGILE_TEST).carry(this)
         }
         binding.btnFragmentTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_DEMO).carry()
+            Butterfly.agile(Schemes.SCHEME_FRAGMENT_DEMO).carry(this)
         }
         binding.btnBottomNavigationTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_BOTTOM_NAVIGATION).carry()
+            Butterfly.agile(Schemes.SCHEME_FRAGMENT_BOTTOM_NAVIGATION).carry(this)
         }
         binding.btnComposeTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_DEMO).carry()
+            Butterfly.agile(Schemes.SCHEME_COMPOSE_DEMO).carry(this)
         }
         binding.btnComposeBottomNavigationTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_BOTTOM_NAVIGATION).carry()
+            Butterfly.agile(Schemes.SCHEME_COMPOSE_BOTTOM_NAVIGATION).carry(this)
         }
         binding.startEvadeTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_EVADE_TEST).carry()
+            Butterfly.agile(Schemes.SCHEME_EVADE_TEST).carry(this)
         }
     }
 
@@ -43,10 +43,11 @@ class MainActivity : AppCompatActivity() {
             return true
         }
 
-        override suspend fun intercept(request: AgileRequest) {
+        override suspend fun intercept(request: AgileRequest): AgileRequest {
             println("intercepting")
             delay(1000)
             println("intercept finish")
+            return request
         }
     }
 }

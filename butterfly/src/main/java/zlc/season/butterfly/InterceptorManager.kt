@@ -11,14 +11,17 @@ class InterceptorManager {
         interceptorList.remove(interceptor)
     }
 
-    suspend fun intercept(agileRequest: AgileRequest) {
+    suspend fun intercept(agileRequest: AgileRequest): AgileRequest {
         val temp = mutableListOf<ButterflyInterceptor>()
         temp.addAll(interceptorList)
 
+        var tempRequest = agileRequest
         temp.forEach {
-            if (it.shouldIntercept(agileRequest)) {
-                it.intercept(agileRequest)
+            if (it.shouldIntercept(tempRequest)) {
+                tempRequest = it.intercept(tempRequest)
             }
         }
+
+        return tempRequest
     }
 }

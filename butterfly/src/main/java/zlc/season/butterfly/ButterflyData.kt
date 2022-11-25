@@ -16,7 +16,7 @@ data class AgileRequest(
     val flags: Int = 0,
     val containerViewId: Int = 0,
 
-    val needResult: Boolean = true,
+    val needResult: Boolean = false,
     val enableBackStack: Boolean = true,
     val enableGlobalInterceptor: Boolean = true,
 

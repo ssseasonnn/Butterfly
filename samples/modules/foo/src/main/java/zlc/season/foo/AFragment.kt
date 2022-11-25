@@ -32,7 +32,7 @@ class AFragment : BaseFragment() {
         }
         btnDialog.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT)
-                .carry(lifecycleScope) {
+                .carry(requireContext()) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -48,7 +48,7 @@ class AFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(lifecycleScope) {
+                .carry(requireContext()) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -64,7 +64,7 @@ class AFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(lifecycleScope) {
+                .carry(requireContext()) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
@@ -80,7 +80,7 @@ class AFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(lifecycleScope) {
+                .carry(requireContext()) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }

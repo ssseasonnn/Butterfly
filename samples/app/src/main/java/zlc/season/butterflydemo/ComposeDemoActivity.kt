@@ -16,14 +16,14 @@ class ComposeDemoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnStartA.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_A).asRoot().carry()
+            Butterfly.agile(Schemes.SCHEME_COMPOSE_A).asRoot().carry(this)
         }
 
         binding.btnStartB.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_B).carry()
+            Butterfly.agile(Schemes.SCHEME_COMPOSE_B).carry(this)
         }
         binding.btnStartC.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_C).carry()
+            Butterfly.agile(Schemes.SCHEME_COMPOSE_C).carry(this)
         }
     }
 

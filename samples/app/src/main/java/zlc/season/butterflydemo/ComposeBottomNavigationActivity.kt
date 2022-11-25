@@ -20,19 +20,19 @@ class ComposeBottomNavigationActivity : AppCompatActivity() {
                     Butterfly.agile(Schemes.SCHEME_COMPOSE_HOME)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
                 R.id.navigation_dashboard -> {
                     Butterfly.agile(Schemes.SCHEME_COMPOSE_DASHBOARD)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
                 R.id.navigation_notifications -> {
                     Butterfly.agile(Schemes.SCHEME_COMPOSE_NOTIFICATION)
                         .container(R.id.container)
                         .group()
-                        .carry()
+                        .carry(this)
                 }
             }
             true

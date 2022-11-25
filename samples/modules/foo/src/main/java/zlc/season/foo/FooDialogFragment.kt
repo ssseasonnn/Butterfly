@@ -28,7 +28,7 @@ class FooDialogFragment : DialogFragment() {
     ): View? {
         return DialogFooBinding.inflate(inflater, container, false).also {
             it.btnNext.setOnClickListener {
-                Butterfly.agile(Schemes.SCHEME_FRAGMENT).carry()
+                Butterfly.agile(Schemes.SCHEME_FRAGMENT).carry(requireContext())
                 dismiss()
             }
             it.btnBack.setOnClickListener {

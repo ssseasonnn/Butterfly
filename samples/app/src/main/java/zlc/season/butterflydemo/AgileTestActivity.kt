@@ -22,7 +22,7 @@ class AgileTestActivity : AppCompatActivity() {
                     "booleanValue" to true,
                     "stringValue" to "test value"
                 )
-                .carry()
+                .carry(this)
         }
 
         binding.startActivityForResult.setOnClickListener {
@@ -32,30 +32,30 @@ class AgileTestActivity : AppCompatActivity() {
                     "booleanValue" to true,
                     "stringValue" to "test value"
                 )
-                .carry {
+                .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
                 }
         }
 
         binding.startAction.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_ACTION + "?a=1&b=2").carry()
+            Butterfly.agile(Schemes.SCHEME_ACTION + "?a=1&b=2").carry(this)
         }
 
         binding.startFragment.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT)
-                .carry {
+                .carry(this) {
                     val abc by it.params<String>()
                     binding.tvResult.text = abc
                 }
         }
 
         binding.startDialogFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_DIALOG_FRAGMbENT).carry()
+            Butterfly.agile(Schemes.SCHEME_DIALOG_FRAGMbENT).carry(this)
         }
 
         binding.startBottomSheetDialogFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry()
+            Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(this)
         }
     }
 

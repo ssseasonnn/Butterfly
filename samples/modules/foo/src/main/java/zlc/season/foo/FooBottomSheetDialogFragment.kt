@@ -22,7 +22,7 @@ class FooBottomSheetDialogFragment : BottomSheetDialogFragment() {
     ): View? {
         return DialogFooBinding.inflate(inflater, container, false).also {
             it.btnNext.setOnClickListener {
-                Butterfly.agile(Schemes.SCHEME_FRAGMENT).carry(lifecycleScope)
+                Butterfly.agile(Schemes.SCHEME_FRAGMENT).carry(requireContext())
                 retreat()
             }
             it.btnBack.setOnClickListener {

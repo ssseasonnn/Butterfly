@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.os.bundleOf
 import zlc.season.base.Schemes
@@ -23,6 +24,7 @@ import zlc.season.butterfly.annotation.Agile
 fun ComposeScreenA(bundle: Bundle = bundleOf()) {
     val id by bundle.params<Int>()
 
+    val ctx = LocalContext.current
     Surface(
         modifier = Modifier
             .fillMaxSize(),
@@ -42,7 +44,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry()
+                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -62,7 +64,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next To A")
                 }
@@ -77,7 +79,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next To B")
                 }
@@ -92,7 +94,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry()
+                        .carry(ctx)
                 }) {
                     Text(text = "Next to C")
                 }
