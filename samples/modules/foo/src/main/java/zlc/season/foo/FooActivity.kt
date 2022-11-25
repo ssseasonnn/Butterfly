@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
+import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.foo.databinding.ActivityFooBinding
 
@@ -32,7 +33,8 @@ class FooActivity : AppCompatActivity() {
         """.trimIndent()
 
         binding.btnFinish.setOnClickListener {
-            finish()
+//            finish()
+            Butterfly.retreat()
         }
     }
 }

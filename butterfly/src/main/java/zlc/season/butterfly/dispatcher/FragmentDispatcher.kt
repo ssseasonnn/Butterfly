@@ -17,8 +17,8 @@ import zlc.season.butterfly.internal.removeFragment
 import zlc.season.butterfly.internal.setFragmentResult
 
 class FragmentDispatcher(
-    val backStackEntryManager: BackStackEntryManager,
-    val groupEntryManager: GroupEntryManager
+    private val backStackEntryManager: BackStackEntryManager,
+    private val groupEntryManager: GroupEntryManager
 ) : InnerDispatcher {
 
     private val fragmentLauncherContext = FragmentLauncherContext()
@@ -31,7 +31,9 @@ class FragmentDispatcher(
                 finish()
             } else {
                 findFragment(topEntry.request)?.let {
-                    setFragmentResult(topEntry.request.uniqueId, bundle)
+                    if (topEntry.request.needResult) {
+                        setFragmentResult(topEntry.request.uniqueId, bundle)
+                    }
                     removeFragment(it)
                 }
             }

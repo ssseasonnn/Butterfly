@@ -17,7 +17,9 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
     override fun retreat(activity: FragmentActivity, topEntry: BackStackEntry, bundle: Bundle) {
         with(activity) {
             val find = findDialogFragment(topEntry.request) ?: return
-            setFragmentResult(topEntry.request.uniqueId, bundle)
+            if (topEntry.request.needResult) {
+                setFragmentResult(topEntry.request.uniqueId, bundle)
+            }
             find.dismissAllowingStateLoss()
         }
     }

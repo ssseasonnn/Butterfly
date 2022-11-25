@@ -46,13 +46,8 @@ class AgileTestActivity : AppCompatActivity() {
             Butterfly.agile(Schemes.SCHEME_FRAGMENT)
                 .carry {
                     val abc by it.params<String>()
-                    println(abc)
                     binding.tvResult.text = abc
                 }
-
-            binding.startFragment.postDelayed({
-
-            }, 3000)
         }
 
         binding.startDialogFragment.setOnClickListener {
@@ -62,5 +57,9 @@ class AgileTestActivity : AppCompatActivity() {
         binding.startBottomSheetDialogFragment.setOnClickListener {
             Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry()
         }
+    }
+
+    override fun onBackPressed() {
+        Butterfly.retreat()
     }
 }

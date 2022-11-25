@@ -24,7 +24,9 @@ class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : Inn
 
     override fun retreat(activity: FragmentActivity, topEntry: BackStackEntry, bundle: Bundle) {
         with(activity) {
-            setActivityResult(bundle)
+            if (topEntry.request.needResult) {
+                setActivityResult(bundle)
+            }
             finish()
         }
     }

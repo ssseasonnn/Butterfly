@@ -3,8 +3,8 @@ package zlc.season.foo
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
@@ -42,6 +42,9 @@ class FooResultActivity : AppCompatActivity() {
                 )
             })
             finish()
+
+            // or use
+            // Butterfly.retreat("result" to "aaa")
         }
     }
 }
