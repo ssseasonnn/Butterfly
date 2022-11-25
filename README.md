@@ -40,11 +40,11 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.0'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.1'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.1'
 
   //for compose
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.1'
 }
 ```
 
@@ -69,11 +69,11 @@ class TestDialogFragment : DialogFragment()
 fun HomeScreen() {}
 
 //Navigation
-Butterfly.agile("test/xxx").carry()
+Butterfly.agile("test/xxx").carry(context)
 
 //Navigation and get result
 Butterfly.agile("test/xxx")
-    .carry {
+    .carry(context) {
         val result = it.getStringExtra("result")
         binding.tvResult.text = result
     }
@@ -132,14 +132,14 @@ Passing parameters:
 
 ```kotlin
 //Splicing scheme
-Butterfly.agile("test/scheme?a=1&b=2").carry()
+Butterfly.agile("test/scheme?a=1&b=2").carry(context)
 
 //Call params
 Butterfly.agile("test/scheme?a=1&b=2")
     .params("intValue" to 1)
     .params("booleanValue" to true)
     .params("stringValue" to "test value")
-    .carry()
+    .carry(context)
 ```
 
 Parses parameters：
@@ -178,11 +178,12 @@ class TestInterceptor : ButterflyInterceptor {
         return true
     }
 
-    override suspend fun intercept(agileRequest: AgileRequest) {
+    override suspend fun intercept(agileRequest: AgileRequest): AgileRequest {
         //Processing interception logic
         println("intercepting")
         delay(5000)
         println("intercept finish")
+        return agileRequest
     }
 }
 ```
@@ -194,7 +195,7 @@ Configure Global Interceptors：
 ButterflyCore.addInterceptor(TestInterceptor())
 
 //Skip all global interceptors
-Butterfly.agile("test/scheme").skipGlobalInterceptor().carry()
+Butterfly.agile("test/scheme").skipGlobalInterceptor().carry(context)
 ```
 
 Configure one-time interceptors：
@@ -203,7 +204,7 @@ Configure one-time interceptors：
 //Only the current navigation uses this interceptor
 Butterfly.agile(Schemes.SCHEME_AGILE_TEST)
     .addInterceptor(TestInterceptor())
-    .carry()
+    .carry(context)
 ```
 
 ### Action
@@ -221,14 +222,14 @@ class TestAction : Action {
 }
 
 //Start Action
-Butterfly.agile("test/action").carry()
+Butterfly.agile("test/action").carry(context)
 
 //Action also support params
-Butterfly.agile("test/action?a=1&b=2").carry()
+Butterfly.agile("test/action?a=1&b=2").carry(context)
 
 Butterfly.agile("test/action")
     .params("intValue" to 1)
-    .carry()
+    .carry(context)
 ```
 
 > Action does not support obtaining returned data
@@ -316,7 +317,7 @@ Butterfly.agile("test/activity")
     .addFlag(Intent.Flag_XXX)    //Add other Flag
     .enterAnim(R.anim.xxx)       //Add anim
     .exitAnim(R.anim.xxx)
-    .carry()
+    .carry(context)
 ```
 
 ### Fragment Configuration
@@ -329,7 +330,7 @@ Butterfly.agile("test/fragment")
     .enterAnim(R.anim.xxx)       //Add anim
     .exitAnim(R.anim.xxx)
     .container(R.id.container)   //Set the container ID to which Fragment is added
-    .carry()
+    .carry(context)
 ```
 
 ### DialogFragment Configuration
@@ -337,7 +338,7 @@ Butterfly.agile("test/fragment")
 ```kotlin
 Butterfly.agile("test/dialog")
     .disableBackStack()         //Do not add to the backstack
-    .carry()
+    .carry(context)
 ```
 
 ### Dialog and Fragment retreat
@@ -388,7 +389,7 @@ For example, there are multiple tabs on the APP homepage, and each tab correspon
 ```kotlin
 Butterfly.agile("test/fragment")
     .group("groupName")             //Pages that use the same groupName will be added to the same group
-    .carry()
+    .carry(context)
 ```
 
 > Pages with the same groupName will be added to the same group, and only one instance of each fragment will exist. 
@@ -410,7 +411,7 @@ fun HomeScreen() {
 }
 
 //navigate to HomeScreen
-Butterfly.agile("test/compose").carry()
+Butterfly.agile("test/compose").carry(context)
 ```
 
 Compose UI Parameter pass also supports URL splicing and params：
@@ -428,14 +429,14 @@ fun HomeScreen(bundle: Bundle) {
 }
 
 //Splicing scheme
-Butterfly.agile("test/compose?a=1&b=2").carry()
+Butterfly.agile("test/compose?a=1&b=2").carry(context)
 
 //or use params
 Butterfly.agile("test/compose?a=1&b=2")
     .params("intValue" to 1)
     .params("booleanValue" to true)
     .params("stringValue" to "test value")
-    .carry()
+    .carry(context)
 
 ```
 
@@ -456,7 +457,7 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 }
 
 //no other config
-Butterfly.agile("test/compose").carry()
+Butterfly.agile("test/compose").carry(context)
 ```
 
 Use Bundle and ViewModel at the same time:
@@ -478,7 +479,7 @@ fun HomeScreen(bundle: Bundle, homeViewModel: HomeViewModel) {
 }
 
 //no other config
-Butterfly.agile("test/compose?a=1&b=2").carry()
+Butterfly.agile("test/compose?a=1&b=2").carry(context)
 ```
 
 

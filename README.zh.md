@@ -42,11 +42,11 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.0'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.1'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.1'
 
   //for compose
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.0'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.1'
 }
 ```
 
@@ -71,11 +71,11 @@ class TestDialogFragment : DialogFragment()
 fun HomeScreen() {}
 
 //导航
-Butterfly.agile("test/xxx").carry()
+Butterfly.agile("test/xxx").carry(context)
 
 //导航并获取返回数据
 Butterfly.agile("test/xxx")
-    .carry {
+    .carry(context) {
         val result = it.getStringExtra("result")
         binding.tvResult.text = result
     }
@@ -133,14 +133,14 @@ home.showHome(supportFragmentManager, R.id.container)
 
 ```kotlin
 //拼接scheme
-Butterfly.agile("test/scheme?a=1&b=2").carry()
+Butterfly.agile("test/scheme?a=1&b=2").carry(context)
 
 //调用params
 Butterfly.agile("test/scheme?a=1&b=2")
     .params("intValue" to 1)
     .params("booleanValue" to true)
     .params("stringValue" to "test value")
-    .carry()
+    .carry(context)
 ```
 
 解析参数：
@@ -179,11 +179,12 @@ class TestInterceptor : ButterflyInterceptor {
         return true
     }
 
-    override suspend fun intercept(agileRequest: AgileRequest) {
+    override suspend fun intercept(agileRequest: AgileRequest): AgileRequest {
         //处理拦截逻辑
         println("intercepting")
         delay(5000)
         println("intercept finish")
+        return agileRequest
     }
 }
 ```
@@ -195,7 +196,7 @@ class TestInterceptor : ButterflyInterceptor {
 ButterflyCore.addInterceptor(TestInterceptor())
 
 //跳过所有全局拦截器
-Butterfly.agile("test/scheme").skipGlobalInterceptor().carry()
+Butterfly.agile("test/scheme").skipGlobalInterceptor().carry(context)
 ```
 
 配置一次性拦截器：
@@ -204,7 +205,7 @@ Butterfly.agile("test/scheme").skipGlobalInterceptor().carry()
 //仅当前导航使用该拦截器
 Butterfly.agile(Schemes.SCHEME_AGILE_TEST)
     .addInterceptor(TestInterceptor())
-    .carry()
+    .carry(context)
 ```
 
 ### Action
@@ -223,15 +224,15 @@ class TestAction : Action {
 }
 
 //启动Action
-Butterfly.agile("test/action").carry()
+Butterfly.agile("test/action").carry(context)
 
 //Action同样支持传参
-Butterfly.agile("test/action?a=1&b=2").carry()
+Butterfly.agile("test/action?a=1&b=2").carry(context)
 
 //params 传参
 Butterfly.agile("test/action")
     .params("intValue" to 1)
-    .carry()
+    .carry(context)
 ```
 
 > Action 不支持获取返回数据
@@ -319,7 +320,7 @@ Butterfly.agile("test/activity")
     .addFlag(Intent.Flag_XXX)    //添加其他Flag
     .enterAnim(R.anim.xxx)       //添加动画
     .exitAnim(R.anim.xxx)
-    .carry()
+    .carry(context)
 ```
 
 ### Fragment配置
@@ -332,7 +333,7 @@ Butterfly.agile("test/fragment")
     .enterAnim(R.anim.xxx)       //添加动画
     .exitAnim(R.anim.xxx)
     .container(R.id.container)   //设置Fragment添加到的容器ID
-    .carry()
+    .carry(context)
 ```
 
 ### DialogFragment配置
@@ -340,7 +341,7 @@ Butterfly.agile("test/fragment")
 ```kotlin
 Butterfly.agile("test/dialog")
     .disableBackStack()         //不添加到返回栈中
-    .carry()
+    .carry(context)
 ```
 
 ### Dialog和Fragment回退
@@ -395,7 +396,7 @@ class TestDialogFragment : DialogFragment() {
 ```kotlin
 Butterfly.agile("test/fragment")
     .group("groupName")             //使用相同groupName的页面会添加到同一个组中
-    .carry()
+    .carry(context)
 ```
 
 > 使用相同groupName的页面会添加到同一个组中，并且每个Fragment只会存在一个实例，对这些Fragment进行切换时将会使用**hide**和**show**方法，而不是add或replace
@@ -415,7 +416,7 @@ fun HomeScreen() {
 }
 
 //导航到HomeScreen页面
-Butterfly.agile("test/compose").carry()
+Butterfly.agile("test/compose").carry(context)
 ```
 
 Compose UI参数传递同样支持url拼接和params传参：
@@ -433,14 +434,14 @@ fun HomeScreen(bundle: Bundle) {
 }
 
 //拼接scheme
-Butterfly.agile("test/compose?a=1&b=2").carry()
+Butterfly.agile("test/compose?a=1&b=2").carry(context)
 
 //或者调用params
 Butterfly.agile("test/compose?a=1&b=2")
     .params("intValue" to 1)
     .params("booleanValue" to true)
     .params("stringValue" to "test value")
-    .carry()
+    .carry(context)
 
 ```
 
@@ -460,7 +461,7 @@ fun HomeScreen(homeViewModel: HomeViewModel) {
 }
 
 //无需额外操作
-Butterfly.agile("test/compose").carry()
+Butterfly.agile("test/compose").carry(context)
 ```
 
 同时使用Bundle和ViewModel:
@@ -481,7 +482,7 @@ fun HomeScreen(bundle: Bundle，homeViewModel: HomeViewModel) {
 }
 
 //无需额外操作
-Butterfly.agile("test/compose?a=1&b=2").carry()
+Butterfly.agile("test/compose?a=1&b=2").carry(context)
 ```
 
 ## License
