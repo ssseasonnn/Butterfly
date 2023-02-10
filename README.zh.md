@@ -42,11 +42,11 @@ repositories {
 apply plugin: 'kotlin-kapt'
 
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.1'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.1'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.2.2'
+  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.2.2'
 
   //for compose
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.1'
+  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.2.2'
 }
 ```
 
