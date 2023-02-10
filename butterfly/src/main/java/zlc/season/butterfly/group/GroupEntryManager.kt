@@ -29,9 +29,9 @@ class GroupEntryManager {
             override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
-                        val uniqueId = it.tag
-                        if (!uniqueId.isNullOrEmpty()) {
-                            removeEntry(activity, uniqueId)
+                        val uniqueTag = it.tag
+                        if (!uniqueTag.isNullOrEmpty()) {
+                            removeEntry(activity, uniqueTag)
                         }
                     }
                 }
@@ -79,9 +79,9 @@ class GroupEntryManager {
     }
 
     @Synchronized
-    private fun removeEntry(activity: Activity, uniqueId: String) {
+    private fun removeEntry(activity: Activity, uniqueTag: String) {
         val entryList = getEntryList(activity)
-        val find = entryList.find { it.request.uniqueId == uniqueId }
+        val find = entryList.find { it.request.uniqueTag == uniqueTag }
         if (find != null) {
             entryList.remove(find)
 

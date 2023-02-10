@@ -56,7 +56,7 @@ internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
     return arrayOf()
 }
 
-internal fun createRequestId(): String {
+internal fun createRequestTag(): String {
     return UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
 }
 

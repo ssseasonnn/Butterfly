@@ -3,7 +3,7 @@ package zlc.season.butterfly
 import android.os.Bundle
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import zlc.season.butterfly.internal.createRequestId
+import zlc.season.butterfly.internal.createRequestTag
 
 @Parcelize
 data class AgileRequest(
@@ -26,7 +26,7 @@ data class AgileRequest(
     val useReplace: Boolean = false,
 
     val groupId: String = "",
-    val uniqueId: String = createRequestId()
+    val uniqueTag: String = createRequestTag()
 ) : Parcelable
 
 data class EvadeRequest(

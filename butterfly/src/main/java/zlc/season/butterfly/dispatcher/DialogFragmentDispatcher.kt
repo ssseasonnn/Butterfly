@@ -18,7 +18,7 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
         with(activity) {
             val find = findDialogFragment(topEntry.request) ?: return
             if (topEntry.request.needResult) {
-                setFragmentResult(topEntry.request.uniqueId, bundle)
+                setFragmentResult(topEntry.request.uniqueTag, bundle)
             }
             find.dismissAllowingStateLoss()
         }
@@ -32,7 +32,7 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
         activity.showDialogFragment(request)
 
         return if (request.needResult) {
-            activity.awaitFragmentResult(request.scheme, request.uniqueId)
+            activity.awaitFragmentResult(request.scheme, request.uniqueTag)
         } else {
             emptyFlow()
         }

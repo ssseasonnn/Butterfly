@@ -36,9 +36,9 @@ class BackStackEntryManager {
             override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
-                        val uniqueId = it.tag
-                        if (!uniqueId.isNullOrEmpty()) {
-                            removeEntry(activity, uniqueId)
+                        val uniqueTag = it.tag
+                        if (!uniqueTag.isNullOrEmpty()) {
+                            removeEntry(activity, uniqueTag)
                         }
                     }
                 }
@@ -83,8 +83,8 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    private fun removeEntry(activity: Activity, uniqueId: String) {
-        val find = getEntryList(activity).find { it.request.uniqueId == uniqueId }
+    private fun removeEntry(activity: Activity, uniqueTag: String) {
+        val find = getEntryList(activity).find { it.request.uniqueTag == uniqueTag }
         if (find != null) {
             getEntryList(activity).remove(find)
 

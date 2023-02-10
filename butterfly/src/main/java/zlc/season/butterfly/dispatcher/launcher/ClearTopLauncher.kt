@@ -14,7 +14,7 @@ class ClearTopLauncher : NonStandardLauncher() {
         } else {
             val targetEntry = topEntryList.removeFirst()
             topEntryList.forEach {
-                removeFragment(it.request.uniqueId)
+                removeFragment(it.request.uniqueTag)
             }
             backStackEntryManager.removeEntries(this, topEntryList)
             tryLaunch(backStackEntryManager, targetEntry.request, request)

@@ -49,6 +49,10 @@ class AgileHandler(
         }
     }
 
+    fun tag(uniqueTag: String): AgileHandler {
+        return configRequest { copy(uniqueTag = uniqueTag) }
+    }
+
     fun group(groupName: String = DEFAULT_GROUP): AgileHandler {
         return configRequest { copy(groupId = groupName) }
     }

@@ -32,7 +32,7 @@ class FragmentDispatcher(
             } else {
                 findFragment(topEntry.request)?.let {
                     if (topEntry.request.needResult) {
-                        setFragmentResult(topEntry.request.uniqueId, bundle)
+                        setFragmentResult(topEntry.request.uniqueTag, bundle)
                     }
                     removeFragment(it)
                 }
@@ -46,7 +46,7 @@ class FragmentDispatcher(
         }
 
         return if (request.needResult) {
-            activity.awaitFragmentResult(request.scheme, request.uniqueId)
+            activity.awaitFragmentResult(request.scheme, request.uniqueTag)
         } else {
             emptyFlow()
         }

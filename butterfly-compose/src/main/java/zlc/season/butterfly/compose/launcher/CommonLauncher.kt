@@ -24,7 +24,7 @@ class CommonLauncher {
     }
 
     private fun FragmentActivity.invokeCompose(composeView: ComposeView, request: AgileRequest) {
-        composeView.tag = request.uniqueId
+        composeView.tag = request.uniqueTag
 
         val cls = Class.forName(request.className)
         val composable = cls.newInstance() as AgileComposable
