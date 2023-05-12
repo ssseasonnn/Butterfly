@@ -14,8 +14,7 @@ object AgileLauncherManager {
 
     init {
         application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
-            override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
-                super.onActivityPreCreated(activity, savedInstanceState)
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (savedInstanceState != null) {
                     val oldKey = savedInstanceState.getString(OLD_ACTIVITY_KEY)
                     if (!oldKey.isNullOrEmpty()) {

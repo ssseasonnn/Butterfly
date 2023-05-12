@@ -20,13 +20,11 @@ class GroupEntryManager {
 
     init {
         application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
-            override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (savedInstanceState != null) {
                     restoreEntryList(activity, savedInstanceState)
                 }
-            }
 
-            override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
                         val uniqueTag = it.tag

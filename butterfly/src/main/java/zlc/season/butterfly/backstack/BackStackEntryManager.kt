@@ -22,7 +22,7 @@ class BackStackEntryManager {
 
     init {
         ButterflyHelper.application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
-            override fun onActivityPreCreated(activity: Activity, savedInstanceState: Bundle?) {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 val intentRequest = activity.intent.getParcelableExtra<AgileRequest>(AGILE_REQUEST)
                 if (intentRequest != null) {
                     addEntry(activity, BackStackEntry(intentRequest))
@@ -31,9 +31,7 @@ class BackStackEntryManager {
                 if (savedInstanceState != null) {
                     restoreEntryList(activity, savedInstanceState)
                 }
-            }
 
-            override fun onActivityPostCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
                         val uniqueTag = it.tag
