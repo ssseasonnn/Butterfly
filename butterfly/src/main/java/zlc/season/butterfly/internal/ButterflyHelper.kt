@@ -8,7 +8,7 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
@@ -19,15 +19,15 @@ object ButterflyHelper {
 
     private val internalScope by lazy { MainScope() }
 
-    internal val application: Application
+    val application: Application
         get() = ClarityPotion.application
 
-    internal val activity: Activity?
+    val activity: Activity?
         get() = ClarityPotion.activity
 
-    internal val fragmentActivity: FragmentActivity?
+    val componentActivity: ComponentActivity?
         get() = with(activity) {
-            if (this != null && this is FragmentActivity) {
+            if (this != null && this is ComponentActivity) {
                 this
             } else {
                 null
@@ -52,16 +52,16 @@ object ButterflyHelper {
         return null
     }
 
-    fun Context.findFragmentActivity(): FragmentActivity? {
+    fun Context.findComponentActivity(): ComponentActivity? {
         val activity = findActivity()
-        if (activity is FragmentActivity) {
+        if (activity is ComponentActivity) {
             return activity
         }
         return null
     }
 
     fun Context.findScope(): CoroutineScope {
-        val fragmentActivity = findFragmentActivity()
+        val fragmentActivity = findComponentActivity()
         return fragmentActivity?.lifecycleScope ?: internalScope
     }
 }

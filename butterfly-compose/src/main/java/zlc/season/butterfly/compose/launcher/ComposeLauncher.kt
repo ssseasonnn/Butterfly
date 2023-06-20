@@ -2,6 +2,7 @@ package zlc.season.butterfly.compose.launcher
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.AgileRequest
@@ -43,20 +44,20 @@ class ComposeLauncher(
         })
     }
 
-    fun FragmentActivity.clear() {
+    fun ComponentActivity.clear() {
         val composeView = findViewById<ComposeView>(composeViewId)
         composeView?.setContent { }
     }
 
-    fun FragmentActivity.retreat(request: AgileRequest) {
+    fun ComponentActivity.retreat(request: AgileRequest) {
         launchDirectly(request)
     }
 
-    private fun FragmentActivity.launchDirectly(request: AgileRequest) {
+    private fun ComponentActivity.launchDirectly(request: AgileRequest) {
         with(modeLauncher) { launchDirectly(request) }
     }
 
-    fun FragmentActivity.launch(request: AgileRequest) {
+    fun ComponentActivity.launch(request: AgileRequest) {
         if (request.groupId.isNotEmpty()) {
             with(groupLauncher) { launch(request) }
         } else {

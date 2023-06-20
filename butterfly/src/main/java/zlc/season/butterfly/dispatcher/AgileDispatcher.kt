@@ -12,7 +12,6 @@ import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntryManager
 import zlc.season.butterfly.group.GroupEntryManager
 import zlc.season.butterfly.internal.ButterflyHelper
-import zlc.season.butterfly.internal.ButterflyHelper.findFragmentActivity
 import zlc.season.butterfly.internal.logw
 
 class AgileDispatcher {
@@ -58,25 +57,20 @@ class AgileDispatcher {
             return flowOf(Result.failure(IllegalStateException("Agile class not found!")))
         }
 
-        val fragmentActivity = context.findFragmentActivity()
-        return if (fragmentActivity == null) {
-            findDispatcher(request).dispatch(context, request)
-        } else {
-            findDispatcher(request).dispatch(fragmentActivity, request)
-        }
+        return findDispatcher(request).dispatch(context, request)
     }
 
     fun retreat(bundle: Bundle): AgileRequest? {
-        val fragmentActivity = ButterflyHelper.fragmentActivity
-        if (fragmentActivity == null) {
+        val currentActivity = ButterflyHelper.activity
+        if (currentActivity == null) {
             "Agile --> retreat failed! Activity not found".logw()
             return null
         }
 
-        val topEntry = backStackEntryManager.removeTopEntry(fragmentActivity) ?: return null
-        findDispatcher(topEntry.request).retreat(fragmentActivity, topEntry, bundle)
+        val topEntry = backStackEntryManager.removeTopEntry(currentActivity) ?: return null
+        findDispatcher(topEntry.request).retreat(currentActivity, topEntry, bundle)
 
-        dispatcherMaps.values.forEach { it.onRetreat(fragmentActivity, topEntry) }
+        dispatcherMaps.values.forEach { it.onRetreat(currentActivity, topEntry) }
 
         return topEntry.request
     }

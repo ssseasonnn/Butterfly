@@ -1,5 +1,7 @@
 package zlc.season.butterfly.dispatcher
 
+import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.flow.Flow
@@ -14,17 +16,15 @@ import zlc.season.butterfly.internal.showDialogFragment
 
 class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager) : InnerDispatcher {
 
-    override fun retreat(activity: FragmentActivity, topEntry: BackStackEntry, bundle: Bundle) {
-        with(activity) {
-            val find = findDialogFragment(topEntry.request) ?: return
-            if (topEntry.request.needResult) {
-                setFragmentResult(topEntry.request.uniqueTag, bundle)
-            }
-            find.dismissAllowingStateLoss()
+    override suspend fun dispatch(context: Context, request: AgileRequest): Flow<Result<Bundle>> {
+        return if (context is FragmentActivity) {
+            dispatch(context, request)
+        } else {
+            emptyFlow()
         }
     }
 
-    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    private fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         if (request.enableBackStack) {
             backStackEntryManager.addEntry(activity, BackStackEntry(request))
         }
@@ -35,6 +35,17 @@ class DialogFragmentDispatcher(val backStackEntryManager: BackStackEntryManager)
             activity.awaitFragmentResult(request.scheme, request.uniqueTag)
         } else {
             emptyFlow()
+        }
+    }
+
+    override fun retreat(activity: Activity, topEntry: BackStackEntry, bundle: Bundle) {
+        if (activity !is FragmentActivity) return
+        with(activity) {
+            val find = findDialogFragment(topEntry.request) ?: return
+            if (topEntry.request.needResult) {
+                setFragmentResult(topEntry.request.uniqueTag, bundle)
+            }
+            find.dismissAllowingStateLoss()
         }
     }
 }

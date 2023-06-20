@@ -1,6 +1,6 @@
 package zlc.season.butterfly.compose.launcher
 
-import androidx.fragment.app.FragmentActivity
+import androidx.activity.ComponentActivity
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.backstack.BackStackEntry
 import zlc.season.butterfly.backstack.BackStackEntryManager
@@ -8,7 +8,7 @@ import zlc.season.butterfly.backstack.BackStackEntryManager
 class ModeLauncher(private val backStackEntryManager: BackStackEntryManager) {
     private val commonLauncher = CommonLauncher()
 
-    fun FragmentActivity.launch(request: AgileRequest) {
+    fun ComponentActivity.launch(request: AgileRequest) {
         if (request.clearTop) {
             clearTopLaunch(request)
         } else if (request.singleTop) {
@@ -18,11 +18,11 @@ class ModeLauncher(private val backStackEntryManager: BackStackEntryManager) {
         }
     }
 
-    fun FragmentActivity.launchDirectly(request: AgileRequest) {
+    fun ComponentActivity.launchDirectly(request: AgileRequest) {
         commonLaunch(request)
     }
 
-    private fun FragmentActivity.standardLaunch(request: AgileRequest) {
+    private fun ComponentActivity.standardLaunch(request: AgileRequest) {
         if (request.enableBackStack) {
             backStackEntryManager.addEntry(this, BackStackEntry(request))
         }
@@ -30,7 +30,7 @@ class ModeLauncher(private val backStackEntryManager: BackStackEntryManager) {
         commonLaunch(request)
     }
 
-    private fun FragmentActivity.clearTopLaunch(request: AgileRequest) {
+    private fun ComponentActivity.clearTopLaunch(request: AgileRequest) {
         val topEntryList = backStackEntryManager.getTopEntryList(this, request)
         return if (topEntryList.isEmpty()) {
             standardLaunch(request)
@@ -41,7 +41,7 @@ class ModeLauncher(private val backStackEntryManager: BackStackEntryManager) {
         }
     }
 
-    private fun FragmentActivity.singleTopLaunch(request: AgileRequest) {
+    private fun ComponentActivity.singleTopLaunch(request: AgileRequest) {
         val topEntry = backStackEntryManager.getTopEntry(this)
         return if (topEntry != null && topEntry.request.className == request.className) {
             commonLaunch(request)
@@ -50,7 +50,7 @@ class ModeLauncher(private val backStackEntryManager: BackStackEntryManager) {
         }
     }
 
-    private fun FragmentActivity.commonLaunch(request: AgileRequest) {
+    private fun ComponentActivity.commonLaunch(request: AgileRequest) {
         with(commonLauncher) {
             launch(request)
         }

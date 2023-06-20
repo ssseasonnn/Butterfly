@@ -3,8 +3,8 @@ package zlc.season.butterfly.compose.launcher
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import zlc.season.butterfly.AgileRequest
@@ -13,7 +13,7 @@ import zlc.season.butterfly.compose.Utils.composeViewId
 import zlc.season.butterfly.internal.ButterflyHelper.contentView
 
 class CommonLauncher {
-    fun FragmentActivity.launch(request: AgileRequest) {
+    fun ComponentActivity.launch(request: AgileRequest) {
         var composeView = findViewById<ComposeView>(composeViewId)
         if (composeView == null) {
             composeView = ComposeView(this).apply { id = composeViewId }
@@ -23,7 +23,7 @@ class CommonLauncher {
         invokeCompose(composeView, request)
     }
 
-    private fun FragmentActivity.invokeCompose(composeView: ComposeView, request: AgileRequest) {
+    private fun ComponentActivity.invokeCompose(composeView: ComposeView, request: AgileRequest) {
         composeView.tag = request.uniqueTag
 
         val cls = Class.forName(request.className)
@@ -42,14 +42,14 @@ class CommonLauncher {
     }
 
     @Suppress("unchecked_cast")
-    private fun FragmentActivity.getViewModel(composable: AgileComposable): ViewModel {
+    private fun ComponentActivity.getViewModel(composable: AgileComposable): ViewModel {
         return ViewModelProvider(
             viewModelStore,
             defaultViewModelProviderFactory
         )[Class.forName(composable.viewModelClass) as Class<ViewModel>]
     }
 
-    private fun FragmentActivity.findContainerView(request: AgileRequest): ViewGroup {
+    private fun ComponentActivity.findContainerView(request: AgileRequest): ViewGroup {
         var result: ViewGroup? = null
         if (request.containerViewId != 0) {
             result = findViewById(request.containerViewId)

@@ -22,22 +22,16 @@ import zlc.season.butterfly.internal.ButterflyHelper.setActivityResult
 
 class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : InnerDispatcher {
 
-    override fun retreat(activity: FragmentActivity, topEntry: BackStackEntry, bundle: Bundle) {
-        with(activity) {
-            if (topEntry.request.needResult) {
-                setActivityResult(bundle)
-            }
-            finish()
-        }
-    }
-
     override suspend fun dispatch(context: Context, request: AgileRequest): Flow<Result<Bundle>> {
+        if (context is FragmentActivity) {
+            return dispatch(context, request)
+        }
         val intent = createIntent(context, request)
         context.startActivity(intent, createActivityOptions(context, request)?.toBundle())
         return emptyFlow()
     }
 
-    override suspend fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
+    private fun dispatch(activity: FragmentActivity, request: AgileRequest): Flow<Result<Bundle>> {
         return if (!request.needResult) {
             val intent = createIntent(activity, request)
             activity.startActivity(intent, createActivityOptions(activity, request)?.toBundle())
@@ -48,6 +42,15 @@ class ActivityDispatcher(val backStackEntryManager: BackStackEntryManager) : Inn
                 intent.putExtra(EXTRA_ACTIVITY_OPTIONS_BUNDLE, it)
             }
             activity.awaitActivityResult(request.scheme, intent)
+        }
+    }
+
+    override fun retreat(activity: Activity, topEntry: BackStackEntry, bundle: Bundle) {
+        with(activity) {
+            if (topEntry.request.needResult) {
+                setActivityResult(bundle)
+            }
+            finish()
         }
     }
 

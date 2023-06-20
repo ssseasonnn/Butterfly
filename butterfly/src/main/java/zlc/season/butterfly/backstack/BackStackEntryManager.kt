@@ -23,15 +23,19 @@ class BackStackEntryManager {
     init {
         ButterflyHelper.application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                // 添加Activity到回退栈
                 val intentRequest = activity.intent.getParcelableExtra<AgileRequest>(AGILE_REQUEST)
                 if (intentRequest != null) {
                     addEntry(activity, BackStackEntry(intentRequest))
                     activity.intent.removeExtra(AGILE_REQUEST)
                 }
+
+                // 恢复回退栈
                 if (savedInstanceState != null) {
                     restoreEntryList(activity, savedInstanceState)
                 }
 
+                // 监听Fragment销毁事件，移除Fragment Entry
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
                         val uniqueTag = it.tag
@@ -43,7 +47,7 @@ class BackStackEntryManager {
             }
 
             override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) =
-                saveEntryList(activity, outState)
+                saveEntryList(activity, outState) // 保存回退栈
 
             override fun onActivityDestroyed(activity: Activity) = destroyEntryList(activity)
         })
@@ -102,7 +106,7 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    fun removeEntries(activity: FragmentActivity, entryList: List<BackStackEntry>) {
+    fun removeEntries(activity: Activity, entryList: List<BackStackEntry>) {
         getEntryList(activity).removeAll(entryList)
 
         "BackStack ---> ${activity.key()} removeEntries -> $entryList".logd()
@@ -141,7 +145,7 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    fun getTopEntryList(activity: FragmentActivity, request: AgileRequest): MutableList<BackStackEntry> {
+    fun getTopEntryList(activity: Activity, request: AgileRequest): MutableList<BackStackEntry> {
         val result = mutableListOf<BackStackEntry>()
 
         val backStackList = getEntryList(activity)
