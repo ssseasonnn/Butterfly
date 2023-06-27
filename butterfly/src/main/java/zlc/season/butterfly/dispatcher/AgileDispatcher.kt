@@ -70,8 +70,6 @@ class AgileDispatcher {
         val topEntry = backStackEntryManager.removeTopEntry(currentActivity) ?: return null
         findDispatcher(topEntry.request).retreat(currentActivity, topEntry, bundle)
 
-        dispatcherMaps.values.forEach { it.onRetreat(currentActivity, topEntry) }
-
         return topEntry.request
     }
 

@@ -15,6 +15,7 @@ data class AgileRequest(
     val exitAnim: Int = 0,
     val flags: Int = 0,
     val containerViewId: Int = 0,
+    val containerViewTag: String = "",
 
     val needResult: Boolean = false,
     val enableBackStack: Boolean = true,

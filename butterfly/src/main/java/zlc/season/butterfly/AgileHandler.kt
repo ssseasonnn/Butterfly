@@ -49,6 +49,12 @@ class AgileHandler(
         }
     }
 
+    fun container(containerViewTag: String): AgileHandler {
+        return configRequest {
+            copy(containerViewTag = containerViewTag)
+        }
+    }
+
     fun tag(uniqueTag: String): AgileHandler {
         return configRequest { copy(uniqueTag = uniqueTag) }
     }

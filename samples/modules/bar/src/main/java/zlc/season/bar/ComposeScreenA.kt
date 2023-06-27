@@ -1,7 +1,6 @@
 package zlc.season.bar
 
 import android.os.Bundle
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
@@ -11,18 +10,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.os.bundleOf
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import zlc.season.base.Schemes
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.annotation.Agile
 
-@Preview
 @Agile(Schemes.SCHEME_COMPOSE_A)
 @Composable
 fun ComposeScreenA(bundle: Bundle = bundleOf()) {
     val id by bundle.params<Int>()
+    val viewModel = viewModel<AScreenViewModel>()
+    val textFromViewModel = viewModel.text.asFlow().collectAsState(initial = "")
 
     val ctx = LocalContext.current
     Surface(
@@ -38,6 +39,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "This is ComposeScreen A ${id}")
+                Text(text = textFromViewModel.value)
                 Button(onClick = {
                     Butterfly.retreat()
                 }) {

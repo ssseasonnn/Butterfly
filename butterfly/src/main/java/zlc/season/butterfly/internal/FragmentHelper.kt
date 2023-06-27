@@ -1,6 +1,8 @@
 package zlc.season.butterfly.internal
 
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -28,9 +30,9 @@ internal fun FragmentActivity.showNewFragment(request: AgileRequest): Fragment {
     with(supportFragmentManager.beginTransaction()) {
         setCustomAnimations(request.enterAnim, request.exitAnim, 0, 0)
         if (request.useReplace) {
-            replace(request.containerId(), fragment, request.uniqueTag)
+            replace(findContainerId(request), fragment, request.uniqueTag)
         } else {
-            add(request.containerId(), fragment, request.uniqueTag)
+            add(findContainerId(request), fragment, request.uniqueTag)
         }
 
         commitAllowingStateLoss()
@@ -38,8 +40,18 @@ internal fun FragmentActivity.showNewFragment(request: AgileRequest): Fragment {
     return fragment
 }
 
-private fun AgileRequest.containerId(): Int {
-    return if (containerViewId != 0) containerViewId else android.R.id.content
+private fun FragmentActivity.findContainerId(request: AgileRequest): Int {
+    var result = 0
+    if (request.containerViewId != 0) {
+        result = request.containerViewId
+    } else if (request.containerViewTag.isNotEmpty()) {
+        val containerView = window.decorView.findViewWithTag<ViewGroup>(request.containerViewTag)
+        if (containerView != null && containerView.id != View.NO_ID) {
+            result = containerView.id
+        }
+    }
+
+    return if (result != 0) result else android.R.id.content
 }
 
 internal fun FragmentActivity.createDialogFragment(request: AgileRequest): DialogFragment {

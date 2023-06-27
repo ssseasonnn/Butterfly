@@ -9,6 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewmodel.compose.viewModel
 import zlc.season.base.Schemes
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.annotation.Agile
@@ -16,6 +18,8 @@ import zlc.season.butterfly.annotation.Agile
 @Agile(Schemes.SCHEME_COMPOSE_C)
 @Composable
 fun ComposeScreenC() {
+    val viewModel = viewModel<CScreenViewModel>()
+    val textFromViewModel = viewModel.text.asFlow().collectAsState(initial = "")
     val ctx = LocalContext.current
     Surface(modifier = Modifier.fillMaxSize(), color = Colors.GREEN) {
         Box {
@@ -26,6 +30,7 @@ fun ComposeScreenC() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "This is ComposeScreen C")
+                Text(text = textFromViewModel.value)
                 Button(onClick = {
                     Butterfly.retreat()
                 }) {

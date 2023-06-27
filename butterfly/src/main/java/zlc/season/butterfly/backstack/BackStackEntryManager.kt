@@ -8,7 +8,6 @@ import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.internal.ButterflyHelper
 import zlc.season.butterfly.internal.ButterflyHelper.AGILE_REQUEST
 import zlc.season.butterfly.internal.key
-import zlc.season.butterfly.internal.logd
 import zlc.season.butterfly.internal.observeFragmentDestroy
 import zlc.season.claritypotion.ActivityLifecycleCallbacksAdapter
 
@@ -18,6 +17,15 @@ class BackStackEntryManager {
         private const val KEY_SAVE_STATE = "butterfly_back_stack_state"
     }
 
+    /**
+     * Activity as the key to save the BackStackEntry corresponding to each activity.
+     *
+     * like:
+     * {
+     *   {ActivityA} -> [BackStackEntryA1, BackStackEntryA2],
+     *   {ActivityB} -> [BackStackEntryB1, BackStackEntryB2]
+     * }
+     */
     private val backStackEntryMap = mutableMapOf<String, MutableList<BackStackEntry>>()
 
     init {
@@ -59,9 +67,6 @@ class BackStackEntryManager {
         if (data != null) {
             val entryList = data.map { BackStackEntry(it) }
             getEntryList(activity).addAll(entryList)
-
-            "BackStack ---> ${activity.key()} restore entry list".logd()
-            "BackStack ---> Result -> $backStackEntryMap".logd()
         }
     }
 
@@ -71,17 +76,12 @@ class BackStackEntryManager {
         if (!list.isNullOrEmpty()) {
             val savedData = list.mapTo(ArrayList()) { it.request }
             outState.putParcelableArrayList(KEY_SAVE_STATE, savedData)
-
-            "BackStack ---> ${activity.key()} save entry list".logd()
         }
     }
 
     @Synchronized
     private fun destroyEntryList(activity: Activity) {
         backStackEntryMap.remove(activity.key())
-
-        "BackStack ---> ${activity.key()} destroy entry list".logd()
-        "BackStack ---> Result -> $backStackEntryMap".logd()
     }
 
     @Synchronized
@@ -89,28 +89,17 @@ class BackStackEntryManager {
         val find = getEntryList(activity).find { it.request.uniqueTag == uniqueTag }
         if (find != null) {
             getEntryList(activity).remove(find)
-
-            "BackStack ---> ${activity.key()} removeEntry -> $find".logd()
-            "BackStack ---> Result -> $backStackEntryMap".logd()
         }
     }
 
     @Synchronized
     fun removeTopEntry(activity: Activity): BackStackEntry? {
-        val topEntry = getEntryList(activity).removeLastOrNull()
-
-        "BackStack ---> ${activity.key()} removeTopEntry -> $topEntry".logd()
-        "BackStack ---> Result -> $backStackEntryMap".logd()
-
-        return topEntry
+        return getEntryList(activity).removeLastOrNull()
     }
 
     @Synchronized
     fun removeEntries(activity: Activity, entryList: List<BackStackEntry>) {
         getEntryList(activity).removeAll(entryList)
-
-        "BackStack ---> ${activity.key()} removeEntries -> $entryList".logd()
-        "BackStack ---> Result -> $backStackEntryMap".logd()
     }
 
     @Synchronized
@@ -128,9 +117,6 @@ class BackStackEntryManager {
                 list.add(entry)
             }
         }
-
-        "BackStack ---> ${activity.key()} addEntry -> $entry".logd()
-        "BackStack ---> Result -> $backStackEntryMap".logd()
     }
 
     @Synchronized
@@ -160,7 +146,7 @@ class BackStackEntryManager {
     }
 
     @Synchronized
-    private fun getEntryList(activity: Activity): MutableList<BackStackEntry> {
+    fun getEntryList(activity: Activity): MutableList<BackStackEntry> {
         var backStackList = backStackEntryMap[activity.key()]
         if (backStackList == null) {
             backStackList = mutableListOf()

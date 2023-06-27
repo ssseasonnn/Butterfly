@@ -12,6 +12,4 @@ interface InnerDispatcher {
     suspend fun dispatch(context: Context, request: AgileRequest): Flow<Result<Bundle>> = emptyFlow()
 
     fun retreat(activity: Activity, topEntry: BackStackEntry, bundle: Bundle) {}
-
-    fun onRetreat(activity: Activity, topEntry: BackStackEntry) {}
 }
