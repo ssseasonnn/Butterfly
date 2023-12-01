@@ -1,1 +1,6 @@
 apply from: "../../compose.gradle"
+
+android {
+    namespace("zlc.season.compose.home")
+}
+

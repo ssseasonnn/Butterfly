@@ -7,6 +7,7 @@ plugins {
 
 android {
     compileSdk 33
+    namespace("zlc.season.butterfly")
 
     defaultConfig {
         minSdk 21
