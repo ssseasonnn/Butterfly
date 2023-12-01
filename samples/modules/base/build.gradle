@@ -1,5 +1,0 @@
-apply from: "../base.gradle"
-
-android {
-    namespace("zlc.season.base")
-}

@@ -5,17 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class DashboardViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String> = _text
+    val text = MutableStateFlow("")
 
     init {
         viewModelScope.launch {
             delay(1500)
-            _text.value = "This is text from dashboard viewModel"
+            text.value = "This is text from dashboard viewModel"
         }
     }
 }

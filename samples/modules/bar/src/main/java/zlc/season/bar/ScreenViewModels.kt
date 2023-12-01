@@ -1,17 +1,15 @@
 package zlc.season.bar
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class AScreenViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String> = _text
+    val text = MutableStateFlow("")
 
     var count = 0
 
@@ -19,7 +17,7 @@ class AScreenViewModel : ViewModel() {
         viewModelScope.launch {
             while (isActive) {
                 delay(1000)
-                _text.value = "This is count: ${count++} from A screen viewModel"
+                text.value = "This is count: ${count++} from A screen viewModel"
             }
         }
     }
@@ -32,15 +30,14 @@ class AScreenViewModel : ViewModel() {
 
 class BScreenViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String> = _text
+    val text = MutableStateFlow("")
     var count = 0
 
     init {
         viewModelScope.launch {
             while (isActive) {
                 delay(1000)
-                _text.value = "This is count: ${count++} from B screen viewModel"
+                text.value = "This is count: ${count++} from B screen viewModel"
             }
         }
     }
@@ -53,15 +50,14 @@ class BScreenViewModel : ViewModel() {
 
 class CScreenViewModel : ViewModel() {
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String> = _text
+    val text = MutableStateFlow("")
     var count = 0
 
     init {
         viewModelScope.launch {
             while (isActive) {
                 delay(1000)
-                _text.value = "This is count: ${count++} from C screen viewModel"
+                text.value = "This is count: ${count++} from C screen viewModel"
             }
         }
     }

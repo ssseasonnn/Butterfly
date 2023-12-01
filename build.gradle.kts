@@ -1,3 +1,5 @@
+@file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
+
 plugins {
     id("build.logic")
     alias(libs.plugins.application) apply false
@@ -9,8 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.kover) apply false
     alias(libs.plugins.kapt) apply false
     alias(libs.plugins.hilt) apply false
-
-    id("io.github.ssseasonnn.butterfly") version ("1.0.1") apply false
+    alias(libs.plugins.butterfly) apply false
 }
 
 tasks.register("clean", Delete::class) {

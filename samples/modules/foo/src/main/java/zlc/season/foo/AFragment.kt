@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.lifecycleScope
 import zlc.season.base.BaseFragment
 import zlc.season.base.Schemes
 import zlc.season.bracer.params

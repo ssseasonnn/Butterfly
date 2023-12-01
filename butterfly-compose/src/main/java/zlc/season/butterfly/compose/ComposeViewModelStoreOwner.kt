@@ -8,7 +8,6 @@ class ComposeViewModelStoreOwner(
     private val composeViewModel: ComposeViewModel,
     private val agileRequest: AgileRequest
 ) : ViewModelStoreOwner {
-    override fun getViewModelStore(): ViewModelStore {
-        return composeViewModel.getViewModelStore(agileRequest.uniqueTag)
-    }
+    override val viewModelStore: ViewModelStore
+        get() = composeViewModel.getViewModelStore(agileRequest.uniqueTag)
 }

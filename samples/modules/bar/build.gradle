@@ -1,5 +1,0 @@
-apply from: "${rootDir}/samples/modules/compose.gradle"
-
-android {
-    namespace("zlc.season.bar")
-}

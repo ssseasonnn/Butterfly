@@ -1,15 +1,14 @@
 package zlc.season.bar
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import zlc.season.base.Schemes
 import zlc.season.butterfly.Butterfly
@@ -19,7 +18,7 @@ import zlc.season.butterfly.annotation.Agile
 @Composable
 fun ComposeScreenC() {
     val viewModel = viewModel<CScreenViewModel>()
-    val textFromViewModel = viewModel.text.asFlow().collectAsState(initial = "")
+    val textFromViewModel = viewModel.text.collectAsState(initial = "")
     val ctx = LocalContext.current
     Surface(modifier = Modifier.fillMaxSize(), color = Colors.GREEN) {
         Box {

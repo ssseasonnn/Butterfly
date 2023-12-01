@@ -1,37 +1,55 @@
 [versions]
 # android
-sdk-min-version = "30"
-sdk-target-version = "33"
-sdk-compile-version = "33"
+sdk-min-version = "21"
+sdk-target-version = "34"
+sdk-compile-version = "34"
 
 # library
-gradle = "8.1.0"
-kotlin = "1.8.21"
+gradle = "8.1.4"
 kover = "0.7.3"
 detekt = "1.23.0"
-compose-compiler = "1.4.7"
+
 ksp = "1.8.10-1.0.9"
 
-activity-compose = "1.7.2"
-appcompat = "1.6.1"
-arch-lifecycle = "2.6.1"
-arch-lifecycle-extension = "2.2.0"
-compose = "1.4.3"
-compose-material3 = "1.1.1"
-constraint-layout = "2.1.4"
-core-ktx = "1.10.1"
-hilt = "2.46.1"
+# kotlin
+kotlin = "1.9.20"
 kotlinx-coroutines = "1.7.2"
 kotlinx-serialization-json = "1.5.1"
-material = "1.9.0"
+
+# android
+appcompat = "1.6.1"
+fragment-ktx = "1.6.2"
+activity-ktx = "1.8.1"
+core-ktx = "1.12.0"
+arch-lifecycle = "2.6.2"
+arch-lifecycle-extension = "2.2.0"
+hilt = "2.46.1"
+
+# ui
+material = "1.10.0"
+constraint-layout = "2.1.4"
+
+# compose
+# compose compiler
+compose-compiler = "1.5.5"
+
+activity-compose = "1.8.1"
+compose = "1.5.4"
+compose-material3 = "1.1.2"
+accompanist = "0.31.3-beta"
+
+# http
 retrofit = "2.9.0"
 retrofit-kotlinx-serialization-json = "1.0.0"
 okhttp-logging = "4.11.0"
-accompanist = "0.31.3-beta"
 coil = "2.4.0"
-exoplayer = "2.19.0"
-fragment = "1.6.1"
-clarity = "1.0.4"
+exoplayer = "2.19.1"
+
+# season
+butterfly = "1.0.1"
+clarity = "1.0.6"
+yasha = "1.1.4"
+bracer = "1.0.7"
 
 # test
 arch-test = "2.2.0"
@@ -49,7 +67,6 @@ androidx-test-runner = "1.5.2"
 androidx-test-rules = "1.5.0"
 espresso-core = "3.5.1"
 
-
 [libraries]
 # plugin
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
@@ -63,13 +80,14 @@ kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 
 # android
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout" }
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activity-ktx" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment-ktx" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraint-layout" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-fragment = { module = "androidx.fragment:fragment", version.ref = "fragment" }
 
 # lifecycle
 lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "arch-lifecycle" }
@@ -117,6 +135,9 @@ coil-kt-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 # video
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
 
+# season
+yasha = { module = "com.github.ssseasonnn:Yasha", version.ref = "yasha" }
+bracer = { module = "com.github.ssseasonnn:Bracer", version.ref = "bracer" }
 clarity = { module = "com.github.ssseasonnn:ClarityPotion", version.ref = "clarity" }
 
 # test
@@ -140,6 +161,11 @@ androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidx-
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso-core" }
 
 [bundles]
+season = [
+    "yasha",
+    "bracer"
+]
+
 compose = [
     "compose-activity",
     "compose-lifecycle",
@@ -158,8 +184,10 @@ kotlin = [
 ]
 android = [
     "appcompat",
-    "constraintlayout",
     "core-ktx",
+    "activity-ktx",
+    "fragment-ktx",
+    "constraintlayout",
     "material",
     "lifecycle-runtime-ktx",
     "lifecycle-viewmodel-ktx",
@@ -212,4 +240,4 @@ kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+butterfly = { id = "io.github.ssseasonnn.butterfly", version.ref = "butterfly" }

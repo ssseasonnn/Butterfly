@@ -4,22 +4,21 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
-import androidx.lifecycle.asFlow
 import zlc.season.base.Schemes
 import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_COMPOSE_DASHBOARD)
 @Composable
 fun DashboardScreen(test: Bundle = bundleOf(), viewModel: DashboardViewModel = DashboardViewModel()) {
-    val textFromViewModel = viewModel.text.asFlow().collectAsState(initial = "")
+    val textFromViewModel = viewModel.text.collectAsState(initial = "")
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Box {

@@ -1,5 +1,0 @@
-apply from: "${rootDir}/samples/modules/base.gradle"
-
-dependencies {
-    implementation project(':samples:modules:base')
-}
