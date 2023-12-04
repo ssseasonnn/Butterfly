@@ -3,7 +3,6 @@ import zlc.season.buildlogic.base.enableCompose
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("maven-publish")
     alias(libs.plugins.library)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.parcelize)
@@ -20,14 +19,4 @@ dependencies {
     api(libs.compose.ui)
     api(libs.compose.runtime)
     api(libs.compose.viewmodel)
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components.getByName("release"))
-            }
-        }
-    }
 }

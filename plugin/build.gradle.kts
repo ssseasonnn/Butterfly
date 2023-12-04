@@ -39,7 +39,7 @@ tasks.withType<Copy>().all {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        create<MavenPublication>("gradle") {
             groupId = "io.github.ssseasonnn"
             artifactId = "io.github.ssseasonnn.butterfly"
             version = "1.0.1"

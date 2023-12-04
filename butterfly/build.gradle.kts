@@ -2,7 +2,6 @@ import zlc.season.buildlogic.base.androidLibrary
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("maven-publish")
     alias(libs.plugins.library)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.parcelize)
@@ -19,14 +18,4 @@ dependencies {
     api(libs.lifecycle.runtime.ktx)
     api(libs.fragment.ktx)
     api(libs.core.ktx)
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("maven") {
-                from(components.getByName("release"))
-            }
-        }
-    }
 }

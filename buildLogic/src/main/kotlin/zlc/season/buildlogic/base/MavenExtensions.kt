@@ -21,6 +21,9 @@ fun Project.setupMaven() {
 private fun Project.configPublish(componentName: String) {
     apply(plugin = "maven-publish")
     configure<PublishingExtension> {
+        repositories {
+            mavenLocal()
+        }
         publications {
             create<MavenPublication>("maven") {
                 afterEvaluate {

@@ -1,7 +1,6 @@
 @file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
 
 plugins {
-    id("maven-publish")
     kotlin("jvm")
     kotlin("kapt")
 }
@@ -14,12 +13,4 @@ dependencies {
 
     implementation(libs.auto.service)
     kapt(libs.auto.service)
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components.getByName("java"))
-        }
-    }
 }

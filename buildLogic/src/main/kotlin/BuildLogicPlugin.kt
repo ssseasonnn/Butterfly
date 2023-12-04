@@ -4,6 +4,8 @@ import zlc.season.buildlogic.base.setupMaven
 
 class BuildLogicPlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        project.setupMaven()
+        project.subprojects {
+            setupMaven()
+        }
     }
 }
