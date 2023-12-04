@@ -10,6 +10,8 @@ kover = "0.7.3"
 detekt = "1.23.0"
 
 ksp = "1.8.10-1.0.9"
+poet = "1.11.0"
+auto-service = "1.0"
 
 # kotlin
 kotlin = "1.9.20"
@@ -45,6 +47,9 @@ okhttp-logging = "4.11.0"
 coil = "2.4.0"
 exoplayer = "2.19.1"
 
+# leak
+leakcanary = "2.9.1"
+
 # season
 butterfly = "1.0.1"
 clarity = "1.0.6"
@@ -68,8 +73,14 @@ androidx-test-rules = "1.5.0"
 espresso-core = "3.5.1"
 
 [libraries]
+# tools
+kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "poet" }
+auto-service = { module = "com.google.auto.service:auto-service", version.ref = "auto-service" }
+
+
 # plugin
-android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+android-gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+android-gradle-api = { module = "com.android.tools.build:gradle-api", version.ref = "gradle" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 
 # kotlin
@@ -135,6 +146,9 @@ coil-kt-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
 # video
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
 
+# leak
+leakcanary = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
+
 # season
 yasha = { module = "com.github.ssseasonnn:Yasha", version.ref = "yasha" }
 bracer = { module = "com.github.ssseasonnn:Bracer", version.ref = "bracer" }
@@ -163,7 +177,8 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 [bundles]
 season = [
     "yasha",
-    "bracer"
+    "bracer",
+    "clarity"
 ]
 
 compose = [

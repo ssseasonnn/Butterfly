@@ -9,8 +9,8 @@ plugins {
 dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
-    implementation("com.android.tools.build:gradle:7.0.4")
-    implementation("com.android.tools.build:gradle-api:7.0.4")
+    implementation(libs.android.gradle)
+    implementation(libs.android.gradle.api)
 }
 
 group = "io.github.ssseasonnn"

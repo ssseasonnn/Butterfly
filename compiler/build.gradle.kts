@@ -1,17 +1,19 @@
+@file:Suppress("DSL_SCOPE_VIOLATION", "UnstableApiUsage")
+
 plugins {
-    id("kotlin")
-    id("kotlin-kapt")
     id("maven-publish")
+    kotlin("jvm")
+    kotlin("kapt")
 }
 
 group = "com.github.ssseasonnn"
 
 dependencies {
     implementation(project(":annotation"))
-    implementation("com.squareup:kotlinpoet:1.10.2")
+    implementation(libs.kotlin.poet)
 
-    implementation("com.google.auto.service:auto-service:1.0")
-    kapt("com.google.auto.service:auto-service:1.0")
+    implementation(libs.auto.service)
+    kapt(libs.auto.service)
 }
 
 publishing {

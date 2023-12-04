@@ -39,6 +39,6 @@ dependencies {
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.season)
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
+    debugImplementation(libs.leakcanary)
 
 }
