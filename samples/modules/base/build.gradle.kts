@@ -6,16 +6,28 @@ plugins {
     alias(libs.plugins.library)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kapt)
     alias(libs.plugins.butterfly)
+    alias(libs.plugins.ksp)
 }
 
 androidLibrary {
     namespace = "zlc.season.base"
+
+    buildTypes {
+        debug {
+            kotlin {
+                sourceSets {
+                    main {
+                        kotlin.srcDir("build/generated/ksp/debug/kotlin")
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
-    kapt(project(":compiler"))
+    ksp(project(":compiler"))
     implementation(project(":butterfly"))
     implementation(libs.bundles.android)
     implementation(libs.bundles.kotlin)

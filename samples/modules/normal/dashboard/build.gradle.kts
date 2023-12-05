@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.library)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.butterfly)
 }
 
@@ -16,7 +16,7 @@ androidLibrary {
 }
 
 dependencies {
-    kapt(project(":compiler"))
+    ksp(project(":compiler"))
     implementation(project(":butterfly"))
 
     implementation(project(":samples:modules:base"))

@@ -9,7 +9,7 @@ gradle = "8.1.4"
 kover = "0.7.3"
 detekt = "1.23.0"
 
-ksp = "1.8.10-1.0.9"
+ksp = "1.9.20-1.0.14"
 poet = "1.11.0"
 auto-service = "1.0"
 
