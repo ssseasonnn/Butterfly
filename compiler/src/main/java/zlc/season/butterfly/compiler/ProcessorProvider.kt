@@ -1,5 +1,6 @@
 package zlc.season.butterfly.compiler
 
+import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
@@ -9,13 +10,13 @@ import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
+import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.validate
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.butterfly.annotation.Evade
 import zlc.season.butterfly.annotation.EvadeImpl
-import java.io.File
-import kotlin.random.Random
 
 class ProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
@@ -28,13 +29,26 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
     private val evadeMap = mutableMapOf<String, String>()
     private val evadeImplMap = mutableMapOf<String, EvadeImplInfo>()
 
+    private val composableMap = mutableMapOf<ComposableInfo, KSFile>()
     private val composableList = mutableListOf<ComposableInfo>()
 
-    val sourceFileList = mutableListOf<KSFile>()
+    private val sourceFileList = mutableListOf<KSFile>()
+
+    private lateinit var bundleClassType: KSType
+    private lateinit var viewModelClassType: KSType
 
     private var packageName = DEFAULT_PACKAGE
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
+        val bundleClass = resolver.getClassDeclarationByName(BUNDLE_CLASS_NAME)
+        bundleClass?.let {
+            bundleClassType = it.asStarProjectedType()
+        }
+        val viewModelClass = resolver.getClassDeclarationByName(VIEW_MODEL_CLASS_NAME)
+        viewModelClass?.let {
+            viewModelClassType = it.asStarProjectedType()
+        }
+
         val invalidAnnotated = mutableListOf<KSAnnotated>()
 
         processAgileSymbols(resolver, invalidAnnotated, sourceFileList)
@@ -53,13 +67,12 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
         val agileSymbols = resolver.getSymbolsWithAnnotation(Agile::class.qualifiedName!!)
         environment.logc("find symbols: ${agileSymbols.toList()}")
 
-        val visitor = AgileAnnotationVisitor(environment, agileMap, sourcesFile)
+        val visitor = AgileAnnotationVisitor(environment, resolver, agileMap, composableList, sourcesFile)
         agileSymbols.toList().forEach {
             if (!it.validate()) {
                 invalidAnnotated.add(it)
             } else {
                 it.accept(visitor, Unit)
-                sourcesFile.add((it as KSClassDeclaration).containingFile!!)
             }
         }
 
@@ -124,6 +137,10 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
 
         val tempFile = environment.codeGenerator.generatedFile.find { it.name.startsWith(TEMP_FILE_NAME) }
         tempFile?.let {
+            val composableGenerator = ComposableGenerator(composableList)
+            composableGenerator.generateNew(environment.codeGenerator)
+            environment.logc("Generate compose file end.")
+
             val generateDir = it.absolutePath
             val className = getModuleNameNew(generateDir)
             environment.logc("Generate module class: $className")
@@ -148,9 +165,15 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
 
 private class AgileAnnotationVisitor(
     private val environment: SymbolProcessorEnvironment,
+    private val resolver: Resolver,
     private val agileMap: MutableMap<String, String>,
+    private val composeList: MutableList<ComposableInfo>,
     private val sourcesFile: MutableList<KSFile>
 ) : KSVisitorVoid() {
+
+    private val bundleClassType = resolver.getClassDeclarationByName(BUNDLE_CLASS_NAME)!!.asStarProjectedType()
+    private val viewModelClassType = resolver.getClassDeclarationByName(VIEW_MODEL_CLASS_NAME)!!.asStarProjectedType()
+
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
         environment.logc("process symbol: $classDeclaration")
         val annotations = classDeclaration.annotations.toList()
@@ -163,6 +186,46 @@ private class AgileAnnotationVisitor(
 
                 // add file to dependency
                 sourcesFile.add(classDeclaration.containingFile!!)
+            }
+        }
+    }
+
+    override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
+        environment.logc("process symbol: $function")
+        val annotations = function.annotations.toList()
+        annotations.forEach { annotation ->
+            val packageName = function.packageName.asString()
+            val methodName = function.simpleName.asString()
+
+            val schemeValue = annotation.arguments.find { it.name?.asString() == "scheme" }?.value as? String
+            schemeValue?.let {
+                if (function.parameters.isNotEmpty()) {
+                    when (function.parameters.size) {
+                        1 -> {
+                            val parameterKsType = function.parameters[0].type.resolve()
+                            if (parameterKsType.isAssignableFrom(bundleClassType)) {
+                                composeList.add(ComposableInfo(packageName, methodName, true, ""))
+                            } else if (parameterKsType.isAssignableFrom(viewModelClassType)) {
+                                val ksClassDeclaration = parameterKsType.declaration as KSClassDeclaration
+                                val packageName = ksClassDeclaration.packageName.asString()
+                                val className = ksClassDeclaration.simpleName.asString()
+                                val viewModelFullName = "$packageName.$className"
+                                composeList.add(ComposableInfo(packageName, methodName, false, viewModelFullName))
+                            } else {
+
+                            }
+                        }
+                    }
+                } else {
+                    composeList.add(ComposableInfo(packageName, methodName, false, ""))
+                }
+
+                val targetClassName = "$COMPOSABLE_PACKAGE_NAME.${methodName}Composable"
+                environment.logc("symbol processed: key=$schemeValue, value=$targetClassName")
+                agileMap[schemeValue] = targetClassName
+
+                // add file to dependency
+                sourcesFile.add(function.containingFile!!)
             }
         }
     }

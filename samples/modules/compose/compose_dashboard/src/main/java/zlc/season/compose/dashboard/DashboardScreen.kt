@@ -17,7 +17,7 @@ import zlc.season.butterfly.annotation.Agile
 
 @Agile(Schemes.SCHEME_COMPOSE_DASHBOARD)
 @Composable
-fun DashboardScreen(test: Bundle = bundleOf(), viewModel: DashboardViewModel = DashboardViewModel()) {
+fun DashboardScreen(viewModel: DashboardViewModel = DashboardViewModel()) {
     val textFromViewModel = viewModel.text.collectAsState(initial = "")
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -30,7 +30,7 @@ fun DashboardScreen(test: Bundle = bundleOf(), viewModel: DashboardViewModel = D
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = 200.dp),
-                text = textFromViewModel.value
+                text = "textFromViewModel.value"
             )
         }
     }

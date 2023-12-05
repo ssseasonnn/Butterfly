@@ -1,5 +1,7 @@
 package zlc.season.butterfly.compiler
 
+import com.google.devtools.ksp.processing.CodeGenerator
+import com.google.devtools.ksp.processing.Dependencies
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.LambdaTypeName.Companion.get
 import zlc.season.butterfly.compiler.ComposableHelper.composableLambdaType
@@ -22,29 +24,29 @@ import zlc.season.butterfly.compose.AgileComposable
 import zlc.season.compose.dashboard.DashboardScreen
 
 public class DashboardScreenComposable : AgileComposable() {
-    public override val composable: @Composable (() -> Unit)? =
-        @Composable {
-               DashboardScreen()
-        }
+public override val composable: @Composable (() -> Unit)? =
+@Composable {
+DashboardScreen()
+}
 
-    public override val paramsComposable: @Composable ((Bundle) -> Unit)? =
-        @Composable { bundle ->
-            DashboardScreen(bundle)
-        }
+public override val paramsComposable: @Composable ((Bundle) -> Unit)? =
+@Composable { bundle ->
+DashboardScreen(bundle)
+}
 
-    public override val viewModelComposable: @Composable ((Any) -> Unit)? =
-        @Composable { viewModel ->
-            DashboardScreen(viewModel as zlc.season.compose.dashboard.DashboardViewModel)
-        }
+public override val viewModelComposable: @Composable ((Any) -> Unit)? =
+@Composable { viewModel ->
+DashboardScreen(viewModel as zlc.season.compose.dashboard.DashboardViewModel)
+}
 
-    public override val paramsViewModelComposable: @Composable ((Bundle, Any) -> Unit)? =
-        @Composable { bundle, viewModel ->
-            DashboardScreen(
-                bundle, viewModel as zlc.season.compose.dashboard.DashboardViewModel
-            )
-    }
+public override val paramsViewModelComposable: @Composable ((Bundle, Any) -> Unit)? =
+@Composable { bundle, viewModel ->
+DashboardScreen(
+bundle, viewModel as zlc.season.compose.dashboard.DashboardViewModel
+)
+}
 
-    public override val viewModelClass: String = "zlc.season.compose.dashboard.DashboardViewModel"
+public override val viewModelClass: String = "zlc.season.compose.dashboard.DashboardViewModel"
 }
  */
 internal object ComposableHelper {
@@ -73,10 +75,25 @@ internal object ComposableHelper {
     val superCls = ClassName("zlc.season.butterfly.compose", "AgileComposable")
 }
 
-internal class ComposableGenerator(private val composableList: List<ComposableInfo>) {
+internal class ComposableGenerator(
+    private val composableList: List<ComposableInfo>
+) {
     fun generate(file: File) {
         composableList.forEach {
             createFileSpec(it).writeTo(file)
+        }
+    }
+
+    fun generateNew(codeGenerator: CodeGenerator) {
+        composableList.forEach {
+            val file = codeGenerator.createNewFile(
+                Dependencies(true),
+                packageName = COMPOSABLE_PACKAGE_NAME,
+                fileName = "${it.methodName}Composable"
+            )
+            val fileString = createFileSpec(it).toString()
+            file.write(fileString.toByteArray())
+            file.close()
         }
     }
 
