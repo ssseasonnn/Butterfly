@@ -34,7 +34,7 @@ dependencies {
 
     implementation(project(":samples:modules:base"))
     implementation(project(":samples:modules:foo"))
-    implementation(project(":samples:modules:bar"))
+    implementation(project(":samples:modules:feature2"))
 
     ksp(project(":compiler"))
     implementation(project(":butterfly"))
