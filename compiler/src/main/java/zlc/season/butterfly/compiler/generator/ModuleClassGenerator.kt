@@ -1,8 +1,16 @@
-package zlc.season.butterfly.compiler
+package zlc.season.butterfly.compiler.generator
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.typeNameOf
 import zlc.season.butterfly.annotation.EvadeData
+import zlc.season.butterfly.compiler.EvadeImplInfo
 import zlc.season.butterfly.module.Module
 
 /**
@@ -31,8 +39,7 @@ import zlc.season.butterfly.module.Module
  *  public override fun getEvadeImpl(): HashMap<String, EvadeData> = evadeImplMap
  * }
  */
-@OptIn(ExperimentalStdlibApi::class)
-internal class Generator(
+internal class ModuleClassGenerator(
     private val packageName: String,
     private val className: String,
     private val agileMap: Map<String, String>,

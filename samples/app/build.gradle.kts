@@ -4,10 +4,10 @@ import zlc.season.buildlogic.base.androidApplication
 import zlc.season.buildlogic.base.enableCompose
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.ksp)
     id("io.github.ssseasonnn.butterfly")
-    id("kotlin-kapt")
 }
 
 
@@ -16,6 +16,11 @@ androidApplication {
 
     viewBinding { enable = true }
     enableCompose()
+}
+
+
+ksp {
+    arg("butterfly.log.enable", "true")
 }
 
 dependencies {
@@ -31,7 +36,7 @@ dependencies {
     implementation(project(":samples:modules:foo"))
     implementation(project(":samples:modules:bar"))
 
-    kapt(project(":compiler"))
+    ksp(project(":compiler"))
     implementation(project(":butterfly"))
     implementation(project(":butterfly-compose"))
     implementation(libs.bundles.android)

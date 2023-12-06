@@ -1,13 +1,21 @@
-package zlc.season.butterfly.compiler
+package zlc.season.butterfly.compiler.generator
 
-import com.google.devtools.ksp.processing.CodeGenerator
-import com.google.devtools.ksp.processing.Dependencies
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.LambdaTypeName.Companion.get
-import zlc.season.butterfly.compiler.ComposableHelper.composableLambdaType
-import zlc.season.butterfly.compiler.ComposableHelper.paramsComposableLambdaType
-import zlc.season.butterfly.compiler.ComposableHelper.paramsViewModelComposableLambdaType
-import zlc.season.butterfly.compiler.ComposableHelper.viewModelComposableLambdaType
+import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
+import zlc.season.butterfly.compiler.ComposableInfo
+import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME
+import zlc.season.butterfly.compiler.utils.composableClassName
+import zlc.season.butterfly.compiler.generator.ComposableHelper.composableLambdaType
+import zlc.season.butterfly.compiler.generator.ComposableHelper.paramsComposableLambdaType
+import zlc.season.butterfly.compiler.generator.ComposableHelper.paramsViewModelComposableLambdaType
+import zlc.season.butterfly.compiler.generator.ComposableHelper.viewModelComposableLambdaType
 import java.io.File
 
 /**
@@ -72,7 +80,7 @@ internal object ComposableHelper {
         get(parameters = listOf(bundleParams, anyParams), returnType = unitType)
             .copy(annotations = arrayListOf(composeAnnotation), nullable = true)
 
-    val superCls = ClassName("zlc.season.butterfly.compose", "AgileComposable")
+    val superCls = ClassName(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, "AgileComposable")
 }
 
 internal class ComposableGenerator(
@@ -84,21 +92,8 @@ internal class ComposableGenerator(
         }
     }
 
-    fun generateNew(codeGenerator: CodeGenerator) {
-        composableList.forEach {
-            val file = codeGenerator.createNewFile(
-                Dependencies(true),
-                packageName = COMPOSABLE_PACKAGE_NAME,
-                fileName = "${it.methodName}Composable"
-            )
-            val fileString = createFileSpec(it).toString()
-            file.write(fileString.toByteArray())
-            file.close()
-        }
-    }
-
-    private fun createFileSpec(composableInfo: ComposableInfo): FileSpec {
-        val classBuilder = TypeSpec.classBuilder("${composableInfo.methodName}Composable")
+    fun createFileSpec(composableInfo: ComposableInfo): FileSpec {
+        val classBuilder = TypeSpec.classBuilder(composableClassName(composableInfo.methodName))
             .superclass(ComposableHelper.superCls)
             .apply {
                 if (composableInfo.hasBundle) {
@@ -160,7 +155,7 @@ internal class ComposableGenerator(
                 }
             }
 
-        return FileSpec.builder(COMPOSABLE_PACKAGE_NAME, "${composableInfo.methodName}Composable")
+        return FileSpec.builder(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, composableClassName(composableInfo.methodName))
             .addType(classBuilder.build())
             .addImport(ClassName(composableInfo.packageName, composableInfo.methodName), "")
             .addImport(ComposableHelper.superCls, "")

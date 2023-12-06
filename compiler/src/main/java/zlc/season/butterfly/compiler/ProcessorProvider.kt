@@ -1,25 +1,32 @@
 package zlc.season.butterfly.compiler
 
-import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
-import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
-import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
-import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import com.google.devtools.ksp.symbol.KSType
-import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.google.devtools.ksp.validate
 import zlc.season.butterfly.annotation.Agile
 import zlc.season.butterfly.annotation.Evade
 import zlc.season.butterfly.annotation.EvadeImpl
+import zlc.season.butterfly.compiler.generator.ComposableGenerator
+import zlc.season.butterfly.compiler.generator.ModuleClassGenerator
+import zlc.season.butterfly.compiler.utils.BUTTERFLY_LOG_ENABLE
+import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME
+import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_MODULE_PACKAGE
+import zlc.season.butterfly.compiler.utils.TEMP_FILE_NAME
+import zlc.season.butterfly.compiler.utils.composableClassName
+import zlc.season.butterfly.compiler.utils.getGenerateModuleClassName
+import zlc.season.butterfly.compiler.visitor.AgileAnnotationVisitor
+import zlc.season.butterfly.compiler.visitor.EvadeAnnotationVisitor
+import zlc.season.butterfly.compiler.visitor.EvadeImplAnnotationVisitor
 
 class ProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
+        environment.options.forEach {
+            environment.logc("options: $it")
+        }
         return ButterflySymbolProcessor(environment)
     }
 }
@@ -29,105 +36,67 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
     private val evadeMap = mutableMapOf<String, String>()
     private val evadeImplMap = mutableMapOf<String, EvadeImplInfo>()
 
-    private val composableMap = mutableMapOf<ComposableInfo, KSFile>()
     private val composableList = mutableListOf<ComposableInfo>()
 
     private val sourceFileList = mutableListOf<KSFile>()
 
-    private lateinit var bundleClassType: KSType
-    private lateinit var viewModelClassType: KSType
-
-    private var packageName = DEFAULT_PACKAGE
+    private var packageName = DEFAULT_GENERATE_MODULE_PACKAGE
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        val bundleClass = resolver.getClassDeclarationByName(BUNDLE_CLASS_NAME)
-        bundleClass?.let {
-            bundleClassType = it.asStarProjectedType()
-        }
-        val viewModelClass = resolver.getClassDeclarationByName(VIEW_MODEL_CLASS_NAME)
-        viewModelClass?.let {
-            viewModelClassType = it.asStarProjectedType()
-        }
+        processAgileSymbols(resolver, sourceFileList)
+        processEvadeSymbols(resolver, sourceFileList)
+        processEvadeImplSymbols(resolver, sourceFileList)
 
-        val invalidAnnotated = mutableListOf<KSAnnotated>()
-
-        processAgileSymbols(resolver, invalidAnnotated, sourceFileList)
-        processEvadeSymbols(resolver, invalidAnnotated, sourceFileList)
-        processEvadeImplSymbols(resolver, invalidAnnotated, sourceFileList)
-
-        return invalidAnnotated
+        return emptyList()
     }
 
     private fun processAgileSymbols(
         resolver: Resolver,
-        invalidAnnotated: MutableList<KSAnnotated>,
         sourcesFile: MutableList<KSFile>
     ) {
         environment.logt("Start process Agile symbols...")
         val agileSymbols = resolver.getSymbolsWithAnnotation(Agile::class.qualifiedName!!)
-        environment.logc("find symbols: ${agileSymbols.toList()}")
+        environment.logc("find agile list: ${agileSymbols.toList()}")
 
         val visitor = AgileAnnotationVisitor(environment, resolver, agileMap, composableList, sourcesFile)
         agileSymbols.toList().forEach {
-            if (!it.validate()) {
-                invalidAnnotated.add(it)
-            } else {
-                it.accept(visitor, Unit)
-            }
+            it.accept(visitor, Unit)
         }
-
-        environment.logc("symbol process result: $agileMap")
-        environment.logc("Process Agile symbols end.")
+        environment.logc("process Agile symbols end.")
     }
 
     private fun processEvadeSymbols(
         resolver: Resolver,
-        invalidAnnotated: MutableList<KSAnnotated>,
         sourcesFile: MutableList<KSFile>
     ) {
         environment.logt("Start process Evade symbols...")
         val evadeSymbols = resolver.getSymbolsWithAnnotation(Evade::class.qualifiedName!!)
-        environment.logc("find symbols: ${evadeSymbols.toList()}")
+        environment.logc("find evade list: ${evadeSymbols.toList()}")
 
         val visitor = EvadeAnnotationVisitor(environment, evadeMap, sourcesFile)
         evadeSymbols.toList().forEach {
-            if (!it.validate()) {
-                invalidAnnotated.add(it)
-            } else {
-                it.accept(visitor, Unit)
-            }
+            it.accept(visitor, Unit)
         }
-
-        environment.logc("symbol process result: $evadeMap")
-        environment.logc("Process Evade symbols end.")
+        environment.logc("process Evade symbols end.")
     }
 
     private fun processEvadeImplSymbols(
         resolver: Resolver,
-        invalidAnnotated: MutableList<KSAnnotated>,
         sourcesFile: MutableList<KSFile>
     ) {
         environment.logt("Start process EvadeImpl symbols...")
         val evadeImplSymbols = resolver.getSymbolsWithAnnotation(EvadeImpl::class.qualifiedName!!)
-        environment.logc("find symbols: ${evadeImplSymbols.toList()}")
+        environment.logc("find evade impl list: ${evadeImplSymbols.toList()}")
 
         val visitor = EvadeImplAnnotationVisitor(environment, evadeImplMap, sourcesFile)
         evadeImplSymbols.toList().forEach {
-            if (!it.validate()) {
-                invalidAnnotated.add(it)
-            } else {
-                it.accept(visitor, Unit)
-            }
+            it.accept(visitor, Unit)
         }
-
-        environment.logc("symbol process result: $evadeImplMap")
-        environment.logc("Process EvadeImpl symbols end.")
+        environment.logc("process EvadeImpl symbols end.")
     }
 
-
     override fun finish() {
-        super.finish()
-
+        // create an empty temp file to get current module name
         val tempOutputFile = environment.codeGenerator.createNewFile(
             Dependencies(true),
             packageName = packageName,
@@ -137,165 +106,59 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
 
         val tempFile = environment.codeGenerator.generatedFile.find { it.name.startsWith(TEMP_FILE_NAME) }
         tempFile?.let {
-            val composableGenerator = ComposableGenerator(composableList)
-            composableGenerator.generateNew(environment.codeGenerator)
-            environment.logc("Generate compose file end.")
+            // generate composable class file first.
+            if (composableList.isNotEmpty()) {
+                environment.logt("Generate composable classes...")
+                val composableGenerator = ComposableGenerator(composableList)
+                composableList.forEach { composableInfo ->
+                    val composableClassName = composableClassName(composableInfo.methodName)
+                    environment.logc("generate composable class file: $composableClassName")
 
-            val generateDir = it.absolutePath
-            val className = getModuleNameNew(generateDir)
-            environment.logc("Generate module class: $className")
+                    val composableClassFile = environment.codeGenerator.createNewFile(
+                        Dependencies(true),
+                        packageName = DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME,
+                        fileName = composableClassName(composableInfo.methodName)
+                    )
+                    val composableClassContent = composableGenerator.createFileSpec(composableInfo).toString()
+                    composableClassFile.write(composableClassContent.toByteArray())
+                    composableClassFile.close()
+                }
+            }
 
-            val outputFile = environment.codeGenerator.createNewFile(
+            // generate module class file.
+            val moduleClassName = getGenerateModuleClassName(it.absolutePath)
+            environment.logt("Generate module class file: $moduleClassName")
+
+            val moduleClassFile = environment.codeGenerator.createNewFile(
                 Dependencies(true, *sourceFileList.toTypedArray()),
                 packageName = packageName,
-                fileName = className
+                fileName = moduleClassName
             )
-            val generator = Generator(packageName, className, agileMap, evadeMap, evadeImplMap)
-            val fileString = generator.generate().toString()
-            outputFile.write(fileString.toByteArray())
-            outputFile.close()
-        }
-    }
-
-    override fun onError() {
-        super.onError()
-        environment.logc("process error")
-    }
-}
-
-private class AgileAnnotationVisitor(
-    private val environment: SymbolProcessorEnvironment,
-    private val resolver: Resolver,
-    private val agileMap: MutableMap<String, String>,
-    private val composeList: MutableList<ComposableInfo>,
-    private val sourcesFile: MutableList<KSFile>
-) : KSVisitorVoid() {
-
-    private val bundleClassType = resolver.getClassDeclarationByName(BUNDLE_CLASS_NAME)!!.asStarProjectedType()
-    private val viewModelClassType = resolver.getClassDeclarationByName(VIEW_MODEL_CLASS_NAME)!!.asStarProjectedType()
-
-    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-        environment.logc("process symbol: $classDeclaration")
-        val annotations = classDeclaration.annotations.toList()
-        annotations.forEach { annotation ->
-            val schemeValue = annotation.arguments.find { it.name?.asString() == "scheme" }?.value as? String
-            val className = "${classDeclaration.packageName.asString()}.${classDeclaration.simpleName.asString()}"
-            schemeValue?.let {
-                environment.logc("symbol processed: key=$schemeValue, value=$className")
-                agileMap[schemeValue] = className
-
-                // add file to dependency
-                sourcesFile.add(classDeclaration.containingFile!!)
-            }
-        }
-    }
-
-    override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
-        environment.logc("process symbol: $function")
-        val annotations = function.annotations.toList()
-        annotations.forEach { annotation ->
-            val packageName = function.packageName.asString()
-            val methodName = function.simpleName.asString()
-
-            val schemeValue = annotation.arguments.find { it.name?.asString() == "scheme" }?.value as? String
-            schemeValue?.let {
-                if (function.parameters.isNotEmpty()) {
-                    when (function.parameters.size) {
-                        1 -> {
-                            val parameterKsType = function.parameters[0].type.resolve()
-                            if (parameterKsType.isAssignableFrom(bundleClassType)) {
-                                composeList.add(ComposableInfo(packageName, methodName, true, ""))
-                            } else if (parameterKsType.isAssignableFrom(viewModelClassType)) {
-                                val ksClassDeclaration = parameterKsType.declaration as KSClassDeclaration
-                                val packageName = ksClassDeclaration.packageName.asString()
-                                val className = ksClassDeclaration.simpleName.asString()
-                                val viewModelFullName = "$packageName.$className"
-                                composeList.add(ComposableInfo(packageName, methodName, false, viewModelFullName))
-                            } else {
-
-                            }
-                        }
-                    }
-                } else {
-                    composeList.add(ComposableInfo(packageName, methodName, false, ""))
-                }
-
-                val targetClassName = "$COMPOSABLE_PACKAGE_NAME.${methodName}Composable"
-                environment.logc("symbol processed: key=$schemeValue, value=$targetClassName")
-                agileMap[schemeValue] = targetClassName
-
-                // add file to dependency
-                sourcesFile.add(function.containingFile!!)
-            }
+            val moduleClassGenerator = ModuleClassGenerator(packageName, moduleClassName, agileMap, evadeMap, evadeImplMap)
+            val moduleClassContent = moduleClassGenerator.generate().toString()
+            moduleClassFile.write(moduleClassContent.toByteArray())
+            moduleClassFile.close()
         }
     }
 }
 
-private class EvadeAnnotationVisitor(
-    private val environment: SymbolProcessorEnvironment,
-    private val evadeMap: MutableMap<String, String>,
-    private val sourcesFile: MutableList<KSFile>
-) : KSVisitorVoid() {
-    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-        if (classDeclaration.classKind == ClassKind.INTERFACE) {
-            environment.logc("process symbol: $classDeclaration")
-            val annotations = classDeclaration.annotations.toList()
-            annotations.forEach { annotation ->
-                val identityValue = annotation.arguments.find { it.name?.asString() == "identity" }?.value as? String ?: ""
-                val realKey = identityValue.ifEmpty { classDeclaration.simpleName.asString() }
-                val className = "${classDeclaration.packageName.asString()}.${classDeclaration.simpleName.asString()}"
-                environment.logc("symbol processed: key=$realKey, value=$className")
-                evadeMap[realKey] = className
-
-                // add file to dependency
-                sourcesFile.add(classDeclaration.containingFile!!)
-            }
-        } else {
-            environment.logc("Invalid symbol: $classDeclaration. @Evade must be annotated at an interface!")
-        }
+internal fun SymbolProcessorEnvironment.logt(log: String) {
+    if (isEnableLog()) {
+        logger.warn("==== $log")
     }
 }
 
-private class EvadeImplAnnotationVisitor(
-    private val environment: SymbolProcessorEnvironment,
-    private val evadeImplMap: MutableMap<String, EvadeImplInfo>,
-    private val sourcesFile: MutableList<KSFile>
-) : KSVisitorVoid() {
-    override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-        if (classDeclaration.classKind == ClassKind.CLASS) {
-            environment.logc("process symbol: $classDeclaration")
-            val annotations = classDeclaration.annotations.toList()
-            annotations.forEach { annotation ->
-                val isSingleton = annotation.arguments.find { it.name?.asString() == "singleton" }?.value as? Boolean ?: true
-                val identityValue = annotation.arguments.find { it.name?.asString() == "identity" }?.value as? String ?: ""
-                val classSimpleName = classDeclaration.simpleName.asString()
-
-                if (identityValue.isEmpty() && !classSimpleName.endsWith("Impl")) {
-                    environment.logc("Invalid symbol: $classDeclaration. If your @EvadeImpl class does not provide identity value, then the class name must end with Impl!")
-                } else {
-                    val realKey = identityValue.ifEmpty {
-                        val index = classSimpleName.lastIndexOf("Impl")
-                        classSimpleName.substring(0, index)
-                    }
-                    val className = "${classDeclaration.packageName.asString()}.${classDeclaration.simpleName.asString()}"
-                    environment.logc("symbol processed: key=$realKey, value=$className")
-                    evadeImplMap[realKey] = EvadeImplInfo(className, isSingleton)
-
-                    // add file to dependency
-                    sourcesFile.add(classDeclaration.containingFile!!)
-                }
-            }
-        } else {
-            environment.logc("Invalid symbol: $classDeclaration. @EvadeImpl must be annotated at an class!")
-        }
+internal fun SymbolProcessorEnvironment.logc(log: String) {
+    if (isEnableLog()) {
+        logger.warn("---- $log")
     }
 }
 
-
-private fun SymbolProcessorEnvironment.logt(log: String) {
-    logger.warn("==== $log")
+internal fun SymbolProcessorEnvironment.loge(log: String) {
+    logger.error(log)
 }
 
-private fun SymbolProcessorEnvironment.logc(log: String) {
-    logger.warn("---- $log")
+private fun SymbolProcessorEnvironment.isEnableLog(): Boolean {
+    val value = options[BUTTERFLY_LOG_ENABLE]
+    return value == "true"
 }

@@ -2,9 +2,9 @@ package zlc.season.butterfly.compiler
 
 import com.google.devtools.ksp.symbol.KSFile
 
-internal data class EvadeImplInfo(val className: String, val singleton: Boolean)
+data class EvadeImplInfo(val className: String, val singleton: Boolean)
 
-internal data class ComposableInfo(
+data class ComposableInfo(
     val packageName: String,
     val methodName: String,
     val hasBundle: Boolean,
