@@ -5,27 +5,14 @@ plugins {
     alias(libs.plugins.library)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.butterfly)
-
     alias(libs.plugins.ksp)
+    alias(libs.plugins.butterfly)
 }
 
 androidLibrary {
     namespace = "zlc.season.foo"
 
     viewBinding { enable = true }
-
-    buildTypes {
-        debug {
-            kotlin {
-                sourceSets {
-                    main {
-                        kotlin.srcDir("build/generated/ksp/debug/kotlin")
-                    }
-                }
-            }
-        }
-    }
 }
 
 dependencies {

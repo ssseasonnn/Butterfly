@@ -19,4 +19,6 @@ dependencies {
     api(libs.compose.ui)
     api(libs.compose.runtime)
     api(libs.compose.viewmodel)
+
+    implementation(libs.bundles.unit.test)
 }

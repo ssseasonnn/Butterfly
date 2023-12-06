@@ -18,4 +18,6 @@ dependencies {
     api(libs.lifecycle.runtime.ktx)
     api(libs.fragment.ktx)
     api(libs.core.ktx)
+
+    implementation(libs.bundles.unit.test)
 }

@@ -1,5 +1,6 @@
 package zlc.season.butterflydemo
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import zlc.season.base.BaseActivity
 import zlc.season.base.Schemes
@@ -40,6 +41,7 @@ class FragmentDemoActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         Butterfly.retreat("result" to "Result from Activity")
     }
