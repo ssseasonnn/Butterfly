@@ -11,7 +11,7 @@ plugins {
 }
 
 androidLibrary {
-    namespace = "zlc.season.bar"
+    namespace = "zlc.season.feature2"
     enableCompose()
 }
 

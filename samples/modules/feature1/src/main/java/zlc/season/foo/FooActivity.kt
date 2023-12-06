@@ -33,7 +33,6 @@ class FooActivity : AppCompatActivity() {
         """.trimIndent()
 
         binding.btnFinish.setOnClickListener {
-//            finish()
             Butterfly.retreat("result" to "asb")
         }
     }

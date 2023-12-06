@@ -10,7 +10,7 @@ plugins {
 }
 
 androidLibrary {
-    namespace = "zlc.season.foo"
+    namespace = "zlc.season.feature1"
 
     viewBinding { enable = true }
 }
