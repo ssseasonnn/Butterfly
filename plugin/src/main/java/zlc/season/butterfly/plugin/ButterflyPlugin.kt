@@ -21,10 +21,10 @@ class ButterflyPlugin : Plugin<Project> {
                 val cleanTask = project.tasks.named("clean")
                 cleanTask.dependsOn(task)
 
-                variant.transformClassesWith(ModuleClassVisitorFactory::class.java, InstrumentationScope.ALL) {
+                variant.instrumentation.transformClassesWith(ModuleClassVisitorFactory::class.java, InstrumentationScope.ALL) {
                     it.invalidate.setDisallowChanges(System.currentTimeMillis())
                 }
-                variant.setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS)
+                variant.instrumentation.setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS)
             }
         }
     }
