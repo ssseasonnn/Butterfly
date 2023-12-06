@@ -7,17 +7,17 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import zlc.season.butterfly.compiler.utils.AGILE_SCHEME_KEY
-import zlc.season.butterfly.compiler.utils.BUNDLE_CLASS_NAME
 import zlc.season.butterfly.compiler.ComposableInfo
-import zlc.season.butterfly.compiler.utils.VIEW_MODEL_CLASS_NAME
-import zlc.season.butterfly.compiler.utils.composableFullClassName
-import zlc.season.butterfly.compiler.utils.getClassFullName
-import zlc.season.butterfly.compiler.utils.getValue
 import zlc.season.butterfly.compiler.logc
 import zlc.season.butterfly.compiler.loge
 import zlc.season.butterfly.compiler.utils.AGILE_NAME
+import zlc.season.butterfly.compiler.utils.AGILE_SCHEME_KEY
+import zlc.season.butterfly.compiler.utils.BUNDLE_CLASS_NAME
+import zlc.season.butterfly.compiler.utils.VIEW_MODEL_CLASS_NAME
+import zlc.season.butterfly.compiler.utils.composableFullClassName
 import zlc.season.butterfly.compiler.utils.getAnnotationByName
+import zlc.season.butterfly.compiler.utils.getClassFullName
+import zlc.season.butterfly.compiler.utils.getValue
 
 class AgileAnnotationVisitor(
     private val environment: SymbolProcessorEnvironment,
@@ -73,8 +73,8 @@ class AgileAnnotationVisitor(
                         2 -> {
                             val firstParameterKsType = function.parameters[0].type.resolve()
                             val secondParameterKsType = function.parameters[1].type.resolve()
-                            val isBundleFirst = firstParameterKsType.isAssignableFrom(bundleClassType)
-                            val isViewModelSecond = secondParameterKsType.isAssignableFrom(viewModelClassType)
+                            val isBundleFirst = bundleClassType.isAssignableFrom(firstParameterKsType)
+                            val isViewModelSecond = viewModelClassType.isAssignableFrom(secondParameterKsType)
 
                             if (isBundleFirst && isViewModelSecond) {
                                 val viewModelClassName = secondParameterKsType.getClassFullName()

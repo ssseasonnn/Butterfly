@@ -6,7 +6,6 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
-import com.android.build.gradle.internal.dsl.BuildType
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 

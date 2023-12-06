@@ -1,5 +1,4 @@
 import zlc.season.buildlogic.base.androidLibrary
-import zlc.season.buildlogic.base.enableCompose
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -12,18 +11,6 @@ plugins {
 
 androidLibrary {
     namespace = "zlc.season.base"
-
-    buildTypes {
-        debug {
-            kotlin {
-                sourceSets {
-                    main {
-                        kotlin.srcDir("build/generated/ksp/debug/kotlin")
-                    }
-                }
-            }
-        }
-    }
 }
 
 dependencies {
