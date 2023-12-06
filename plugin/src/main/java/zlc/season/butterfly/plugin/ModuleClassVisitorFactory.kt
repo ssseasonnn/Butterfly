@@ -20,23 +20,23 @@ object ModuleHolder {
     private val modulesMap = ConcurrentHashMap<String, String>()
 
     fun printCurrentModules() {
-        println("Butterfly --> Current module info ${modulesMap.values}")
+        "Current module info ${modulesMap.values}".log()
     }
 
     fun addModule(moduleName: String) {
         modulesMap[moduleName] = moduleName
-        println("Butterfly --> Found module $moduleName")
+        "Found module $moduleName".log()
     }
 
     fun forEach(block: (String) -> Unit) {
         modulesMap.values.forEach {
-            println("Butterfly --> Auto register module $it")
+            "Auto register module $it".log()
             block(it)
         }
     }
 
     fun clearModule() {
-        println("Butterfly --> Clear module info...")
+        "Clear module info...".log()
         modulesMap.clear()
     }
 }
@@ -58,7 +58,7 @@ abstract class ModuleClassVisitorFactory : AsmClassVisitorFactory<ModuleClassVis
         }
 
         return if (classData.superClasses.contains("android.app.Application")) {
-            println("Butterfly --> Found application: ${classData.className}")
+            "Found application: ${classData.className}".log()
             true
         } else {
             false

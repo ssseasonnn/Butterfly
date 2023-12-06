@@ -9,6 +9,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import java.util.Locale
 
 class ButterflyPlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -16,7 +17,7 @@ class ButterflyPlugin : Plugin<Project> {
             val androidComponentsExtension = project.extensions.getByType(AndroidComponentsExtension::class.java)
             androidComponentsExtension.onVariants { variant ->
 
-                val task = project.tasks.register("clean${variant.name.capitalize()}ButterflyModule", CleanModuleMapTask::class.java) {}
+                val task = project.tasks.register("clean${variant.name.cap()}ButterflyModule", CleanModuleMapTask::class.java) {}
                 val cleanTask = project.tasks.named("clean")
                 cleanTask.dependsOn(task)
 
@@ -26,6 +27,10 @@ class ButterflyPlugin : Plugin<Project> {
                 variant.setAsmFramesComputationMode(FramesComputationMode.COMPUTE_FRAMES_FOR_INSTRUMENTED_METHODS)
             }
         }
+    }
+
+    private fun String.cap(): String {
+        return replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
     }
 }
 
