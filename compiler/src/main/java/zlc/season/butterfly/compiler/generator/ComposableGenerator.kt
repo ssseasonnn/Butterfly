@@ -83,15 +83,7 @@ internal object ComposableHelper {
     val superCls = ClassName(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, "AgileComposable")
 }
 
-internal class ComposableGenerator(
-    private val composableList: List<ComposableInfo>
-) {
-    fun generate(file: File) {
-        composableList.forEach {
-            createFileSpec(it).writeTo(file)
-        }
-    }
-
+internal class ComposableGenerator {
     fun createFileSpec(composableInfo: ComposableInfo): FileSpec {
         val classBuilder = TypeSpec.classBuilder(composableClassName(composableInfo.methodName))
             .superclass(ComposableHelper.superCls)

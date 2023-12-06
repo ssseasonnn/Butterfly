@@ -109,7 +109,7 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
             // generate composable class file first.
             if (composableList.isNotEmpty()) {
                 environment.logt("Generate composable classes...")
-                val composableGenerator = ComposableGenerator(composableList)
+                val composableGenerator = ComposableGenerator()
                 composableList.forEach { composableInfo ->
                     val composableClassName = composableClassName(composableInfo.methodName)
                     environment.logc("generate composable class file: $composableClassName")
