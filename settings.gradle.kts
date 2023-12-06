@@ -37,7 +37,7 @@ include(":samples:modules")
 
 include(":samples:modules:base")
 include(":samples:modules:feature2")
-include(":samples:modules:foo")
+include(":samples:modules:feature1")
 
 include(":samples:modules:compose")
 include(":samples:modules:compose:compose_home")

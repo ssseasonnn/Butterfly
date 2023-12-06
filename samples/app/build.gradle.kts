@@ -33,7 +33,7 @@ dependencies {
     implementation(project(":samples:modules:compose:compose_notifications"))
 
     implementation(project(":samples:modules:base"))
-    implementation(project(":samples:modules:foo"))
+    implementation(project(":samples:modules:feature1"))
     implementation(project(":samples:modules:feature2"))
 
     ksp(project(":compiler"))
