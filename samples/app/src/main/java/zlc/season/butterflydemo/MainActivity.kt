@@ -3,7 +3,7 @@ package zlc.season.butterflydemo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.delay
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.butterfly.AgileRequest
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.ButterflyInterceptor
@@ -18,23 +18,23 @@ class MainActivity : AppCompatActivity() {
 
 //        ButterflyCore.addInterceptor(TestInterceptor())
 
-        binding.startAgileTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_AGILE_TEST).carry(this)
+        binding.startDestinationTest.setOnClickListener {
+            Butterfly.agile(Destinations.DESTINATION_TEST).carry(this)
         }
         binding.btnFragmentTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_DEMO).carry(this)
+            Butterfly.agile(Destinations.FRAGMENT_DEMO).carry(this)
         }
         binding.btnBottomNavigationTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_BOTTOM_NAVIGATION).carry(this)
+            Butterfly.agile(Destinations.FRAGMENT_BOTTOM_NAVIGATION).carry(this)
         }
         binding.btnComposeTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_DEMO).carry(this)
+            Butterfly.agile(Destinations.COMPOSE_DEMO).carry(this)
         }
         binding.btnComposeBottomNavigationTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_COMPOSE_BOTTOM_NAVIGATION).carry(this)
+            Butterfly.agile(Destinations.COMPOSE_BOTTOM_NAVIGATION).carry(this)
         }
         binding.startEvadeTest.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_EVADE_TEST).carry(this)
+            Butterfly.agile(Destinations.EVADE_TEST).carry(this)
         }
     }
 

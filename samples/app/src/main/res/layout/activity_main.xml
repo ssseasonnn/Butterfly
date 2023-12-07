@@ -15,12 +15,12 @@
         android:paddingBottom="20dp">
 
         <Button
-            android:id="@+id/startAgileTest"
+            android:id="@+id/startDestinationTest"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Agile Demo"
+            android:text="Destination Demo"
             android:textColor="@color/black" />
 
         <Button
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Bottom Navigation DEMO"
+            android:text="BottomNavigation DEMO"
             android:textColor="@color/black" />
 
         <Button
@@ -56,7 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
-            android:text="Compose Navigation DEMO"
+            android:text="Compose BottomNavigation DEMO"
             android:textColor="@color/black" />
 
         <Button

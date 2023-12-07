@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 
-@Agile(Schemes.SCHEME_COMPOSE_B)
+@Destination(Destinations.COMPOSE_B)
 @Composable
 fun ComposeScreenB() {
     val ctx = LocalContext.current
@@ -37,7 +37,7 @@ fun ComposeScreenB() {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
+                    Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -46,7 +46,7 @@ fun ComposeScreenB() {
                 var clearTop by remember { mutableStateOf(false) }
 
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_A)
+                    Butterfly.agile(Destinations.COMPOSE_A)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -61,7 +61,7 @@ fun ComposeScreenB() {
                     Text(text = "Next To A")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_B)
+                    Butterfly.agile(Destinations.COMPOSE_B)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -76,7 +76,7 @@ fun ComposeScreenB() {
                     Text(text = "Next To B")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_C)
+                    Butterfly.agile(Destinations.COMPOSE_C)
                         .run {
                             if (clearTop) {
                                 clearTop()

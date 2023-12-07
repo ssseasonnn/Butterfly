@@ -7,7 +7,7 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSFile
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.butterfly.annotation.Evade
 import zlc.season.butterfly.annotation.EvadeImpl
 import zlc.season.butterfly.compiler.generator.ComposableGenerator
@@ -16,9 +16,9 @@ import zlc.season.butterfly.compiler.utils.BUTTERFLY_LOG_ENABLE
 import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME
 import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_MODULE_PACKAGE
 import zlc.season.butterfly.compiler.utils.TEMP_FILE_NAME
-import zlc.season.butterfly.compiler.utils.composableClassName
+import zlc.season.butterfly.compiler.utils.composeDestinationClassName
 import zlc.season.butterfly.compiler.utils.getGenerateModuleClassName
-import zlc.season.butterfly.compiler.visitor.AgileAnnotationVisitor
+import zlc.season.butterfly.compiler.visitor.DestinationAnnotationVisitor
 import zlc.season.butterfly.compiler.visitor.EvadeAnnotationVisitor
 import zlc.season.butterfly.compiler.visitor.EvadeImplAnnotationVisitor
 
@@ -32,37 +32,37 @@ class ProcessorProvider : SymbolProcessorProvider {
 }
 
 private class ButterflySymbolProcessor(private val environment: SymbolProcessorEnvironment) : SymbolProcessor {
-    private val agileMap = mutableMapOf<String, String>()
+    private val destinationMap = mutableMapOf<String, String>()
     private val evadeMap = mutableMapOf<String, String>()
     private val evadeImplMap = mutableMapOf<String, EvadeImplInfo>()
 
-    private val composableList = mutableListOf<ComposableInfo>()
+    private val composableList = mutableListOf<ComposeDestinationInfo>()
 
     private val sourceFileList = mutableListOf<KSFile>()
 
     private var packageName = DEFAULT_GENERATE_MODULE_PACKAGE
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
-        processAgileSymbols(resolver, sourceFileList)
+        processDestinationSymbols(resolver, sourceFileList)
         processEvadeSymbols(resolver, sourceFileList)
         processEvadeImplSymbols(resolver, sourceFileList)
 
         return emptyList()
     }
 
-    private fun processAgileSymbols(
+    private fun processDestinationSymbols(
         resolver: Resolver,
         sourcesFile: MutableList<KSFile>
     ) {
-        environment.logt("Start process Agile symbols...")
-        val agileSymbols = resolver.getSymbolsWithAnnotation(Agile::class.qualifiedName!!)
-        environment.logc("find agile list: ${agileSymbols.toList()}")
+        environment.logt("Start process Destination symbols...")
+        val destinationSymbols = resolver.getSymbolsWithAnnotation(Destination::class.qualifiedName!!)
+        environment.logc("find destination list: ${destinationSymbols.toList()}")
 
-        val visitor = AgileAnnotationVisitor(environment, resolver, agileMap, composableList, sourcesFile)
-        agileSymbols.toList().forEach {
+        val visitor = DestinationAnnotationVisitor(environment, resolver, destinationMap, composableList, sourcesFile)
+        destinationSymbols.toList().forEach {
             it.accept(visitor, Unit)
         }
-        environment.logc("process Agile symbols end.")
+        environment.logc("process Destination symbols end.")
     }
 
     private fun processEvadeSymbols(
@@ -111,13 +111,13 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
                 environment.logt("Generate composable classes...")
                 val composableGenerator = ComposableGenerator()
                 composableList.forEach { composableInfo ->
-                    val composableClassName = composableClassName(composableInfo.methodName)
+                    val composableClassName = composeDestinationClassName(composableInfo.methodName)
                     environment.logc("generate composable class file: $composableClassName")
 
                     val composableClassFile = environment.codeGenerator.createNewFile(
                         Dependencies(true),
                         packageName = DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME,
-                        fileName = composableClassName(composableInfo.methodName)
+                        fileName = composeDestinationClassName(composableInfo.methodName)
                     )
                     val composableClassContent = composableGenerator.createFileSpec(composableInfo).toString()
                     composableClassFile.write(composableClassContent.toByteArray())
@@ -134,7 +134,7 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
                 packageName = packageName,
                 fileName = moduleClassName
             )
-            val moduleClassGenerator = ModuleClassGenerator(packageName, moduleClassName, agileMap, evadeMap, evadeImplMap)
+            val moduleClassGenerator = ModuleClassGenerator(packageName, moduleClassName, destinationMap, evadeMap, evadeImplMap)
             val moduleClassContent = moduleClassGenerator.generate().toString()
             moduleClassFile.write(moduleClassContent.toByteArray())
             moduleClassFile.close()

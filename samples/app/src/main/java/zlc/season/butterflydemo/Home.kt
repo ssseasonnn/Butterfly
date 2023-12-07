@@ -2,7 +2,7 @@ package zlc.season.butterflydemo
 
 import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.Evade
-import zlc.season.butterfly.compose.AgileComposable
+import zlc.season.butterfly.compose.ComposeDestination
 
 @Evade
 interface Home {
@@ -10,5 +10,5 @@ interface Home {
     fun showHome(fragmentManager: FragmentManager, container: Int)
     fun hideHome(fragmentManager: FragmentManager)
 
-    fun testCompose(): AgileComposable
+    fun testCompose(): ComposeDestination
 }

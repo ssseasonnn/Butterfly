@@ -18,7 +18,7 @@ class ModuleManager {
     fun queryAgile(scheme: String): AgileRequest {
         var result = ""
         modules.forEach {
-            val find = it.getAgile()[scheme]
+            val find = it.getDestination()[scheme]
             if (find != null) {
                 result = find.name
                 return@forEach

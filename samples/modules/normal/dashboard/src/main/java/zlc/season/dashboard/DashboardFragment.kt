@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import zlc.season.base.Schemes
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.base.Destinations
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.dashboard.databinding.FragmentDashboardBinding
 
-@Agile(Schemes.SCHEME_DASHBOARD)
+@Destination(Destinations.DASHBOARD)
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null

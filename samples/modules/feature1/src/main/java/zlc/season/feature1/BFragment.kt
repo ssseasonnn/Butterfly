@@ -1,19 +1,19 @@
-package zlc.season.foo
+package zlc.season.feature1
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import zlc.season.base.BaseFragment
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
 import zlc.season.butterfly.Butterfly.retreat
-import zlc.season.butterfly.annotation.Agile
-import zlc.season.foo.databinding.FragmentCommonBinding
+import zlc.season.butterfly.annotation.Destination
+import zlc.season.feature1.databinding.FragmentCommonBinding
 
-@Agile(Schemes.SCHEME_FRAGMENT_C)
-class CFragment : BaseFragment() {
+@Destination(Destinations.FRAGMENT_B)
+class BFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -24,20 +24,20 @@ class CFragment : BaseFragment() {
     }
 
     private fun FragmentCommonBinding.setup() {
-        root.setBackgroundResource(R.color.yellow)
-        tvContent.text = "Fragment C ${hashCode()}"
+        root.setBackgroundResource(R.color.green)
+        tvContent.text = "Fragment B ${hashCode()}"
         btnBack.setOnClickListener {
-            retreat("result" to "Result from C")
+            retreat("result" to "Result from B")
         }
         btnDialog.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT)
+            Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT)
                 .carry(requireContext()) {
                     val result by it.params<String>()
                     tvResult.text = result
                 }
         }
         btnNextA.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_A)
+            Butterfly.agile(Destinations.FRAGMENT_A)
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()
@@ -53,7 +53,7 @@ class CFragment : BaseFragment() {
                 }
         }
         btnNextB.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_B)
+            Butterfly.agile(Destinations.FRAGMENT_B)
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()
@@ -69,7 +69,7 @@ class CFragment : BaseFragment() {
                 }
         }
         btnNextC.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_C)
+            Butterfly.agile(Destinations.FRAGMENT_C)
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()

@@ -9,14 +9,14 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
-import zlc.season.butterfly.compiler.ComposableInfo
+import zlc.season.butterfly.compiler.ComposeDestinationInfo
 import zlc.season.butterfly.compiler.utils.DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME
-import zlc.season.butterfly.compiler.utils.composableClassName
+import zlc.season.butterfly.compiler.utils.composeDestinationClassName
 import zlc.season.butterfly.compiler.generator.ComposableHelper.composableLambdaType
 import zlc.season.butterfly.compiler.generator.ComposableHelper.paramsComposableLambdaType
 import zlc.season.butterfly.compiler.generator.ComposableHelper.paramsViewModelComposableLambdaType
 import zlc.season.butterfly.compiler.generator.ComposableHelper.viewModelComposableLambdaType
-import java.io.File
+import zlc.season.butterfly.compiler.utils.COMPOSE_DESTINATION_CLASS
 
 /**
 Generated file:
@@ -28,10 +28,10 @@ import androidx.compose.runtime.Composable
 import kotlin.Any
 import kotlin.String
 import kotlin.Unit
-import zlc.season.butterfly.compose.AgileComposable
+import zlc.season.butterfly.compose.ComposeDestination
 import zlc.season.compose.dashboard.DashboardScreen
 
-public class DashboardScreenComposable : AgileComposable() {
+public class DashboardScreenComposeDestination : ComposeDestination() {
 public override val composable: @Composable (() -> Unit)? =
 @Composable {
 DashboardScreen()
@@ -80,21 +80,21 @@ internal object ComposableHelper {
         get(parameters = listOf(bundleParams, anyParams), returnType = unitType)
             .copy(annotations = arrayListOf(composeAnnotation), nullable = true)
 
-    val superCls = ClassName(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, "AgileComposable")
+    val superCls = ClassName(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, COMPOSE_DESTINATION_CLASS)
 }
 
 internal class ComposableGenerator {
-    fun createFileSpec(composableInfo: ComposableInfo): FileSpec {
-        val classBuilder = TypeSpec.classBuilder(composableClassName(composableInfo.methodName))
+    fun createFileSpec(composeDestinationInfo: ComposeDestinationInfo): FileSpec {
+        val classBuilder = TypeSpec.classBuilder(composeDestinationClassName(composeDestinationInfo.methodName))
             .superclass(ComposableHelper.superCls)
             .apply {
-                if (composableInfo.hasBundle) {
-                    if (composableInfo.viewModelName.isNotEmpty()) {
+                if (composeDestinationInfo.hasBundle) {
+                    if (composeDestinationInfo.viewModelName.isNotEmpty()) {
                         addProperty(
                             PropertySpec.builder("paramsViewModelComposable", paramsViewModelComposableLambdaType)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """@Composable { bundle, viewModel -> ${composableInfo.methodName}(bundle, viewModel as ${composableInfo.viewModelName}) }""".trimIndent()
+                                    """@Composable { bundle, viewModel -> ${composeDestinationInfo.methodName}(bundle, viewModel as ${composeDestinationInfo.viewModelName}) }""".trimIndent()
                                 )
                                 .build()
                         )
@@ -102,7 +102,7 @@ internal class ComposableGenerator {
                             PropertySpec.builder("viewModelClass", String::class)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """ "${composableInfo.viewModelName}" """.trimIndent()
+                                    """ "${composeDestinationInfo.viewModelName}" """.trimIndent()
                                 )
                                 .build()
                         )
@@ -111,18 +111,18 @@ internal class ComposableGenerator {
                             PropertySpec.builder("paramsComposable", paramsComposableLambdaType)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """@Composable { bundle -> ${composableInfo.methodName}(bundle) }""".trimIndent()
+                                    """@Composable { bundle -> ${composeDestinationInfo.methodName}(bundle) }""".trimIndent()
                                 )
                                 .build()
                         )
                     }
                 } else {
-                    if (composableInfo.viewModelName.isNotEmpty()) {
+                    if (composeDestinationInfo.viewModelName.isNotEmpty()) {
                         addProperty(
                             PropertySpec.builder("viewModelComposable", viewModelComposableLambdaType)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """@Composable { viewModel -> ${composableInfo.methodName}(viewModel as ${composableInfo.viewModelName}) }""".trimIndent()
+                                    """@Composable { viewModel -> ${composeDestinationInfo.methodName}(viewModel as ${composeDestinationInfo.viewModelName}) }""".trimIndent()
                                 )
                                 .build()
                         )
@@ -130,7 +130,7 @@ internal class ComposableGenerator {
                             PropertySpec.builder("viewModelClass", String::class)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """ "${composableInfo.viewModelName}" """.trimIndent()
+                                    """ "${composeDestinationInfo.viewModelName}" """.trimIndent()
                                 )
                                 .build()
                         )
@@ -139,7 +139,7 @@ internal class ComposableGenerator {
                             PropertySpec.builder("composable", composableLambdaType)
                                 .addModifiers(KModifier.OVERRIDE)
                                 .initializer(
-                                    """@Composable { ${composableInfo.methodName}() }""".trimIndent()
+                                    """@Composable { ${composeDestinationInfo.methodName}() }""".trimIndent()
                                 )
                                 .build()
                         )
@@ -147,9 +147,9 @@ internal class ComposableGenerator {
                 }
             }
 
-        return FileSpec.builder(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, composableClassName(composableInfo.methodName))
+        return FileSpec.builder(DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME, composeDestinationClassName(composeDestinationInfo.methodName))
             .addType(classBuilder.build())
-            .addImport(ClassName(composableInfo.packageName, composableInfo.methodName), "")
+            .addImport(ClassName(composeDestinationInfo.packageName, composeDestinationInfo.methodName), "")
             .addImport(ComposableHelper.superCls, "")
             .build()
     }

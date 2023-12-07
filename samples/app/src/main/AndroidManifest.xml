@@ -38,7 +38,7 @@
             android:name=".EvadeTestActivity"
             android:exported="false" />
         <activity
-            android:name=".AgileTestActivity"
+            android:name=".DestinationTestActivity"
             android:exported="false" />
         <activity
             android:name=".FragmentDemoActivity"

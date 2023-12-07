@@ -1,4 +1,4 @@
-package zlc.season.foo
+package zlc.season.feature1
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -6,13 +6,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.bracer.params
-import zlc.season.butterfly.annotation.Agile
-import zlc.season.foo.databinding.ActivityFooResultBinding
+import zlc.season.butterfly.annotation.Destination
+import zlc.season.feature1.databinding.ActivityTestResultBinding
 
-@Agile(Schemes.SCHEME_FOO_RESULT)
-class FooResultActivity : AppCompatActivity() {
+@Destination(Destinations.TEST_RESULT)
+class TestResultActivity : AppCompatActivity() {
     val intValue by params<Int>()
     val booleanValue by params<Boolean>()
     val stringValue by params<String>()
@@ -22,7 +22,7 @@ class FooResultActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityFooResultBinding.inflate(layoutInflater)
+        val binding = ActivityTestResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.tvParam.text = """

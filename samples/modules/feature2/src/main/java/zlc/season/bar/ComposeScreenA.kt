@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 
-@Agile(Schemes.SCHEME_COMPOSE_A)
+@Destination(Destinations.COMPOSE_A)
 @Composable
 fun ComposeScreenA(bundle: Bundle = bundleOf()) {
     val id by bundle.params<Int>()
@@ -45,7 +45,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
+                    Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -54,7 +54,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                 var clearTop by remember { mutableStateOf(false) }
 
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_A)
+                    Butterfly.agile(Destinations.COMPOSE_A)
                         .params(bundleOf("id" to id + 1))
                         .run {
                             if (clearTop) {
@@ -70,7 +70,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                     Text(text = "Next To A")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_B)
+                    Butterfly.agile(Destinations.COMPOSE_B)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -85,7 +85,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                     Text(text = "Next To B")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_C)
+                    Butterfly.agile(Destinations.COMPOSE_C)
                         .run {
                             if (clearTop) {
                                 clearTop()

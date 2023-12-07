@@ -2,12 +2,12 @@ package zlc.season.butterflydemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.butterflydemo.databinding.ActivityComposeBottomNavigationBinding
 
-@Agile(Schemes.SCHEME_COMPOSE_BOTTOM_NAVIGATION)
+@Destination(Destinations.COMPOSE_BOTTOM_NAVIGATION)
 class ComposeBottomNavigationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,19 +17,19 @@ class ComposeBottomNavigationActivity : AppCompatActivity() {
         binding.navView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_HOME)
+                    Butterfly.agile(Destinations.COMPOSE_HOME)
                         .container(R.id.container)
                         .group()
                         .carry(this)
                 }
                 R.id.navigation_dashboard -> {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_DASHBOARD)
+                    Butterfly.agile(Destinations.COMPOSE_DASHBOARD)
                         .container(R.id.container)
                         .group()
                         .carry(this)
                 }
                 R.id.navigation_notifications -> {
-                    Butterfly.agile(Schemes.SCHEME_COMPOSE_NOTIFICATION)
+                    Butterfly.agile(Destinations.COMPOSE_NOTIFICATION)
                         .container(R.id.container)
                         .group()
                         .carry(this)

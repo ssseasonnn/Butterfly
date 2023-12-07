@@ -26,6 +26,6 @@
 -keep public class zlc.season.butterfly.ButterflyCore {*;}
 -keep public class * extends zlc.season.butterfly.Action
 
--keep @zlc.season.butterfly.annotation.Agile class * {*;}
+-keep @zlc.season.butterfly.annotation.Destination class * {*;}
 -keep @zlc.season.butterfly.annotation.Evade class * {*;}
 -keep @zlc.season.butterfly.annotation.EvadeImpl class * {*;}

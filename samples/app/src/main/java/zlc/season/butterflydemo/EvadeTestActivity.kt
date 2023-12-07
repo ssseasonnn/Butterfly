@@ -3,12 +3,12 @@ package zlc.season.butterflydemo
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.butterflydemo.databinding.ActivityEvadeTestBinding
 
-@Agile(Schemes.SCHEME_EVADE_TEST)
+@Destination(Destinations.EVADE_TEST)
 class EvadeTestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

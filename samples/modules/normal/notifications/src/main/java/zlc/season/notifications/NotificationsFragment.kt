@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import zlc.season.base.Schemes
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.base.Destinations
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.notifications.databinding.FragmentNotificationsBinding
 
-@Agile(Schemes.SCHEME_NOTIFICATION)
+@Destination(Destinations.NOTIFICATION)
 class NotificationsFragment : Fragment() {
 
     private var _binding: FragmentNotificationsBinding? = null

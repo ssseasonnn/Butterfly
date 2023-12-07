@@ -2,8 +2,8 @@ package zlc.season.butterfly.annotation
 
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-annotation class Agile(
-    val scheme: String
+annotation class Destination(
+    val route: String
 )
 
 @Retention(AnnotationRetention.BINARY)

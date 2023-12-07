@@ -10,10 +10,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import zlc.season.base.Schemes
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.base.Destinations
+import zlc.season.butterfly.annotation.Destination
 
-@Agile(Schemes.SCHEME_COMPOSE_NOTIFICATION)
+@Destination(Destinations.COMPOSE_NOTIFICATION)
 @Composable
 fun NotificationsScreen(viewModel: NotificationsViewModel) {
     val textFromViewModel = viewModel.text.collectAsState(initial = "")

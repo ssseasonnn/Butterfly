@@ -3,21 +3,21 @@ package zlc.season.butterflydemo
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
-import zlc.season.butterflydemo.databinding.ActivityAgileTestBinding
+import zlc.season.butterfly.annotation.Destination
+import zlc.season.butterflydemo.databinding.ActivityDestinationTestBinding
 
-@Agile(Schemes.SCHEME_AGILE_TEST)
-class AgileTestActivity : AppCompatActivity() {
+@Destination(Destinations.DESTINATION_TEST)
+class DestinationTestActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityAgileTestBinding.inflate(layoutInflater)
+        val binding = ActivityDestinationTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.startActivity.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FOO + "?a=1&b=2")
+            Butterfly.agile(Destinations.TEST + "?a=1&b=2")
                 .params(
                     "intValue" to 1,
                     "booleanValue" to true,
@@ -27,7 +27,7 @@ class AgileTestActivity : AppCompatActivity() {
         }
 
         binding.startActivityForResult.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FOO_RESULT + "?a=1&b=2")
+            Butterfly.agile(Destinations.TEST_RESULT + "?a=1&b=2")
                 .params(
                     "intValue" to 1,
                     "booleanValue" to true,
@@ -40,11 +40,11 @@ class AgileTestActivity : AppCompatActivity() {
         }
 
         binding.startAction.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_ACTION + "?a=1&b=2").carry(this)
+            Butterfly.agile(Destinations.ACTION + "?a=1&b=2").carry(this)
         }
 
         binding.startFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT)
+            Butterfly.agile(Destinations.FRAGMENT)
                 .carry(this) {
                     val abc by it.params<String>()
                     binding.tvResult.text = abc
@@ -52,11 +52,11 @@ class AgileTestActivity : AppCompatActivity() {
         }
 
         binding.startDialogFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_DIALOG_FRAGMbENT).carry(this)
+            Butterfly.agile(Destinations.DIALOG_FRAGMbENT).carry(this)
         }
 
         binding.startBottomSheetDialogFragment.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_BOTTOM_SHEET_DIALOG_FRAGMENT).carry(this)
+            Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(this)
         }
     }
 

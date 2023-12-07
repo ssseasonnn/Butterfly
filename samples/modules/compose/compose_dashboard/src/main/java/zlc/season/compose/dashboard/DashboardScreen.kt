@@ -12,10 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
-import zlc.season.base.Schemes
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.base.Destinations
+import zlc.season.butterfly.annotation.Destination
 
-@Agile(Schemes.SCHEME_COMPOSE_DASHBOARD)
+@Destination(Destinations.COMPOSE_DASHBOARD)
 @Composable
 fun DashboardScreen(test: Bundle = bundleOf(), viewModel: DashboardViewModel = DashboardViewModel()) {
     val textFromViewModel = viewModel.text.collectAsState(initial = "")

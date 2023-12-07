@@ -8,10 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import zlc.season.base.Schemes
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.base.Destinations
+import zlc.season.butterfly.annotation.Destination
 
-@Agile(Schemes.SCHEME_COMPOSE_HOME)
+@Destination(Destinations.COMPOSE_HOME)
 @Composable
 fun HomeScreen(test: Bundle) {
     Surface(modifier = Modifier.fillMaxSize()) {

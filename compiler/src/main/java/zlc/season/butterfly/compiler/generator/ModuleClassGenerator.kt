@@ -15,13 +15,13 @@ import zlc.season.butterfly.module.Module
 
 /**
  * public class ButterflyModuleApp() : Module {
- *  public val agileMap: HashMap<String, String> = hashMapOf<String, String>()
+ *  public val destinationMap: HashMap<String, String> = hashMapOf<String, String>()
  *  public val evadeMap: HashMap<String, String> = hashMapOf<String, String>()
  *  public val evadeImplMap: HashMap<String, EvadeData> = hashMapOf<String, EvadeData>()
  *
  *  init {
- *      agileMap["/path/foo"] = "zlc.season.butterflydemo.MainActivity"
- *      agileMap["/path/bar"] = "zlc.season.butterflydemo.TestActivity"
+ *      destinationMap["/path/foo"] = "zlc.season.butterflydemo.MainActivity"
+ *      destinationMap["/path/bar"] = "zlc.season.butterflydemo.TestActivity"
  *  }
  *
  *   *  init {
@@ -34,7 +34,7 @@ import zlc.season.butterfly.module.Module
  *      evadeImplMap["/path/bar"] = EvadeData("zlc.season.butterflydemo.Bar",false)
  *  }
  *
- *  public override fun getAgile(): HashMap<String, String> = agileMap
+ *  public override fun getDestination(): HashMap<String, String> = destinationMap
  *  public override fun getEvade(): HashMap<String, String> = evadeMap
  *  public override fun getEvadeImpl(): HashMap<String, EvadeData> = evadeImplMap
  * }
@@ -42,7 +42,7 @@ import zlc.season.butterfly.module.Module
 internal class ModuleClassGenerator(
     private val packageName: String,
     private val className: String,
-    private val agileMap: Map<String, String>,
+    private val destinationMap: Map<String, String>,
     private val evadeMap: Map<String, String>,
     private val evadeImplMap: Map<String, EvadeImplInfo>,
 ) {
@@ -64,7 +64,7 @@ internal class ModuleClassGenerator(
             .addSuperinterface(moduleClass)
             .primaryConstructor(FunSpec.constructorBuilder().build())
             .addProperty(
-                PropertySpec.builder("agileMap", mapClass)
+                PropertySpec.builder("destinationMap", mapClass)
                     .initializer("hashMapOf<String,  Class<*>>()")
                     .build()
             )
@@ -79,7 +79,7 @@ internal class ModuleClassGenerator(
                     .build()
             )
             .addInitializerBlock(
-                generateAgileMapBlock()
+                generateDestinationMapBlock()
             )
             .addInitializerBlock(
                 generateEvadeMapBlock()
@@ -88,9 +88,9 @@ internal class ModuleClassGenerator(
                 generateEvadeImplMapBlock()
             )
             .addFunction(
-                FunSpec.builder("getAgile")
+                FunSpec.builder("getDestination")
                     .addModifiers(KModifier.OVERRIDE)
-                    .addStatement("return agileMap")
+                    .addStatement("return destinationMap")
                     .returns(mapClass)
                     .build()
             )
@@ -115,10 +115,10 @@ internal class ModuleClassGenerator(
             .build()
     }
 
-    private fun generateAgileMapBlock(): CodeBlock {
+    private fun generateDestinationMapBlock(): CodeBlock {
         val builder = CodeBlock.Builder()
-        agileMap.forEach { (k, v) ->
-            builder.addStatement("""agileMap["$k"] = ${v}::class.java """)
+        destinationMap.forEach { (k, v) ->
+            builder.addStatement("""destinationMap["$k"] = ${v}::class.java """)
         }
         return builder.build()
     }

@@ -7,23 +7,23 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import zlc.season.butterfly.compiler.ComposableInfo
+import zlc.season.butterfly.compiler.ComposeDestinationInfo
 import zlc.season.butterfly.compiler.logc
 import zlc.season.butterfly.compiler.loge
-import zlc.season.butterfly.compiler.utils.AGILE_NAME
-import zlc.season.butterfly.compiler.utils.AGILE_SCHEME_KEY
 import zlc.season.butterfly.compiler.utils.BUNDLE_CLASS_NAME
+import zlc.season.butterfly.compiler.utils.DESTINATION_NAME
+import zlc.season.butterfly.compiler.utils.DESTINATION_ROUTE_KEY
 import zlc.season.butterfly.compiler.utils.VIEW_MODEL_CLASS_NAME
-import zlc.season.butterfly.compiler.utils.composableFullClassName
+import zlc.season.butterfly.compiler.utils.composeDestinationFullClassName
 import zlc.season.butterfly.compiler.utils.getAnnotationByName
 import zlc.season.butterfly.compiler.utils.getClassFullName
 import zlc.season.butterfly.compiler.utils.getValue
 
-class AgileAnnotationVisitor(
+class DestinationAnnotationVisitor(
     private val environment: SymbolProcessorEnvironment,
     private val resolver: Resolver,
-    private val agileMap: MutableMap<String, String>,
-    private val composeList: MutableList<ComposableInfo>,
+    private val destinationMap: MutableMap<String, String>,
+    private val composeList: MutableList<ComposeDestinationInfo>,
     private val sourcesFile: MutableList<KSFile>
 ) : KSVisitorVoid() {
 
@@ -31,14 +31,14 @@ class AgileAnnotationVisitor(
     private val viewModelClassType = resolver.getClassDeclarationByName(VIEW_MODEL_CLASS_NAME)!!.asStarProjectedType()
 
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
-        environment.logc("process agile: $classDeclaration")
-        val annotation = classDeclaration.getAnnotationByName(AGILE_NAME)
+        environment.logc("process destination: $classDeclaration")
+        val annotation = classDeclaration.getAnnotationByName(DESTINATION_NAME)
         if (annotation != null) {
-            val schemeValue = annotation.getValue(AGILE_SCHEME_KEY, "")
+            val schemeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
             val className = classDeclaration.getClassFullName()
             if (schemeValue.isNotEmpty()) {
-                environment.logc("agile processed: [scheme='$schemeValue', target='$className']")
-                agileMap[schemeValue] = className
+                environment.logc("destination processed: [scheme='$schemeValue', target='$className']")
+                destinationMap[schemeValue] = className
 
                 // add file to dependency
                 sourcesFile.add(classDeclaration.containingFile!!)
@@ -49,22 +49,22 @@ class AgileAnnotationVisitor(
     }
 
     override fun visitFunctionDeclaration(function: KSFunctionDeclaration, data: Unit) {
-        environment.logc("process agile composable: $function")
-        val annotation = function.getAnnotationByName(AGILE_NAME)
+        environment.logc("process compose destination: $function")
+        val annotation = function.getAnnotationByName(DESTINATION_NAME)
         if (annotation != null) {
             val packageName = function.packageName.asString()
             val methodName = function.simpleName.asString()
-            val schemeValue = annotation.getValue(AGILE_SCHEME_KEY, "")
+            val schemeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
             if (schemeValue.isNotEmpty()) {
                 if (function.parameters.isNotEmpty()) {
                     when (function.parameters.size) {
                         1 -> {
                             val parameterKsType = function.parameters[0].type.resolve()
                             if (bundleClassType.isAssignableFrom(parameterKsType)) {
-                                composeList.add(ComposableInfo(packageName, methodName, true, ""))
+                                composeList.add(ComposeDestinationInfo(packageName, methodName, true, ""))
                             } else if (viewModelClassType.isAssignableFrom(parameterKsType)) {
                                 val viewModelClassName = parameterKsType.getClassFullName()
-                                composeList.add(ComposableInfo(packageName, methodName, false, viewModelClassName))
+                                composeList.add(ComposeDestinationInfo(packageName, methodName, false, viewModelClassName))
                             } else {
                                 environment.loge("[$function] invalid parameter! Compose only support Bundle or ViewModel type!")
                             }
@@ -78,7 +78,7 @@ class AgileAnnotationVisitor(
 
                             if (isBundleFirst && isViewModelSecond) {
                                 val viewModelClassName = secondParameterKsType.getClassFullName()
-                                composeList.add(ComposableInfo(packageName, methodName, true, viewModelClassName))
+                                composeList.add(ComposeDestinationInfo(packageName, methodName, true, viewModelClassName))
                             } else {
                                 if (!isBundleFirst) {
                                     environment.loge("[$function] first parameter type must be Bundle!")
@@ -93,12 +93,12 @@ class AgileAnnotationVisitor(
                         }
                     }
                 } else {
-                    composeList.add(ComposableInfo(packageName, methodName, false, ""))
+                    composeList.add(ComposeDestinationInfo(packageName, methodName, false, ""))
                 }
 
-                val targetClassName = composableFullClassName(methodName)
-                environment.logc("agile composable processed: [scheme='$schemeValue', target='$targetClassName']")
-                agileMap[schemeValue] = targetClassName
+                val targetClassName = composeDestinationFullClassName(methodName)
+                environment.logc("compose destination processed: [scheme='$schemeValue', target='$targetClassName']")
+                destinationMap[schemeValue] = targetClassName
 
                 // add file to dependency
                 sourcesFile.add(function.containingFile!!)

@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.compose.AgileComposable
+import zlc.season.butterfly.compose.ComposeDestination
 import zlc.season.butterfly.compose.ComposeViewModel
 import zlc.season.butterfly.compose.ComposeViewModelStoreOwner
 import zlc.season.butterfly.compose.Utils.COMPOSE_VIEW_TAG
@@ -27,7 +27,7 @@ class ComposeBasicLauncher {
     }
 
     private fun ComponentActivity.invokeCompose(composeView: ComposeView, request: AgileRequest) {
-        val composable = Class.forName(request.className).newInstance() as AgileComposable
+        val composable = Class.forName(request.className).newInstance() as ComposeDestination
         composeView.setContent {
             val composeViewModel = ComposeViewModel.getInstance(viewModelStore)
             val composeViewModelStoreOwner = ComposeViewModelStoreOwner(composeViewModel, request)
@@ -53,7 +53,7 @@ class ComposeBasicLauncher {
     @Suppress("unchecked_cast")
     private fun getViewModel(
         viewModelStoreOwner: ComposeViewModelStoreOwner,
-        composable: AgileComposable
+        composable: ComposeDestination
     ): ViewModel {
         return ViewModelProvider(viewModelStoreOwner)[Class.forName(composable.viewModelClass) as Class<ViewModel>]
     }

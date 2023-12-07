@@ -4,7 +4,7 @@ import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.fragment.app.FragmentManager
 import zlc.season.butterfly.annotation.EvadeImpl
-import zlc.season.butterfly.compose.AgileComposable
+import zlc.season.butterfly.compose.ComposeDestination
 
 @EvadeImpl
 class HomeImpl {
@@ -36,8 +36,8 @@ class HomeImpl {
         }
     }
 
-    fun testCompose(): AgileComposable {
-        return AgileComposable(composable = @Composable {
+    fun testCompose(): ComposeDestination {
+        return ComposeDestination(composable = @Composable {
             BasicText("test compose")
         })
     }

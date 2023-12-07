@@ -14,11 +14,13 @@ const val TEMP_FILE_NAME = "Temp"
 const val BUNDLE_CLASS_NAME = "android.os.Bundle"
 const val VIEW_MODEL_CLASS_NAME = "androidx.lifecycle.ViewModel"
 
-const val AGILE_NAME = "Agile"
+const val DESTINATION_NAME = "Destination"
 const val EVADE_NAME = "Evade"
 const val EVADE_IMPL_NAME = "EvadeImpl"
 
-const val AGILE_SCHEME_KEY = "scheme"
+const val COMPOSE_DESTINATION_CLASS = "ComposeDestination"
+
+const val DESTINATION_ROUTE_KEY = "route"
 const val EVADE_IDENTITY_KEY = "identity"
 const val EVADE_SINGLETON_KEY = "singleton"
 
@@ -44,22 +46,22 @@ internal fun getGenerateModuleClassName(generateDir: String): String {
 /**
  * The name of each Composable function Class.
  */
-internal fun composableFullClassName(methodName: String): String {
-    return "$DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME.${methodName}Composable"
+internal fun composeDestinationFullClassName(methodName: String): String {
+    return "$DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME.${composeDestinationClassName(methodName)}"
 }
 
 /**
- * The name of generated Composable class.
+ * The name of generated ComposeDestination class.
  * eg:
- * @Agile
+ * @Destination("path")
  * @Composable
  * fun Test(){}
  *
  * will generate class:
- * class TestComposable: AgileComposable {}
+ * class TestComposeDestination: ComposeDestination {}
  */
-internal fun composableClassName(methodName: String): String {
-    return "${methodName}Composable"
+internal fun composeDestinationClassName(methodName: String): String {
+    return "${methodName}${COMPOSE_DESTINATION_CLASS}"
 }
 
 internal fun String.camelCase(): String {

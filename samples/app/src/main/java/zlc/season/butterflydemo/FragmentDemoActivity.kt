@@ -3,13 +3,13 @@ package zlc.season.butterflydemo
 import android.annotation.SuppressLint
 import android.os.Bundle
 import zlc.season.base.BaseActivity
-import zlc.season.base.Schemes
+import zlc.season.base.Destinations
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.annotation.Agile
+import zlc.season.butterfly.annotation.Destination
 import zlc.season.butterflydemo.databinding.ActivityFragmentDemoBinding
 
-@Agile(Schemes.SCHEME_FRAGMENT_DEMO)
+@Destination(Destinations.FRAGMENT_DEMO)
 class FragmentDemoActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,7 +17,7 @@ class FragmentDemoActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.btnStartA.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_A)
+            Butterfly.agile(Destinations.FRAGMENT_A)
                 .asRoot()
                 .carry(this) {
                     val result by it.params<String>()
@@ -26,14 +26,14 @@ class FragmentDemoActivity : BaseActivity() {
         }
 
         binding.btnStartB.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_B)
+            Butterfly.agile(Destinations.FRAGMENT_B)
                 .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
                 }
         }
         binding.btnStartC.setOnClickListener {
-            Butterfly.agile(Schemes.SCHEME_FRAGMENT_C)
+            Butterfly.agile(Destinations.FRAGMENT_C)
                 .carry(this) {
                     val result by it.params<String>()
                     binding.tvResult.text = result
