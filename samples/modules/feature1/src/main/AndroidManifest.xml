@@ -3,10 +3,10 @@
 
     <application>
         <activity
-            android:name=".FooResultActivity"
+            android:name=".TestActivity"
             android:exported="false" />
         <activity
-            android:name=".FooActivity"
+            android:name=".TestResultActivity"
             android:exported="false" />
     </application>
 
