@@ -1,29 +1,27 @@
-@file:OptIn(FlowPreview::class)
-
 package zlc.season.butterfly
 
 import android.content.Context
 import android.os.Bundle
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
-import zlc.season.butterfly.dispatcher.AgileDispatcher
-import zlc.season.butterfly.dispatcher.EvadeDispatcher
+import zlc.season.butterfly.core.EvadeManager
+import zlc.season.butterfly.core.InterceptorManager
+import zlc.season.butterfly.core.ModuleManager
+import zlc.season.butterfly.core.NavigatorManager
+import zlc.season.butterfly.entities.DestinationData
+import zlc.season.butterfly.entities.EvadeData
+import zlc.season.butterfly.interceptor.Interceptor
 import zlc.season.butterfly.module.Module
 
 object ButterflyCore {
     private val moduleManager = ModuleManager()
     private val interceptorManager = InterceptorManager()
-    private val agileDispatcher = AgileDispatcher()
-    private val evadeDispatcher = EvadeDispatcher()
+    private val navigatorManager = NavigatorManager()
+    private val evadeManager = EvadeManager()
 
     fun addModuleName(moduleName: String) {
         try {
             val cls = Class.forName(moduleName)
             if (Module::class.java.isAssignableFrom(cls)) {
-                val module = cls.newInstance() as Module
+                val module = cls.getDeclaredConstructor().newInstance() as Module
                 addModule(module)
             }
         } catch (ignore: Exception) {
@@ -35,40 +33,36 @@ object ButterflyCore {
 
     fun removeModule(module: Module) = moduleManager.removeModule(module)
 
-    fun addInterceptor(interceptor: ButterflyInterceptor) = interceptorManager.addInterceptor(interceptor)
+    fun addInterceptor(interceptor: Interceptor) = interceptorManager.addInterceptor(interceptor)
 
-    fun removeInterceptor(interceptor: ButterflyInterceptor) = interceptorManager.removeInterceptor(interceptor)
+    fun removeInterceptor(interceptor: Interceptor) =
+        interceptorManager.removeInterceptor(interceptor)
 
-    fun queryAgile(scheme: String): AgileRequest = moduleManager.queryAgile(scheme)
+    fun queryDestination(scheme: String): String = moduleManager.queryDestination(scheme)
 
-    fun queryEvade(identity: String): EvadeRequest = moduleManager.queryEvade(identity)
+    fun queryEvade(identity: String): EvadeData = moduleManager.queryEvade(identity)
 
-    fun dispatchAgile(
+    suspend fun dispatchDestination(
         context: Context,
-        request: AgileRequest,
+        destinationData: DestinationData,
         interceptorManager: InterceptorManager
-    ): Flow<Result<Bundle>> {
-        return flowOf(request)
-            .map {
-                if (it.enableGlobalInterceptor) {
-                    this.interceptorManager.intercept(it)
-                } else {
-                    it
-                }
-            }
-            .map {
-                interceptorManager.intercept(it)
-            }
-            .flatMapConcat {
-                agileDispatcher.dispatch(context, it)
-            }
+    ): Result<Bundle> {
+        var tempDestinationData = if (destinationData.enableGlobalInterceptor) {
+            this.interceptorManager.intercept(destinationData)
+        } else {
+            destinationData
+        }
+
+        tempDestinationData = interceptorManager.intercept(tempDestinationData)
+
+        return navigatorManager.navigate(context, tempDestinationData)
     }
 
-    fun dispatchRetreat(bundle: Bundle): AgileRequest? {
-        return agileDispatcher.retreat(bundle)
+    fun popBack(context: Context, bundle: Bundle): DestinationData? {
+        return navigatorManager.popBack(context, bundle)
     }
 
-    fun dispatchEvade(evadeRequest: EvadeRequest): Any {
-        return evadeDispatcher.dispatch(evadeRequest)
+    fun dispatchEvade(evadeData: EvadeData): Any {
+        return evadeManager.dispatch(evadeData)
     }
 }

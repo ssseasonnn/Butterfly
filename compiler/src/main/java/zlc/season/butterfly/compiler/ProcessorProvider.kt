@@ -21,6 +21,7 @@ import zlc.season.butterfly.compiler.utils.getGenerateModuleClassName
 import zlc.season.butterfly.compiler.visitor.DestinationAnnotationVisitor
 import zlc.season.butterfly.compiler.visitor.EvadeAnnotationVisitor
 import zlc.season.butterfly.compiler.visitor.EvadeImplAnnotationVisitor
+import java.io.File
 
 class ProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor {
@@ -108,37 +109,45 @@ private class ButterflySymbolProcessor(private val environment: SymbolProcessorE
         tempFile?.let {
             // generate composable class file first.
             if (composableList.isNotEmpty()) {
-                environment.logt("Generate composable classes...")
-                val composableGenerator = ComposableGenerator()
-                composableList.forEach { composableInfo ->
-                    val composableClassName = composeDestinationClassName(composableInfo.methodName)
-                    environment.logc("generate composable class file: $composableClassName")
-
-                    val composableClassFile = environment.codeGenerator.createNewFile(
-                        Dependencies(true),
-                        packageName = DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME,
-                        fileName = composeDestinationClassName(composableInfo.methodName)
-                    )
-                    val composableClassContent = composableGenerator.createFileSpec(composableInfo).toString()
-                    composableClassFile.write(composableClassContent.toByteArray())
-                    composableClassFile.close()
-                }
+                generateComposeDestinationClass()
             }
 
             // generate module class file.
-            val moduleClassName = getGenerateModuleClassName(it.absolutePath)
-            environment.logt("Generate module class file: $moduleClassName")
-
-            val moduleClassFile = environment.codeGenerator.createNewFile(
-                Dependencies(true, *sourceFileList.toTypedArray()),
-                packageName = packageName,
-                fileName = moduleClassName
-            )
-            val moduleClassGenerator = ModuleClassGenerator(packageName, moduleClassName, destinationMap, evadeMap, evadeImplMap)
-            val moduleClassContent = moduleClassGenerator.generate().toString()
-            moduleClassFile.write(moduleClassContent.toByteArray())
-            moduleClassFile.close()
+            generateModuleClass(it)
         }
+    }
+
+    private fun generateComposeDestinationClass() {
+        environment.logt("Generate compose destination classes...")
+        val composableGenerator = ComposableGenerator()
+        composableList.forEach { composableInfo ->
+            val composableClassName = composeDestinationClassName(composableInfo.methodName)
+            environment.logc("generate compose destination class file: $composableClassName")
+
+            val composableClassFile = environment.codeGenerator.createNewFile(
+                Dependencies(true),
+                packageName = DEFAULT_GENERATE_COMPOSABLE_PACKAGE_NAME,
+                fileName = composeDestinationClassName(composableInfo.methodName)
+            )
+            val composableClassContent = composableGenerator.createFileSpec(composableInfo).toString()
+            composableClassFile.write(composableClassContent.toByteArray())
+            composableClassFile.close()
+        }
+    }
+
+    private fun generateModuleClass(tempFile: File) {
+        val moduleClassName = getGenerateModuleClassName(tempFile.absolutePath)
+        environment.logt("Generate module class file: $moduleClassName")
+
+        val moduleClassFile = environment.codeGenerator.createNewFile(
+            Dependencies(true, *sourceFileList.toTypedArray()),
+            packageName = packageName,
+            fileName = moduleClassName
+        )
+        val moduleClassGenerator = ModuleClassGenerator(packageName, moduleClassName, destinationMap, evadeMap, evadeImplMap)
+        val moduleClassContent = moduleClassGenerator.generate().toString()
+        moduleClassFile.write(moduleClassContent.toByteArray())
+        moduleClassFile.close()
     }
 }
 

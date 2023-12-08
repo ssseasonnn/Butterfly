@@ -8,7 +8,6 @@ import androidx.fragment.app.DialogFragment
 import zlc.season.base.Destinations
 import zlc.season.base.Destinations.DIALOG_FRAGMbENT
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Destination
 import zlc.season.feature1.databinding.DialogTestBinding
 
@@ -25,14 +24,14 @@ class TestDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return DialogTestBinding.inflate(inflater, container, false).also {
             it.btnNext.setOnClickListener {
-                Butterfly.agile(Destinations.FRAGMENT).carry(requireContext())
+                Butterfly.of(requireContext()).navigate(Destinations.FRAGMENT)
                 dismiss()
             }
             it.btnBack.setOnClickListener {
-                retreat("result" to "Result from dialog!")
+                Butterfly.of(requireContext()).popBack("result" to "Result from dialog!")
             }
         }.root
     }

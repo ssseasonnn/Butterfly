@@ -8,47 +8,69 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.coroutines.flow.Flow
-import zlc.season.butterfly.AgileLauncherManager
+import kotlinx.coroutines.suspendCancellableCoroutine
+import zlc.season.butterfly.launcher.DestinationLauncherManager
+import zlc.season.butterfly.navigator.fragment.addFragment
+import zlc.season.butterfly.navigator.fragment.awaitFragmentResume
+import zlc.season.butterfly.navigator.fragment.removeFragment
 
 class ButterflyFragment : Fragment() {
     companion object {
-        private const val KEY_SCHEME = "key_scheme"
-        private const val KEY_REQUEST_ID = "key_request_id"
+        private const val KEY_SCHEME = "key_destination_scheme"
+        private const val KEY_TAG = "key_destination_tag"
 
-        fun FragmentActivity.awaitActivityResult(scheme: String, intent: Intent): Flow<Result<Bundle>> {
+        suspend fun FragmentActivity.startActivityAndAwaitResult(
+            scheme: String,
+            intent: Intent
+        ): Result<Bundle> {
+            "Await activity result: currentActivity=$this, scheme=$scheme".logd()
             val fragment = ButterflyFragment().apply {
                 arguments = Bundle().apply {
                     putString(KEY_SCHEME, scheme)
                 }
             }
-            return awaitFragmentResume(fragment) {
-                fragment.viewModel.callback = {
-                    trySend(Result.success(it))
-                    close()
-                }
-                fragment.launcher.launch(intent)
-            }
+
+            "Await activity result: add fragment $fragment...".logd()
+            addFragment(fragment)
+
+            "Await activity result: waiting fragment resume...".logd()
+            awaitFragmentResume(fragment)
+
+            "Await activity result: waiting activity result...".logd()
+            val result = fragment.startActivityAndAwaitResult(intent)
+
+            "Await activity result: result=$result.".logd()
+            return Result.success(result)
         }
 
-        fun FragmentActivity.awaitFragmentResult(scheme: String, requestId: String): Flow<Result<Bundle>> {
+        suspend fun FragmentActivity.awaitFragmentResult(
+            scheme: String,
+            uniqueTag: String
+        ): Result<Bundle> {
+            "Await fragment result: currentActivity=$this, scheme=$scheme, uniqueTag=$uniqueTag".logd()
             val fragment = ButterflyFragment().apply {
                 arguments = Bundle().apply {
                     putString(KEY_SCHEME, scheme)
-                    putString(KEY_REQUEST_ID, requestId)
+                    putString(KEY_TAG, uniqueTag)
                 }
             }
-            return awaitFragmentResume(fragment) {
-                fragment.viewModel.callback = {
-                    trySend(Result.success(it))
-                    close()
-                }
-            }
+
+            "Await fragment result: add fragment $fragment...".logd()
+            addFragment(fragment)
+
+            "Await fragment result: waiting fragment resume...".logd()
+            awaitFragmentResume(fragment)
+
+            "Await fragment result: waiting fragment result...".logd()
+            val result = fragment.waitFragmentResult()
+
+            "Await fragment result: result=$result.".logd()
+            return Result.success(result)
         }
     }
 
     private val scheme by lazy { arguments?.getString(KEY_SCHEME) ?: "" }
-    private val requestId by lazy { arguments?.getString(KEY_REQUEST_ID) ?: "" }
+    private val uniqueTag by lazy { arguments?.getString(KEY_TAG) ?: "" }
 
     private val viewModel by lazy { ViewModelProvider(this)[ButterflyViewModel::class.java] }
     private val launcher = registerForActivityResult(StartActivityForResult()) {
@@ -58,27 +80,63 @@ class ButterflyFragment : Fragment() {
             Bundle()
         }
 
+        "ButterflyFragment[$this] onActivityResult: result=$result".logd()
         //set result for callback
         viewModel.callback.invoke(result)
 
         //set result for launcher
-        val launcher = AgileLauncherManager.getLauncher(requireActivity().key(), scheme)
+        val launcher = DestinationLauncherManager.getLauncher(requireActivity().key(), scheme)
         launcher?.flow?.tryEmit(Result.success(result))
 
         //clear current fragment
         activity?.removeFragment(this)
     }
 
+    /**
+     * Launch activity and wait result.
+     */
+    suspend fun startActivityAndAwaitResult(intent: Intent): Bundle = suspendCancellableCoroutine {
+        viewModel.callback = { result ->
+            it.resumeWith(Result.success(result))
+            viewModel.callback = {}
+        }
+
+        "ButterflyFragment[$this] launch activity and wait result".logd()
+        launcher.launch(intent)
+
+        it.invokeOnCancellation {
+            viewModel.callback = {}
+        }
+    }
+
+    suspend fun waitFragmentResult(): Bundle = suspendCancellableCoroutine {
+        viewModel.callback = { result ->
+            it.resumeWith(Result.success(result))
+            viewModel.callback = {}
+        }
+
+        "ButterflyFragment[$this] wait fragment result".logd()
+
+        it.invokeOnCancellation {
+            viewModel.callback = {}
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (requestId.isNotEmpty()) {
-            parentFragmentManager.setFragmentResultListener(requestId, this) { requestKey, result ->
-                if (requestId == requestKey) {
+        "ButterflyFragment[$this] onCreate".logd()
+
+        if (uniqueTag.isNotEmpty()) {
+            parentFragmentManager.setFragmentResultListener(uniqueTag, this) { requestKey, result ->
+                if (uniqueTag == requestKey) {
+                    "ButterflyFragment[$this] onFragmentResult: result=$result".logd()
+
                     //set result for callback
                     viewModel.callback.invoke(result)
 
                     //set result for launcher
-                    val launcher = AgileLauncherManager.getLauncher(requireActivity().key(), scheme)
+                    val launcher =
+                        DestinationLauncherManager.getLauncher(requireActivity().key(), scheme)
                     launcher?.flow?.tryEmit(Result.success(result))
 
                     parentFragmentManager.clearFragmentResultListener(requestKey)
@@ -90,12 +148,19 @@ class ButterflyFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        "ButterflyFragment[$this] onResume".logd()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        "ButterflyFragment[$this] onDestroy".logd()
+
         viewModel.callback = {}
 
-        if (requestId.isNotEmpty()) {
-            parentFragmentManager.clearFragmentResultListener(requestId)
+        if (uniqueTag.isNotEmpty()) {
+            parentFragmentManager.clearFragmentResultListener(uniqueTag)
         }
     }
 

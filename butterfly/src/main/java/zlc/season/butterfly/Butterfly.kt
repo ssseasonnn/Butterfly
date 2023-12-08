@@ -1,25 +1,13 @@
 package zlc.season.butterfly
 
+import android.content.Context
 import androidx.core.os.bundleOf
-import zlc.season.butterfly.internal.parseScheme
-import zlc.season.butterfly.internal.parseSchemeParams
+import zlc.season.butterfly.entities.DestinationData
+import zlc.season.butterfly.internal.ButterflyHelper
 
 object Butterfly {
-    fun enableLog(flag: Boolean) {
-        zlc.season.butterfly.internal.enableLog = flag
-    }
-
-    fun agile(scheme: String): AgileHandler {
-        val realScheme = parseScheme(scheme)
-        val request = ButterflyCore.queryAgile(realScheme).apply {
-            val params = parseSchemeParams(scheme)
-            bundle.putAll(bundleOf(*params))
-        }
-        return AgileHandler(request)
-    }
-
-    fun retreat(vararg result: Pair<String, Any?>): AgileRequest? {
-        return ButterflyCore.dispatchRetreat(bundleOf(*result))
+    fun of(context: Context = ButterflyHelper.context): DestinationHandler {
+        return DestinationHandler(context)
     }
 
     // avoid inline

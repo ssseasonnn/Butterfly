@@ -8,7 +8,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import zlc.season.base.Destinations
 import zlc.season.base.Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Destination
 import zlc.season.feature1.databinding.DialogTestBinding
 
@@ -18,14 +17,14 @@ class TestBottomSheetDialogFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return DialogTestBinding.inflate(inflater, container, false).also {
             it.btnNext.setOnClickListener {
-                Butterfly.agile(Destinations.FRAGMENT).carry(requireContext())
-                retreat()
+                Butterfly.of(requireContext()).navigate(Destinations.FRAGMENT)
+                Butterfly.of(requireContext()).popBack()
             }
             it.btnBack.setOnClickListener {
-                retreat("result" to "Result from dialog!")
+                Butterfly.of(requireContext()).popBack("result" to "Result from BottomSheetDialog!")
             }
         }.root
     }

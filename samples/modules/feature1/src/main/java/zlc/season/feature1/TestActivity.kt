@@ -33,7 +33,7 @@ class TestActivity : AppCompatActivity() {
         """.trimIndent()
 
         binding.btnFinish.setOnClickListener {
-            Butterfly.retreat("result" to "asb")
+            Butterfly.of(this).popBack("result" to "asb")
         }
     }
 }

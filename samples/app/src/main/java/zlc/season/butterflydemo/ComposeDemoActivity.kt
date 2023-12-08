@@ -16,20 +16,20 @@ class ComposeDemoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.btnStartA.setOnClickListener {
-            Butterfly.agile(Destinations.COMPOSE_A).asRoot().carry(this)
+            Butterfly.of(this).asRoot().navigate(Destinations.COMPOSE_A)
         }
 
         binding.btnStartB.setOnClickListener {
-            Butterfly.agile(Destinations.COMPOSE_B).carry(this)
+            Butterfly.of(this).navigate(Destinations.COMPOSE_B)
         }
         binding.btnStartC.setOnClickListener {
-            Butterfly.agile(Destinations.COMPOSE_C).carry(this)
+            Butterfly.of(this).navigate(Destinations.COMPOSE_C)
         }
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        Butterfly.retreat("result" to "Result from Activity")
+        Butterfly.of(this).popBack("result" to "Result from Activity")
     }
 }
 

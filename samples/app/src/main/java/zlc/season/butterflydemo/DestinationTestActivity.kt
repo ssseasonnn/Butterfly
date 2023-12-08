@@ -17,52 +17,57 @@ class DestinationTestActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.startActivity.setOnClickListener {
-            Butterfly.agile(Destinations.TEST + "?a=1&b=2")
+            Butterfly.of(this)
                 .params(
                     "intValue" to 1,
                     "booleanValue" to true,
                     "stringValue" to "test value"
                 )
-                .carry(this)
+                .navigate(Destinations.TEST + "?a=1&b=2")
         }
 
         binding.startActivityForResult.setOnClickListener {
-            Butterfly.agile(Destinations.TEST_RESULT + "?a=1&b=2")
+            Butterfly.of(this)
                 .params(
                     "intValue" to 1,
                     "booleanValue" to true,
                     "stringValue" to "test value"
                 )
-                .carry(this) {
-                    val result by it.params<String>()
-                    binding.tvResult.text = result
+                .navigate(Destinations.TEST_RESULT + "?a=1&b=2") {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        binding.tvResult.text = result
+                    }
                 }
         }
 
         binding.startAction.setOnClickListener {
-            Butterfly.agile(Destinations.ACTION + "?a=1&b=2").carry(this)
+            Butterfly.of(this).navigate(Destinations.ACTION + "?a=1&b=2")
         }
 
         binding.startFragment.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT)
-                .carry(this) {
-                    val abc by it.params<String>()
+            Butterfly.of(this).navigate(Destinations.FRAGMENT) {
+                if (it.isSuccess) {
+                    val bundle = it.getOrDefault(Bundle.EMPTY)
+                    val abc by bundle.params<String>()
                     binding.tvResult.text = abc
                 }
+            }
         }
 
         binding.startDialogFragment.setOnClickListener {
-            Butterfly.agile(Destinations.DIALOG_FRAGMbENT).carry(this)
+            Butterfly.of(this).navigate(Destinations.DIALOG_FRAGMbENT)
         }
 
         binding.startBottomSheetDialogFragment.setOnClickListener {
-            Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(this)
+            Butterfly.of(this).navigate(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT)
         }
     }
 
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
 //        super.onBackPressed()
-        Butterfly.retreat()
+        Butterfly.of(this).popBack()
     }
 }

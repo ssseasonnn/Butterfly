@@ -1,11 +1,20 @@
 package zlc.season.bar
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,6 +29,7 @@ fun ComposeScreenC() {
     val viewModel = viewModel<CScreenViewModel>()
     val textFromViewModel = viewModel.text.collectAsState(initial = "")
     val ctx = LocalContext.current
+
     Surface(modifier = Modifier.fillMaxSize(), color = Colors.GREEN) {
         Box {
             Column(
@@ -31,12 +41,12 @@ fun ComposeScreenC() {
                 Text(text = "This is ComposeScreen C")
                 Text(text = textFromViewModel.value)
                 Button(onClick = {
-                    Butterfly.retreat()
+                    Butterfly.of(ctx).popBack()
                 }) {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
+                    Butterfly.of(ctx).navigate(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -45,7 +55,7 @@ fun ComposeScreenC() {
                 var clearTop by remember { mutableStateOf(false) }
 
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_A)
+                    Butterfly.of(ctx)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -55,12 +65,12 @@ fun ComposeScreenC() {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_A)
                 }) {
                     Text(text = "Next To A")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_B)
+                    Butterfly.of(ctx)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -70,12 +80,12 @@ fun ComposeScreenC() {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_B)
                 }) {
                     Text(text = "Next To B")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_C)
+                    Butterfly.of(ctx)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -85,7 +95,7 @@ fun ComposeScreenC() {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_C)
                 }) {
                     Text(text = "Next to C")
                 }

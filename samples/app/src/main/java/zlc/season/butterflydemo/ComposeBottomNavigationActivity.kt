@@ -17,22 +17,24 @@ class ComposeBottomNavigationActivity : AppCompatActivity() {
         binding.navView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    Butterfly.agile(Destinations.COMPOSE_HOME)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.COMPOSE_HOME)
                 }
+
                 R.id.navigation_dashboard -> {
-                    Butterfly.agile(Destinations.COMPOSE_DASHBOARD)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.COMPOSE_DASHBOARD)
                 }
+
                 R.id.navigation_notifications -> {
-                    Butterfly.agile(Destinations.COMPOSE_NOTIFICATION)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.COMPOSE_NOTIFICATION)
                 }
             }
             true

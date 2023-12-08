@@ -24,7 +24,7 @@
 -keep public class zlc.season.butterfly.module.**
 -keep public class zlc.season.butterfly.annotation.**
 -keep public class zlc.season.butterfly.ButterflyCore {*;}
--keep public class * extends zlc.season.butterfly.Action
+-keep public class * extends zlc.season.butterfly.action.Action
 
 -keep @zlc.season.butterfly.annotation.Destination class * {*;}
 -keep @zlc.season.butterfly.annotation.Evade class * {*;}

@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Toast
 import zlc.season.base.Destinations
-import zlc.season.butterfly.Action
+import zlc.season.butterfly.action.Action
 import zlc.season.butterfly.annotation.Destination
 
 @Destination(Destinations.ACTION)

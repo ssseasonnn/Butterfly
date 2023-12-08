@@ -39,13 +39,14 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
             ) {
                 Text(text = "This is ComposeScreen A ${id}")
                 Text(text = textFromViewModel.value)
+
                 Button(onClick = {
-                    Butterfly.retreat()
+                    Butterfly.of(ctx).popBack()
                 }) {
                     Text(text = "Back")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT).carry(ctx)
+                    Butterfly.of(ctx).navigate(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT)
                 }) {
                     Text(text = "Show Dialog")
                 }
@@ -54,7 +55,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                 var clearTop by remember { mutableStateOf(false) }
 
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_A)
+                    Butterfly.of(ctx)
                         .params(bundleOf("id" to id + 1))
                         .run {
                             if (clearTop) {
@@ -65,12 +66,12 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_A)
                 }) {
                     Text(text = "Next To A")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_B)
+                    Butterfly.of(ctx)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -80,12 +81,12 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_B)
                 }) {
                     Text(text = "Next To B")
                 }
                 Button(onClick = {
-                    Butterfly.agile(Destinations.COMPOSE_C)
+                    Butterfly.of(ctx)
                         .run {
                             if (clearTop) {
                                 clearTop()
@@ -95,7 +96,7 @@ fun ComposeScreenA(bundle: Bundle = bundleOf()) {
                                 this
                             }
                         }
-                        .carry(ctx)
+                        .navigate(Destinations.COMPOSE_C)
                 }) {
                     Text(text = "Next to C")
                 }

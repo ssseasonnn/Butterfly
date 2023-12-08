@@ -30,7 +30,7 @@ class TestFragment : Fragment() {
         binding?.apply {
             tvContent.text = "This is Fragment $number"
             btnSetResult.setOnClickListener {
-                Butterfly.retreat("abc" to "123")
+                Butterfly.of(requireContext()).popBack("abc" to "123")
             }
         }
     }

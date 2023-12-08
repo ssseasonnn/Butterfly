@@ -3,10 +3,10 @@ package zlc.season.butterfly.compose.launcher
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import zlc.season.butterfly.AgileRequest
-import zlc.season.butterfly.backstack.BackStackEntryManager
+import zlc.season.butterfly.core.BackStackEntryManager
 import zlc.season.butterfly.compose.Utils.isComposeEntry
-import zlc.season.butterfly.group.GroupEntryManager
+import zlc.season.butterfly.core.GroupEntryManager
+import zlc.season.butterfly.entities.DestinationData
 import zlc.season.butterfly.internal.ButterflyHelper.contentView
 import zlc.season.claritypotion.ActivityLifecycleCallbacksAdapter
 import zlc.season.claritypotion.ClarityPotion.application
@@ -19,14 +19,15 @@ class ComposeLauncher(
     private val composeModeLauncher = ComposeModeLauncher(backStackEntryManager)
 
     init {
-        application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
+        application.registerActivityLifecycleCallbacks(object :
+            ActivityLifecycleCallbacksAdapter() {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
                 if (activity is ComponentActivity && savedInstanceState != null) {
                     // restore top entry after activity recreated
                     val topEntry = backStackEntryManager.getTopEntry(activity)
                     if (topEntry != null && isComposeEntry(topEntry)) {
                         activity.contentView().post {
-                            activity.launchDirectly(topEntry.request)
+                            activity.launchDirectly(topEntry.destinationData)
                         }
                     }
 
@@ -35,7 +36,7 @@ class ComposeLauncher(
                     val groupEntry = groupEntryList.firstOrNull { isComposeEntry(it) }
                     if (groupEntry != null) {
                         activity.contentView().post {
-                            activity.launchDirectly(groupEntry.request)
+                            activity.launchDirectly(groupEntry.destinationData)
                         }
                     }
                 }
@@ -43,15 +44,15 @@ class ComposeLauncher(
         })
     }
 
-    fun ComponentActivity.launchDirectly(request: AgileRequest) {
-        with(composeModeLauncher) { launchDirectly(request) }
+    fun ComponentActivity.launchDirectly(data: DestinationData) {
+        with(composeModeLauncher) { launchDirectly(data) }
     }
 
-    fun ComponentActivity.launch(request: AgileRequest) {
-        if (request.groupId.isNotEmpty()) {
-            with(composeGroupLauncher) { launch(request) }
+    fun ComponentActivity.launch(data: DestinationData) {
+        if (data.groupId.isNotEmpty()) {
+            with(composeGroupLauncher) { launch(data) }
         } else {
-            with(composeModeLauncher) { launch(request) }
+            with(composeModeLauncher) { launch(data) }
         }
     }
 }

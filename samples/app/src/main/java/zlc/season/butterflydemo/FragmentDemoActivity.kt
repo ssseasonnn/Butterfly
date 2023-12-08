@@ -17,32 +17,41 @@ class FragmentDemoActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.btnStartA.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_A)
+            Butterfly.of(this)
                 .asRoot()
-                .carry(this) {
-                    val result by it.params<String>()
-                    binding.tvResult.text = result
+                .navigate(Destinations.FRAGMENT_A) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        binding.tvResult.text = result
+                    }
                 }
         }
 
         binding.btnStartB.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_B)
-                .carry(this) {
-                    val result by it.params<String>()
-                    binding.tvResult.text = result
+            Butterfly.of(this)
+                .navigate(Destinations.FRAGMENT_B) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        binding.tvResult.text = result
+                    }
                 }
         }
         binding.btnStartC.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_C)
-                .carry(this) {
-                    val result by it.params<String>()
-                    binding.tvResult.text = result
+            Butterfly.of(this)
+                .navigate(Destinations.FRAGMENT_C) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        binding.tvResult.text = result
+                    }
                 }
         }
     }
 
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
-        Butterfly.retreat("result" to "Result from Activity")
+        Butterfly.of(this).popBack("result" to "Result from Activity")
     }
 }

@@ -21,22 +21,24 @@ class FragmentBottomNavigationActivity : AppCompatActivity() {
         binding.navView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
-                    Butterfly.agile(Destinations.HOME)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.HOME)
                 }
+
                 R.id.navigation_dashboard -> {
-                    Butterfly.agile(Destinations.DASHBOARD)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.DASHBOARD)
                 }
+
                 R.id.navigation_notifications -> {
-                    Butterfly.agile(Destinations.NOTIFICATION)
+                    Butterfly.of(this)
                         .container(R.id.container)
                         .group()
-                        .carry(this)
+                        .navigate(Destinations.NOTIFICATION)
                 }
             }
             true

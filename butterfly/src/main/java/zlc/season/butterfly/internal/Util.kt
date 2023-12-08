@@ -5,34 +5,7 @@ import android.util.Log
 import androidx.core.net.toUri
 import java.util.*
 
-internal var enableLog = false
-
-internal fun <T> T.logd(tag: String = ""): T {
-    if (enableLog) {
-        val realTag = tag.ifEmpty { "Butterfly" }
-        if (this is Throwable) {
-            Log.d(realTag, this.message ?: "", this)
-        } else {
-            Log.d(realTag, this.toString())
-        }
-    }
-    return this
-}
-
-internal fun <T> T.logw(tag: String = ""): T {
-    if (enableLog) {
-        val realTag = tag.ifEmpty { "Butterfly" }
-        if (this is Throwable) {
-            Log.w(realTag, this.message ?: "", this)
-        } else {
-            Log.w(realTag, this.toString())
-        }
-    }
-    return this
-}
-
-
-internal fun parseScheme(scheme: String): String {
+internal fun parseRouteScheme(scheme: String): String {
     val index = scheme.indexOfFirst { it == '?' }
     return if (index > 0) {
         scheme.substring(0, index)
@@ -41,7 +14,7 @@ internal fun parseScheme(scheme: String): String {
     }
 }
 
-internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
+internal fun parseRouteSchemeParams(scheme: String): Array<Pair<String, String?>> {
     val uri = scheme.toUri()
     val query = uri.query
 
@@ -56,10 +29,10 @@ internal fun parseSchemeParams(scheme: String): Array<Pair<String, String?>> {
     return arrayOf()
 }
 
-internal fun createRequestTag(): String {
+internal fun createDestinationDataTag(): String {
     return UUID.randomUUID().toString().replace("-", "").uppercase(Locale.getDefault())
 }
 
 internal fun Activity.key(): String {
-    return "Activity@${hashCode()}"
+    return "${javaClass.canonicalName}@${hashCode()}"
 }

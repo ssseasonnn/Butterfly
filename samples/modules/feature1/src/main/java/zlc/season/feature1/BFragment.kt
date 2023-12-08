@@ -8,7 +8,6 @@ import zlc.season.base.BaseFragment
 import zlc.season.base.Destinations
 import zlc.season.bracer.params
 import zlc.season.butterfly.Butterfly
-import zlc.season.butterfly.Butterfly.retreat
 import zlc.season.butterfly.annotation.Destination
 import zlc.season.feature1.databinding.FragmentCommonBinding
 
@@ -27,17 +26,20 @@ class BFragment : BaseFragment() {
         root.setBackgroundResource(R.color.green)
         tvContent.text = "Fragment B ${hashCode()}"
         btnBack.setOnClickListener {
-            retreat("result" to "Result from B")
+            Butterfly.of(requireContext()).popBack("result" to "Result from FragmentB")
         }
         btnDialog.setOnClickListener {
-            Butterfly.agile(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT)
-                .carry(requireContext()) {
-                    val result by it.params<String>()
-                    tvResult.text = result
+            Butterfly.of(requireContext())
+                .navigate(Destinations.BOTTOM_SHEET_DIALOG_FRAGMENT) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        tvResult.text = result
+                    }
                 }
         }
         btnNextA.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_A)
+            Butterfly.of(requireContext())
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()
@@ -47,13 +49,16 @@ class BFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(requireContext()) {
-                    val result by it.params<String>()
-                    tvResult.text = result
+                .navigate(Destinations.FRAGMENT_A) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        tvResult.text = result
+                    }
                 }
         }
         btnNextB.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_B)
+            Butterfly.of(requireContext())
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()
@@ -63,13 +68,16 @@ class BFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(requireContext()) {
-                    val result by it.params<String>()
-                    tvResult.text = result
+                .navigate(Destinations.FRAGMENT_B) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        tvResult.text = result
+                    }
                 }
         }
         btnNextC.setOnClickListener {
-            Butterfly.agile(Destinations.FRAGMENT_C)
+            Butterfly.of(requireContext())
                 .run {
                     if (cbClearTop.isChecked) {
                         clearTop()
@@ -79,9 +87,12 @@ class BFragment : BaseFragment() {
                         this
                     }
                 }
-                .carry(requireContext()) {
-                    val result by it.params<String>()
-                    tvResult.text = result
+                .navigate(Destinations.FRAGMENT_C) {
+                    if (it.isSuccess) {
+                        val bundle = it.getOrDefault(Bundle.EMPTY)
+                        val result by bundle.params<String>()
+                        tvResult.text = result
+                    }
                 }
         }
     }
