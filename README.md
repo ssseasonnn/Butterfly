@@ -35,21 +35,32 @@ The butterfly provides these features：
 
 ## Installation
 
-```gradle
+```kotlin
+// Add jitpack repository
 repositories {
-  maven { url 'https://jitpack.io' }
+  maven { url("https://jitpack.io") }
 }
 ```
 
-```gradle
-apply plugin: 'kotlin-kapt'
+```kotlin
+// First, declare the KSP plugin in your top level build.gradle.kts file.
+plugins {
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
+}
 
+// Then, enable KSP in your module-level build.gradle.kts file:
+plugins {
+    id("com.google.devtools.ksp")
+}
+
+
+// Then, add Butterfly dependencies.
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.3.0'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.3.0'
+  implementation("com.github.ssseasonnn.Butterfly:butterfly:1.3.0")
+  ksp("com.github.ssseasonnn.Butterfly:compiler:1.3.0")
 
   //for compose
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.3.0'
+  implementation("com.github.ssseasonnn.Butterfly:butterfly-compose:1.3.0")
 }
 ```
 

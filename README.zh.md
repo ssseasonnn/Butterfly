@@ -35,23 +35,34 @@ Butterfly提供以下功能：
 
 ## 安装
 
-```gradle
+```kotlin
+// 添加jitpack仓库
 repositories {
-  maven { url 'https://jitpack.io' }
+  maven { url("https://jitpack.io") }
 }
 ```
 
-```gradle
-apply plugin: 'kotlin-kapt'
+```kotlin
+// 首先，在顶级build.gradle.kts文件中声明ksp插件
+plugins {
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
+}
 
+// 然后，在模块级build.gradle.kts文件中启用ksp：
+plugins {
+    id("com.google.devtools.ksp")
+}
+
+// 然后，添加 Butterfly 依赖项
 dependencies {
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly:1.3.0'
-  kapt 'com.github.ssseasonnn.Butterfly:compiler:1.3.0'
+    implementation("com.github.ssseasonnn.Butterfly:butterfly:1.3.0")
+    ksp("com.github.ssseasonnn.Butterfly:compiler:1.3.0")
 
-  //for compose
-  implementation 'com.github.ssseasonnn.Butterfly:butterfly-compose:1.3.0'
+    //for compose
+    implementation("com.github.ssseasonnn.Butterfly:butterfly-compose:1.3.0")
 }
 ```
+
 
 ## 基本用法
 
