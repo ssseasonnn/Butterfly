@@ -28,7 +28,7 @@ class ComposeDemoActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
+//        super.onBackPressed()
         Butterfly.of(this).popBack("result" to "Result from Activity")
     }
 }

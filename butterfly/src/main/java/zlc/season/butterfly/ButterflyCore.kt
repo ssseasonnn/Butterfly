@@ -17,6 +17,8 @@ object ButterflyCore {
     private val navigatorManager = NavigatorManager()
     private val evadeManager = EvadeManager()
 
+    fun getNavigatorManager() = navigatorManager
+
     fun addModuleName(moduleName: String) {
         try {
             val cls = Class.forName(moduleName)
@@ -38,22 +40,24 @@ object ButterflyCore {
     fun removeInterceptor(interceptor: Interceptor) =
         interceptorManager.removeInterceptor(interceptor)
 
-    fun queryDestination(scheme: String): String = moduleManager.queryDestination(scheme)
+    fun queryDestination(route: String): String = moduleManager.queryDestination(route)
 
     fun queryEvade(identity: String): EvadeData = moduleManager.queryEvade(identity)
 
-    suspend fun dispatchDestination(
+    suspend fun dispatchNavigate(
         context: Context,
         destinationData: DestinationData,
         interceptorManager: InterceptorManager
     ): Result<Bundle> {
+        // Use global interceptor before
         var tempDestinationData = if (destinationData.enableGlobalInterceptor) {
-            this.interceptorManager.intercept(destinationData)
+            this.interceptorManager.intercept(context, destinationData)
         } else {
             destinationData
         }
 
-        tempDestinationData = interceptorManager.intercept(tempDestinationData)
+        // Then use current navigation interceptor
+        tempDestinationData = interceptorManager.intercept(context, tempDestinationData)
 
         return navigatorManager.navigate(context, tempDestinationData)
     }

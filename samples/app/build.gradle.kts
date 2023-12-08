@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.application)
     alias(libs.plugins.kotlin)
     alias(libs.plugins.ksp)
-    id("io.github.ssseasonnn.butterfly")
+    alias(libs.plugins.butterfly)
 }
 
 
@@ -15,6 +15,7 @@ androidApplication {
     namespace = "zlc.season.butterflydemo"
 
     viewBinding { enable = true }
+
     enableCompose()
 }
 
@@ -39,6 +40,7 @@ dependencies {
     ksp(project(":compiler"))
     implementation(project(":butterfly"))
     implementation(project(":butterfly-compose"))
+
     implementation(libs.bundles.android)
     implementation(libs.bundles.compose)
     implementation(libs.bundles.kotlin)

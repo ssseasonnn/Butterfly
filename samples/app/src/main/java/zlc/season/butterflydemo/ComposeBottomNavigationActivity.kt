@@ -19,21 +19,21 @@ class ComposeBottomNavigationActivity : AppCompatActivity() {
                 R.id.navigation_home -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group("")
                         .navigate(Destinations.COMPOSE_HOME)
                 }
 
                 R.id.navigation_dashboard -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group("")
                         .navigate(Destinations.COMPOSE_DASHBOARD)
                 }
 
                 R.id.navigation_notifications -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group("")
                         .navigate(Destinations.COMPOSE_NOTIFICATION)
                 }
             }

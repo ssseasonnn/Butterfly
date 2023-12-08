@@ -39,16 +39,20 @@ object Utils {
         return result
     }
 
+    fun Activity.getComposeView(data: DestinationData): ComposeView? {
+        val containerView = findContainerView(data)
+        return containerView.findViewWithTag(COMPOSE_VIEW_TAG)
+    }
+
     fun Activity.clearContainerView(data: DestinationData) {
-        val container = findContainerView(data)
-        val composeView = container.findViewWithTag<ComposeView>(COMPOSE_VIEW_TAG)
+        val composeView = getComposeView(data)
         composeView?.setContent { }
     }
 
-    fun BackStackEntry.hasContainer() =
+    fun BackStackEntry.hasCustomContainer() =
         destinationData.containerViewId != 0 || destinationData.containerViewTag.isNotEmpty()
 
-    fun BackStackEntry.hasSameContainer(other: BackStackEntry) =
+    fun BackStackEntry.hasSameCustomContainer(other: BackStackEntry) =
         destinationData.containerViewId == other.destinationData.containerViewId &&
                 destinationData.containerViewTag == other.destinationData.containerViewTag
 }

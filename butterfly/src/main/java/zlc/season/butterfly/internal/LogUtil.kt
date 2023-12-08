@@ -2,11 +2,12 @@ package zlc.season.butterfly.internal
 
 import android.util.Log
 
-internal var enableLog = true
+var enableLog = true
+val TAG = "Butterfly"
 
-internal fun <T> T.logd(tag: String = ""): T {
+fun <T> T.logd(tag: String = ""): T {
     if (enableLog) {
-        val realTag = tag.ifEmpty { "Butterfly" }
+        val realTag = tag.ifEmpty { TAG }
         if (this is Throwable) {
             Log.d(realTag, this.message ?: "", this)
         } else {
@@ -16,9 +17,9 @@ internal fun <T> T.logd(tag: String = ""): T {
     return this
 }
 
-internal fun <T> T.logw(tag: String = ""): T {
+fun <T> T.logw(tag: String = ""): T {
     if (enableLog) {
-        val realTag = tag.ifEmpty { "Butterfly" }
+        val realTag = tag.ifEmpty { TAG }
         if (this is Throwable) {
             Log.w(realTag, this.message ?: "", this)
         } else {

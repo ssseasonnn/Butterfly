@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.entities.DestinationData
 import zlc.season.butterfly.navigator.fragment.findFragment
 import zlc.season.butterfly.navigator.fragment.showFragment
-import zlc.season.butterfly.navigator.fragment.OnFragmentNewArgument
+import zlc.season.butterfly.navigator.fragment.FragmentParamUpdatable
 import zlc.season.butterfly.navigator.fragment.awaitFragmentResume
 import zlc.season.butterfly.navigator.fragment.createAndShowFragment
 
@@ -29,8 +29,8 @@ class BackstackNavigatorHelper {
         return if (target == null) {
             createAndShowFragment(activity, newData)
         } else {
-            if (target is OnFragmentNewArgument) {
-                target.onNewArgument(newData.bundle)
+            if (target is FragmentParamUpdatable) {
+                target.onParamsUpdate(newData.bundle)
             }
             activity.showFragment(target)
             activity.awaitFragmentResume(target)

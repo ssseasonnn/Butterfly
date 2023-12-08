@@ -4,11 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.launchIn
 import zlc.season.butterfly.ButterflyCore
 import zlc.season.butterfly.entities.DestinationData
 import zlc.season.butterfly.core.InterceptorManager
-import zlc.season.butterfly.internal.ButterflyHelper.findScope
 
 class DestinationLauncher(
     val context: Context,
@@ -22,6 +20,6 @@ class DestinationLauncher(
     }
 
     suspend fun launch() {
-        ButterflyCore.dispatchDestination(context, destinationData, interceptorManager)
+        ButterflyCore.dispatchNavigate(context, destinationData, interceptorManager)
     }
 }

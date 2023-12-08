@@ -34,7 +34,7 @@ class FragmentNavigator(
         navigatorContext.navigate(activity, request)
 
         return if (request.needResult) {
-            activity.awaitFragmentResult(request.scheme, request.uniqueTag)
+            activity.awaitFragmentResult(request.route, request.uniqueTag)
         } else {
             Result.success(Bundle.EMPTY)
         }
@@ -43,23 +43,12 @@ class FragmentNavigator(
     override fun popBack(activity: Activity, topEntry: BackStackEntry, bundle: Bundle) {
         if (activity !is FragmentActivity) return
         activity.apply {
-            val newTopEntry = backStackEntryManager.getTopEntry(this)
-            if ((newTopEntry == null || isActivityEntry(newTopEntry)) && topEntry.destinationData.isRoot) {
-                setActivityResult(bundle)
-                finish()
-            } else {
-                findFragment(topEntry.destinationData)?.let {
-                    if (topEntry.destinationData.needResult) {
-                        setFragmentResult(topEntry.destinationData.uniqueTag, bundle)
-                    }
-                    removeFragment(it)
+            findFragment(topEntry.destinationData)?.let {
+                if (topEntry.destinationData.needResult) {
+                    setFragmentResult(topEntry.destinationData.uniqueTag, bundle)
                 }
+                removeFragment(it)
             }
         }
-    }
-
-    private fun isActivityEntry(entry: BackStackEntry): Boolean {
-        val cls = Class.forName(entry.destinationData.className)
-        return Activity::class.java.isAssignableFrom(cls)
     }
 }

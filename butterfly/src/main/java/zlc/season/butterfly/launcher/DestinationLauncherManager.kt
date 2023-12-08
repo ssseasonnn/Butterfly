@@ -68,13 +68,13 @@ object DestinationLauncherManager {
     @Synchronized
     fun addLauncher(key: String, launcher: DestinationLauncher) {
         val list = launcherMap.getOrPut(key) { mutableListOf() }
-        if (list.find { it.destinationData.scheme == launcher.destinationData.scheme } == null) {
+        if (list.find { it.destinationData.route == launcher.destinationData.route } == null) {
             list.add(launcher)
         }
     }
 
     @Synchronized
-    fun getLauncher(key: String, scheme: String): DestinationLauncher? {
-        return launcherMap[key]?.find { it.destinationData.scheme == scheme }
+    fun getLauncher(key: String, route: String): DestinationLauncher? {
+        return launcherMap[key]?.find { it.destinationData.route == route }
     }
 }

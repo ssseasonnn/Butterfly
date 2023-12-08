@@ -7,7 +7,7 @@ import zlc.season.butterfly.internal.createDestinationDataTag
 
 @Parcelize
 data class DestinationData(
-    val scheme: String = "",
+    val route: String = "",
     val className: String = "",
     val bundle: Bundle = Bundle(),
 

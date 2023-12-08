@@ -12,7 +12,7 @@ object ActionNavigator : Navigator {
 
     private fun handleAction(context: Context, request: DestinationData): Result<Bundle> {
         val action = createAction(request)
-        action.doAction(context, request.scheme, request.bundle)
+        action.doAction(context, request.route, request.bundle)
         return Result.success(Bundle.EMPTY)
     }
 

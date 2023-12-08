@@ -18,26 +18,27 @@ class FragmentBottomNavigationActivity : AppCompatActivity() {
         binding = ActivityFragmentBottomNavigationBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val groupId = "test_group"
         binding.navView.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_home -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group(groupId)
                         .navigate(Destinations.HOME)
                 }
 
                 R.id.navigation_dashboard -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group(groupId)
                         .navigate(Destinations.DASHBOARD)
                 }
 
                 R.id.navigation_notifications -> {
                     Butterfly.of(this)
                         .container(R.id.container)
-                        .group()
+                        .group(groupId)
                         .navigate(Destinations.NOTIFICATION)
                 }
             }

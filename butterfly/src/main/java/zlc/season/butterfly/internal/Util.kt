@@ -1,21 +1,20 @@
 package zlc.season.butterfly.internal
 
 import android.app.Activity
-import android.util.Log
 import androidx.core.net.toUri
 import java.util.*
 
-internal fun parseRouteScheme(scheme: String): String {
-    val index = scheme.indexOfFirst { it == '?' }
+internal fun parseRoute(route: String): String {
+    val index = route.indexOfFirst { it == '?' }
     return if (index > 0) {
-        scheme.substring(0, index)
+        route.substring(0, index)
     } else {
-        scheme
+        route
     }
 }
 
-internal fun parseRouteSchemeParams(scheme: String): Array<Pair<String, String?>> {
-    val uri = scheme.toUri()
+internal fun parseRouteParams(route: String): Array<Pair<String, String?>> {
+    val uri = route.toUri()
     val query = uri.query
 
     if (query != null) {

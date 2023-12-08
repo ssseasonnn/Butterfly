@@ -4,32 +4,66 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.get
+import kotlinx.coroutines.flow.MutableStateFlow
+import zlc.season.butterfly.entities.DestinationData
 
 /**
- * 该ViewModel用于辅助Compose页面创建基于回退栈生命周期的ViewModel
+ * This ViewModel is used to help Compose Destination Page in creating a ViewModel
+ * based on the fallback stack lifecycle.
  */
 class ComposeViewModel : ViewModel() {
+    /**
+     * Save [ComposeViewId : Flow]
+     */
+    private val destinationDataFlows = mutableMapOf<Int, MutableStateFlow<DestinationData?>>()
+
+    /**
+     * Save [destinationDataTag : ViewModelStore]
+     */
     private val viewModelStores = mutableMapOf<String, ViewModelStore>()
 
-    fun clear(requestTag: String) {
-        val viewModelStore = viewModelStores.remove(requestTag)
+    fun getAllDestinationDataFlows(): List<MutableStateFlow<DestinationData?>> {
+        return destinationDataFlows.values.toList()
+    }
+
+    fun getDestinationDataFlow(
+        viewId: Int,
+        data: DestinationData? = null
+    ): MutableStateFlow<DestinationData?> {
+        var flow = destinationDataFlows[viewId]
+        if (flow == null) {
+            flow = MutableStateFlow(data)
+            destinationDataFlows[viewId] = flow
+        }
+        return flow
+    }
+
+    fun getViewModelStore(destinationDataTag: String): ViewModelStore {
+        var viewModelStore = viewModelStores[destinationDataTag]
+        if (viewModelStore == null) {
+            viewModelStore = ViewModelStore()
+            viewModelStores[destinationDataTag] = viewModelStore
+        }
+        return viewModelStore
+    }
+
+    fun clear(destinationDataTag: String) {
+        val viewModelStore = viewModelStores.remove(destinationDataTag)
         viewModelStore?.clear()
     }
 
     override fun onCleared() {
-        for (store in viewModelStores.values) {
-            store.clear()
+        // clear flow
+        destinationDataFlows.values.forEach {
+            it.value = null
+        }
+        destinationDataFlows.clear()
+
+        // clear viewModelStore
+        viewModelStores.values.forEach {
+            it.clear()
         }
         viewModelStores.clear()
-    }
-
-    fun getViewModelStore(requestTag: String): ViewModelStore {
-        var viewModelStore = viewModelStores[requestTag]
-        if (viewModelStore == null) {
-            viewModelStore = ViewModelStore()
-            viewModelStores[requestTag] = viewModelStore
-        }
-        return viewModelStore
     }
 
     override fun toString(): String {

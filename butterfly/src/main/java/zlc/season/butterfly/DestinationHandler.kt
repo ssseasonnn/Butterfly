@@ -5,7 +5,9 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import zlc.season.butterfly.core.InterceptorManager
 import zlc.season.butterfly.entities.DestinationData
 import zlc.season.butterfly.interceptor.DefaultInterceptor
@@ -13,8 +15,8 @@ import zlc.season.butterfly.interceptor.Interceptor
 import zlc.season.butterfly.internal.ButterflyHelper.findActivity
 import zlc.season.butterfly.internal.key
 import zlc.season.butterfly.internal.logd
-import zlc.season.butterfly.internal.parseRouteScheme
-import zlc.season.butterfly.internal.parseRouteSchemeParams
+import zlc.season.butterfly.internal.parseRoute
+import zlc.season.butterfly.internal.parseRouteParams
 import zlc.season.butterfly.launcher.DestinationLauncher
 import zlc.season.butterfly.launcher.DestinationLauncherManager
 
@@ -24,8 +26,7 @@ class DestinationHandler(
     private val interceptorManager: InterceptorManager = InterceptorManager()
 ) {
     companion object {
-        private const val DEFAULT_GROUP = "butterfly_group"
-        private val EMPTY_LAMBDA: (Result<Bundle>) -> Unit = {}
+        private val EMPTY_CALLBACK: (Result<Bundle>) -> Unit = {}
     }
 
     /**
@@ -44,137 +45,117 @@ class DestinationHandler(
     }
 
     /**
-     * Skip global interceptor for current navigate.
+     * Skip global interceptor for current navigation
      */
     fun skipGlobalInterceptor(): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(enableGlobalInterceptor = false)
         }
     }
 
     /**
-     * Add interceptor for current navigate.
+     * Add interceptor for current navigation
      */
     fun addInterceptor(interceptor: Interceptor): DestinationHandler {
         return apply { interceptorManager.addInterceptor(interceptor) }
     }
 
-    fun addInterceptor(interceptor: suspend (DestinationData) -> DestinationData): DestinationHandler {
+    fun addInterceptor(interceptor: suspend (Context, DestinationData) -> DestinationData): DestinationHandler {
         return apply {
             interceptorManager.addInterceptor(DefaultInterceptor(interceptor))
         }
     }
 
     fun container(containerViewId: Int): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(containerViewId = containerViewId)
         }
     }
 
     fun container(containerViewTag: String): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(containerViewTag = containerViewTag)
         }
     }
 
     fun tag(uniqueTag: String): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(uniqueTag = uniqueTag)
         }
     }
 
-    fun group(groupName: String = DEFAULT_GROUP): DestinationHandler {
-        return setupDestinationData {
-            copy(groupId = groupName)
+    fun group(groupId: String): DestinationHandler {
+        return configDestinationData {
+            copy(groupId = groupId)
         }
     }
 
     fun clearTop(): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(clearTop = true)
         }
     }
 
     fun singleTop(): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(singleTop = true)
         }
     }
 
     fun asRoot(): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(isRoot = true)
         }
     }
 
     fun disableBackStack(): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(enableBackStack = false)
         }
     }
 
     fun addFlag(flag: Int): DestinationHandler {
-        return setupDestinationData {
+        return configDestinationData {
             copy(flags = flags or flag)
         }
     }
 
-    fun enterAnim(enterAnim: Int = 0): DestinationHandler {
-        return setupDestinationData {
+    fun enterAnim(enterAnim: Int): DestinationHandler {
+        return configDestinationData {
             copy(enterAnim = enterAnim)
         }
     }
 
-    fun exitAnim(exitAnim: Int = 0): DestinationHandler {
-        return setupDestinationData {
+    fun exitAnim(exitAnim: Int): DestinationHandler {
+        return configDestinationData {
             copy(exitAnim = exitAnim)
         }
     }
 
-    fun navigate(route: String, onResult: (Result<Bundle>) -> Unit = EMPTY_LAMBDA) {
-        if (context is LifecycleOwner) {
-            context.lifecycleScope.launch {
-                if (onResult != EMPTY_LAMBDA) {
-                    val result = awaitNavigateResult(route, bundleOf())
-                    onResult(result)
-                } else {
-                    awaitNavigate(route, bundleOf())
-                }
-            }
-        } else {
-            "Navigate failed, context is not LifecycleOwner!".logd()
-        }
+    fun navigate(
+        route: String,
+        onResult: (Result<Bundle>) -> Unit = EMPTY_CALLBACK
+    ) {
+        navigate(route, bundleOf(), onResult)
     }
 
     fun navigate(
         route: String,
         vararg params: Pair<String, Any?>,
-        onResult: (Result<Bundle>) -> Unit = EMPTY_LAMBDA
+        onResult: (Result<Bundle>) -> Unit = EMPTY_CALLBACK
     ) {
-        if (context is LifecycleOwner) {
-            context.lifecycleScope.launch {
-                if (onResult != EMPTY_LAMBDA) {
-                    val result = awaitNavigateResult(route, bundleOf(*params))
-                    onResult(result)
-                } else {
-                    awaitNavigate(route, bundleOf(*params))
-                }
-            }
-        } else {
-            "Navigate failed, context is not LifecycleOwner!".logd()
-        }
+        navigate(route, bundleOf(*params), onResult)
     }
 
     fun navigate(
         route: String,
         params: Bundle,
-        onResult: (Result<Bundle>) -> Unit = EMPTY_LAMBDA
+        onResult: (Result<Bundle>) -> Unit = EMPTY_CALLBACK
     ) {
         if (context is LifecycleOwner) {
             context.lifecycleScope.launch {
-                if (onResult != EMPTY_LAMBDA) {
-                    val result = awaitNavigateResult(route, params)
-                    onResult(result)
+                if (onResult != EMPTY_CALLBACK) {
+                    onResult(awaitNavigateResult(route, params))
                 } else {
                     awaitNavigate(route, params)
                 }
@@ -185,15 +166,15 @@ class DestinationHandler(
     }
 
     suspend fun awaitNavigate(route: String, params: Bundle) {
-        setupSchemeAndParams(route, false, params)
+        setupRouteAndParams(route, false, params)
 
-        ButterflyCore.dispatchDestination(context, destinationData, interceptorManager)
+        ButterflyCore.dispatchNavigate(context, destinationData, interceptorManager)
     }
 
     suspend fun awaitNavigateResult(route: String, params: Bundle): Result<Bundle> {
-        setupSchemeAndParams(route, true, params)
+        setupRouteAndParams(route, true, params)
 
-        return ButterflyCore.dispatchDestination(context, destinationData, interceptorManager)
+        return ButterflyCore.dispatchNavigate(context, destinationData, interceptorManager)
     }
 
     fun popBack(vararg result: Pair<String, Any?>): DestinationData? {
@@ -204,31 +185,37 @@ class DestinationHandler(
         return ButterflyCore.popBack(context, result)
     }
 
-    private fun setupSchemeAndParams(route: String, needResult: Boolean, extraParams: Bundle) {
-        val scheme = parseRouteScheme(route)
-        val destinationClassName = ButterflyCore.queryDestination(scheme)
-        val params = parseRouteSchemeParams(route)
+    private suspend fun setupRouteAndParams(
+        route: String,
+        needResult: Boolean,
+        extraParams: Bundle
+    ) {
+        withContext(Dispatchers.Default) {
+            val parsedRoute = parseRoute(route)
+            val destinationClassName = ButterflyCore.queryDestination(parsedRoute)
+            val params = parseRouteParams(parsedRoute)
 
-        setupDestinationData {
-            bundle.putAll(bundleOf(*params))
-            bundle.putAll(extraParams)
+            configDestinationData {
+                bundle.putAll(bundleOf(*params))
+                bundle.putAll(extraParams)
 
-            copy(
-                scheme = scheme,
-                className = destinationClassName,
-                needResult = needResult
-            )
+                copy(
+                    route = parsedRoute,
+                    className = destinationClassName,
+                    needResult = needResult
+                )
+            }
         }
     }
 
     fun getLauncher(context: Context): DestinationLauncher {
-        val agileHandler = setupDestinationData { copy(needResult = true) }
+        val agileHandler = configDestinationData { copy(needResult = true) }
 
         val activity = context.findActivity()
             ?: throw IllegalStateException("No Activity founded!")
 
         val key = activity.key()
-        var launcher = DestinationLauncherManager.getLauncher(key, destinationData.scheme)
+        var launcher = DestinationLauncherManager.getLauncher(key, destinationData.route)
         if (launcher == null) {
             launcher = DestinationLauncher(
                 context,
@@ -241,7 +228,7 @@ class DestinationHandler(
         return launcher
     }
 
-    private fun setupDestinationData(block: DestinationData.() -> DestinationData): DestinationHandler {
+    private fun configDestinationData(block: DestinationData.() -> DestinationData): DestinationHandler {
         return apply {
             destinationData = destinationData.block()
         }

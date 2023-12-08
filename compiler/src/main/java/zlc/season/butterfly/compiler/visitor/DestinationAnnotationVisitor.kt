@@ -34,16 +34,16 @@ class DestinationAnnotationVisitor(
         environment.logc("process destination: $classDeclaration")
         val annotation = classDeclaration.getAnnotationByName(DESTINATION_NAME)
         if (annotation != null) {
-            val schemeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
+            val routeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
             val className = classDeclaration.getClassFullName()
-            if (schemeValue.isNotEmpty()) {
-                environment.logc("destination processed: [scheme='$schemeValue', target='$className']")
-                destinationMap[schemeValue] = className
+            if (routeValue.isNotEmpty()) {
+                environment.logc("destination processed: [route='$routeValue', target='$className']")
+                destinationMap[routeValue] = className
 
                 // add file to dependency
                 sourcesFile.add(classDeclaration.containingFile!!)
             } else {
-                environment.loge("[$classDeclaration] scheme not found!")
+                environment.loge("[$classDeclaration] route not found!")
             }
         }
     }
@@ -54,8 +54,8 @@ class DestinationAnnotationVisitor(
         if (annotation != null) {
             val packageName = function.packageName.asString()
             val methodName = function.simpleName.asString()
-            val schemeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
-            if (schemeValue.isNotEmpty()) {
+            val routeValue = annotation.getValue(DESTINATION_ROUTE_KEY, "")
+            if (routeValue.isNotEmpty()) {
                 if (function.parameters.isNotEmpty()) {
                     when (function.parameters.size) {
                         1 -> {
@@ -97,13 +97,13 @@ class DestinationAnnotationVisitor(
                 }
 
                 val targetClassName = composeDestinationFullClassName(methodName)
-                environment.logc("compose destination processed: [scheme='$schemeValue', target='$targetClassName']")
-                destinationMap[schemeValue] = targetClassName
+                environment.logc("compose destination processed: [route='$routeValue', target='$targetClassName']")
+                destinationMap[routeValue] = targetClassName
 
                 // add file to dependency
                 sourcesFile.add(function.containingFile!!)
             } else {
-                environment.loge("[$function] scheme not found!")
+                environment.loge("[$function] route not found!")
             }
         }
     }

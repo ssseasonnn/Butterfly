@@ -33,7 +33,7 @@ class BackStackEntryManager {
         ButterflyHelper.application.registerActivityLifecycleCallbacks(object :
             ActivityLifecycleCallbacksAdapter() {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                // If activity is recreate, then restore back stack entry list.
+                // If activity recreated, then restore current activity's entry list.
                 if (savedInstanceState != null) {
                     restoreEntryList(activity, savedInstanceState)
                 } else {
@@ -44,7 +44,7 @@ class BackStackEntryManager {
                     }
                 }
 
-                // 监听Fragment销毁事件，移除Fragment Entry
+                // Observe fragment's destroy event to remove FragmentEntry.
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
                         val uniqueTag = it.tag
@@ -62,6 +62,7 @@ class BackStackEntryManager {
         })
     }
 
+    @Suppress("deprecation")
     @Synchronized
     private fun restoreEntryList(activity: Activity, savedState: Bundle) {
         val data = savedState.getParcelableArrayList<DestinationData>(KEY_SAVE_STATE)
@@ -106,18 +107,19 @@ class BackStackEntryManager {
     @Synchronized
     fun addEntry(activity: Activity, entry: BackStackEntry) {
         val list = getEntryList(activity)
+        list.add(entry)
 
-        if (isDialogEntry(entry)) {
-            list.add(entry)
-        } else {
-            val dialogEntry = list.firstOrNull { isDialogEntry(it) }
-            if (dialogEntry != null) {
-                val index = list.indexOf(dialogEntry)
-                list.add(index, entry)
-            } else {
-                list.add(entry)
-            }
-        }
+//        if (isDialogEntry(entry)) {
+//            list.add(entry)
+//        } else {
+//            val dialogEntry = list.firstOrNull { isDialogEntry(it) }
+//            if (dialogEntry != null) {
+//                val index = list.indexOf(dialogEntry)
+//                list.add(index, entry)
+//            } else {
+//                list.add(entry)
+//            }
+//        }
     }
 
     @Synchronized

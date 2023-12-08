@@ -49,7 +49,7 @@ class ActivityNavigator(val backStackEntryManager: BackStackEntryManager) : Navi
             createActivityOptions(activity, data)?.toBundle()?.let {
                 intent.putExtra(EXTRA_ACTIVITY_OPTIONS_BUNDLE, it)
             }
-            activity.startActivityAndAwaitResult(data.scheme, intent)
+            activity.startActivityAndAwaitResult(data.route, intent)
         }
     }
 

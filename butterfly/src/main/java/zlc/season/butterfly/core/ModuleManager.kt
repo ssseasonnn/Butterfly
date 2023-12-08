@@ -16,10 +16,10 @@ class ModuleManager {
         modules.remove(module)
     }
 
-    fun queryDestination(scheme: String): String {
+    fun queryDestination(route: String): String {
         var result = ""
         modules.forEach {
-            val find = it.getDestination()[scheme]
+            val find = it.getDestination()[route]
             if (find != null) {
                 result = find.name
                 return@forEach

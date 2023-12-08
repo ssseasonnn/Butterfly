@@ -4,5 +4,5 @@ import android.content.Context
 import android.os.Bundle
 
 interface Action {
-    fun doAction(context: Context, scheme: String, data: Bundle = Bundle())
+    fun doAction(context: Context, route: String, data: Bundle = Bundle())
 }

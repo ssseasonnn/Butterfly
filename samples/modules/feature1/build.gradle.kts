@@ -20,6 +20,7 @@ dependencies {
     implementation(project(":butterfly"))
 
     implementation(project(":samples:modules:base"))
+
     implementation(libs.bundles.android)
     implementation(libs.bundles.kotlin)
     implementation(libs.bundles.season)

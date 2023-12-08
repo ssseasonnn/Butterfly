@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import zlc.season.butterfly.core.GroupEntryManager
 import zlc.season.butterfly.entities.DestinationData
 import zlc.season.butterfly.entities.GroupEntry
-import zlc.season.butterfly.navigator.fragment.OnFragmentNewArgument
+import zlc.season.butterfly.navigator.fragment.FragmentParamUpdatable
 import zlc.season.butterfly.navigator.fragment.createAndShowFragment
 import zlc.season.butterfly.navigator.fragment.findFragment
 import zlc.season.butterfly.navigator.fragment.hideFragment
@@ -36,8 +36,8 @@ class GroupNavigator(private val groupEntryManager: GroupEntryManager) {
             activity.createAndShowFragment(request)
         } else {
             // pass new arguments to fragment
-            if (targetFragment is OnFragmentNewArgument) {
-                targetFragment.onNewArgument(request.bundle)
+            if (targetFragment is FragmentParamUpdatable) {
+                targetFragment.onParamsUpdate(request.bundle)
             }
 
             activity.showFragment(targetFragment)

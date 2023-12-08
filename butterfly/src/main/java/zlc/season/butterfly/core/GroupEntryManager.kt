@@ -20,12 +20,15 @@ class GroupEntryManager {
     }
 
     init {
-        application.registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacksAdapter() {
+        application.registerActivityLifecycleCallbacks(object :
+            ActivityLifecycleCallbacksAdapter() {
             override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                // If activity recreated, then restore current activity's entry list.
                 if (savedInstanceState != null) {
                     restoreEntryList(activity, savedInstanceState)
                 }
 
+                // Observe fragment's destroy event to remove FragmentEntry.
                 if (activity is FragmentActivity) {
                     activity.observeFragmentDestroy {
                         val uniqueTag = it.tag
@@ -52,9 +55,6 @@ class GroupEntryManager {
         if (data != null) {
             val entryList = data.map { GroupEntry(it) }
             getEntryList(activity).addAll(entryList)
-
-            "Group ---> ${activity.key()} restore entry list".logd()
-            "Group ---> Result -> $groupEntryMap".logd()
         }
     }
 
@@ -64,17 +64,12 @@ class GroupEntryManager {
         if (!entryList.isNullOrEmpty()) {
             val savedData = entryList.mapTo(ArrayList()) { it.destinationData }
             outState.putParcelableArrayList(KEY_SAVE_STATE, savedData)
-
-            "Group ---> ${activity.key()} save entry list".logd()
         }
     }
 
     @Synchronized
     private fun destroyEntryList(activity: Activity) {
         groupEntryMap.remove(activity.key())
-
-        "Group ---> ${activity.key()} destroy entry list".logd()
-        "Group ---> Result -> $groupEntryMap".logd()
     }
 
     @Synchronized
@@ -83,9 +78,6 @@ class GroupEntryManager {
         val find = entryList.find { it.destinationData.uniqueTag == uniqueTag }
         if (find != null) {
             entryList.remove(find)
-
-            "Group ---> ${activity.key()} removeEntry -> $find".logd()
-            "Group ---> Result -> $groupEntryMap".logd()
         }
     }
 
@@ -93,9 +85,6 @@ class GroupEntryManager {
     fun addEntry(activity: Activity, groupEntry: GroupEntry) {
         val entryList = getEntryList(activity)
         entryList.add(groupEntry)
-
-        "Group ---> ${activity.key()} addEntry -> $groupEntry".logd()
-        "Group ---> Result -> $groupEntryMap".logd()
     }
 
     @Synchronized

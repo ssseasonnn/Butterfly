@@ -29,6 +29,10 @@ class NavigatorManager {
     private val backStackEntryManager = BackStackEntryManager()
     private val groupEntryManager = GroupEntryManager()
 
+    fun getBackStackEntryManager() = backStackEntryManager
+
+    fun getGroupEntryManager() = groupEntryManager
+
     init {
         navigatorMaps.apply {
             putAll(
@@ -75,7 +79,12 @@ class NavigatorManager {
             return null
         }
 
-        val topEntry = backStackEntryManager.removeTopEntry(currentActivity) ?: return null
+        val topEntry = backStackEntryManager.removeTopEntry(currentActivity)
+        if (topEntry == null) {
+            "Pop back failed! Current activity's backstack can not find any entry!".logd()
+            return null
+        }
+
         findNavigator(topEntry.destinationData).popBack(currentActivity, topEntry, result)
 
         return topEntry.destinationData

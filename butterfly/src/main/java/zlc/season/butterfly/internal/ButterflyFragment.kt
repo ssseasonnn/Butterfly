@@ -16,17 +16,17 @@ import zlc.season.butterfly.navigator.fragment.removeFragment
 
 class ButterflyFragment : Fragment() {
     companion object {
-        private const val KEY_SCHEME = "key_destination_scheme"
+        private const val KEY_ROUTE = "key_destination_route"
         private const val KEY_TAG = "key_destination_tag"
 
         suspend fun FragmentActivity.startActivityAndAwaitResult(
-            scheme: String,
+            route: String,
             intent: Intent
         ): Result<Bundle> {
-            "Await activity result: currentActivity=$this, scheme=$scheme".logd()
+            "Await activity result: currentActivity=$this, route=$route".logd()
             val fragment = ButterflyFragment().apply {
                 arguments = Bundle().apply {
-                    putString(KEY_SCHEME, scheme)
+                    putString(KEY_ROUTE, route)
                 }
             }
 
@@ -44,13 +44,13 @@ class ButterflyFragment : Fragment() {
         }
 
         suspend fun FragmentActivity.awaitFragmentResult(
-            scheme: String,
+            route: String,
             uniqueTag: String
         ): Result<Bundle> {
-            "Await fragment result: currentActivity=$this, scheme=$scheme, uniqueTag=$uniqueTag".logd()
+            "Await fragment result: currentActivity=$this, route=$route, uniqueTag=$uniqueTag".logd()
             val fragment = ButterflyFragment().apply {
                 arguments = Bundle().apply {
-                    putString(KEY_SCHEME, scheme)
+                    putString(KEY_ROUTE, route)
                     putString(KEY_TAG, uniqueTag)
                 }
             }
@@ -69,7 +69,7 @@ class ButterflyFragment : Fragment() {
         }
     }
 
-    private val scheme by lazy { arguments?.getString(KEY_SCHEME) ?: "" }
+    private val route by lazy { arguments?.getString(KEY_ROUTE) ?: "" }
     private val uniqueTag by lazy { arguments?.getString(KEY_TAG) ?: "" }
 
     private val viewModel by lazy { ViewModelProvider(this)[ButterflyViewModel::class.java] }
@@ -85,7 +85,7 @@ class ButterflyFragment : Fragment() {
         viewModel.callback.invoke(result)
 
         //set result for launcher
-        val launcher = DestinationLauncherManager.getLauncher(requireActivity().key(), scheme)
+        val launcher = DestinationLauncherManager.getLauncher(requireActivity().key(), route)
         launcher?.flow?.tryEmit(Result.success(result))
 
         //clear current fragment
@@ -136,7 +136,7 @@ class ButterflyFragment : Fragment() {
 
                     //set result for launcher
                     val launcher =
-                        DestinationLauncherManager.getLauncher(requireActivity().key(), scheme)
+                        DestinationLauncherManager.getLauncher(requireActivity().key(), route)
                     launcher?.flow?.tryEmit(Result.success(result))
 
                     parentFragmentManager.clearFragmentResultListener(requestKey)

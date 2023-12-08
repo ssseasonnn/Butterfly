@@ -16,7 +16,7 @@ androidLibrary {
 }
 
 dependencies {
-//    ksp(project(":compiler"))
+    ksp(project(":compiler"))
     implementation(project(":butterfly"))
     implementation(project(":butterfly-compose"))
 

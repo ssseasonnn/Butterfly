@@ -31,7 +31,7 @@ class DialogFragmentNavigator(val backStackEntryManager: BackStackEntryManager) 
         activity.showDialogFragment(destinationData)
 
         return if (destinationData.needResult) {
-            activity.awaitFragmentResult(destinationData.scheme, destinationData.uniqueTag)
+            activity.awaitFragmentResult(destinationData.route, destinationData.uniqueTag)
         } else {
             Result.success(Bundle.EMPTY)
         }

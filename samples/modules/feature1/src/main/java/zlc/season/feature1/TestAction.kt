@@ -9,7 +9,7 @@ import zlc.season.butterfly.annotation.Destination
 
 @Destination(Destinations.ACTION)
 class TestAction : Action {
-    override fun doAction(context: Context, scheme: String, data: Bundle) {
+    override fun doAction(context: Context, route: String, data: Bundle) {
         Toast.makeText(context, "This is an Action", Toast.LENGTH_SHORT).show()
     }
 }
